@@ -1,0 +1,78 @@
+[ 프로젝트 생성 ]
+django-admin startproject spjt01
+
+[ app생성 ]
+python manage.py startapp students
+
+[ cmd창 생성 ]
+win+r > cmd 입력후 엔터키
+
+[ cmd창에서 디렉토리 위치 이동 ]
+cd C:\workspace\web\aix_web_1007\p1007\spjt01
+
+[ 서버구동 ]
+python manage.py runserver
+
+[ 서버접속 ]
+http://127.0.0.1:8000/
+
+[ 서버종료 ]
+ctrl + c : 종료됨
+
+[이동]
+cd spjt01
+cd.. 앞 폴더가기
+cd\ 폴더 초기화
+
+
+
+
+
+[ 1. 디렉토리 이동 ]
+cd p1007 폴더이동
+
+[ 2. 프로젝트 생성 ]
+django-admin startproject spjt04
+
+[ 3. 디렉토리 이동 ]
+cd spjt04
+
+[ 4. app생성 ]
+python manage.py startapp students
+
+[ 5. cmd창 생성 ]
+win+r > cmd 입력후 엔터키
+
+[ 6. cmd창에서 디렉토리 위치 이동 ]
+cd C:\workspace\web\aix_web_1007\p1007\spjt04
+
+[ 7. 서버구동 ]
+python manage.py runserver
+
+[ 8. 서버접속 ]
+http://127.0.0.1:8000/
+
+[ 9. sjpt04> setting.py ]
+INSTALLED_APPS = [
+'students',
+]
+
+[ 10. sjpt04> urls.py ]
+from django.urls import path,include
+urlpatterns = [
+path('admin/', admin.site.urls),
+path('students/', include('students.urls')),
+]
+
+[ 11. students > urls.py 생성 ]
+from django.urls import path,include
+from . import views
+
+app_name='students'
+urlpatterns = [
+    path('swrite/', views.swrite, name='swrite'),
+]
+
+[ 12. students > views.py ]
+def swrite(request):
+    return render(request,'swrite.html')
