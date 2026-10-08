@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>학생성적입력</h1>
+    <ul>
+        <form action="/stuscore/score_write/" name="frm" method="post">
+        {% csrf_token %}
+        <label>번호</label>
+        <input type="text" name="no" id="no" required><br>
+        <label>이름</label>
+        <input type="text" name="name" id="name" required><br>
+        <label>학교</label>
+        <input type="text" name="school" id="school" required><br>
+        <label>학년</label>
+        <input type="text" name="grade" id="grade" required><br>
+        <label>나이</label>
+        <input type="text" name="age" id="age" required><br>
+        <label>키</label>
+        <input type="text" name="stature" id="stature" required><br>
+        <label>국어</label>
+        <input type="text" name="kor" id="kor" required><br>
+        <label>영어</label>
+        <input type="text" name="eng" id="eng" required><br>
+        <label>수학</label>
+        <input type="text" name="math" id="math" required><br>
+        <label>SW특기</label>
+        <input type="text" name="sw" id="sw" required><br>
+        <input type="submit" value="저장">
+        <br>
+
+    </form>
+        <li><a href="/">메인화면</a></li>
+        <li><a href="/students/slist/">학생리스트</a></li>
+    </ul>
+</body>
+</html>

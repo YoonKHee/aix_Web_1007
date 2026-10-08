@@ -76,3 +76,12 @@ urlpatterns = [
 [ 12. students > views.py ]
 def swrite(request):
     return render(request,'swrite.html')
+
+
+
+
+./ 현재 폴더에서 찾아라
+
+../ 상위폴더에서 찾아라
+
+/ root폴더에서 검색

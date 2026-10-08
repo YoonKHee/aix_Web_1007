@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>학생성적입력</h1>
+    <ul>
+        <form action="/students/swrite/" name="frm" method="post">
+        {% csrf_token %}
+        <label>이름</label>
+        <input type="text" name="name" id="name" required><br>
+        <label>학과</label>
+        <input type="text" name="major" id="major" required><br>
+        <label>학년</label>
+        <input type="text" name="grade" id="grade" required><br>
+        <label>나이</label>
+        <input type="text" name="age" id="age" required><br>
+        <label>성별</label><br>
+        <input type="radio" name="gender" id="man" value="남자">
+        <label for="man">남자</label>
+        <input type="radio" name="gender" id="woman" value="여자">
+        <label for="woman">남자</label>
+        <br>
+        <input type="submit" value="저장">
+        <br>
+
+    </form>
+        <li><a href="/">메인화면</a></li>
+        <li><a href="/students/slist/">학생리스트</a></li>
+    </ul>
+</body>
+</html>
