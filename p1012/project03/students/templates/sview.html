@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+        {% comment %} {%for,it%}, {{name}} {% endcomment %}
+        {% csrf_token %}
+        <label for="">이름</label>
+        <input type="text" name=name id='name'><br>
+        <label for="">학과</label>
+        <input type="text" name=major id='major'><br>
+        <label for="">학년</label>
+        <input type="text" name=grade id='grade'><br>
+        <label for="">나이</label>
+        <input type="text" name=age id='age'><br>
+        <label for="">성별</label>
+        <input type="radio" name=gender id='man' value='남자'>
+        <label for="man">남자</label>
+        <input type="radio" name=gender id='woman' value='여자'>
+        <label for="woman">여자</label><br>
+
+        <a href="/students/slist/"><button>리스트</button></a>
+        <a href="/students/supdate/"><button>수정</button></a>
+        <a href="/students/sdelete/"><button>삭제</button></a>
+        <a href="/"><button>홈으로</button></a>
+        <br>
+
+
+
+
+</body>
+</html>
