@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 목록</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Sans KR", Arial, sans-serif;
+            color: #333;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* HEADER */
+        header {
+            border-bottom: 1px solid #eee;
+        }
+
+        .top {
+            width: 1200px;
+            height: 90px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .menu {
+            display: flex;
+            gap: 40px;
+        }
+
+        .menu li {
+            font-size: 15px;
+        }
+
+        /* TOP BANNER */
+        .visual {
+            height: 280px;
+            background:
+                linear-gradient(
+                    rgba(0, 0, 0, .28),
+                    rgba(0, 0, 0, .28)
+                ),
+                url("https://images.unsplash.com/photo-1506744038136-46273834b3fb")
+                center / cover no-repeat;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .visual h1 {
+            font-size: 42px;
+            font-weight: 400;
+        }
+
+        .visual p {
+            margin-top: 15px;
+        }
+
+        /* CONTENT */
+        .container {
+            width: 1200px;
+            margin: auto;
+            padding: 70px 0 100px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 40px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .breadcrumb span {
+            margin: 0 10px;
+        }
+
+        .title {
+            margin-bottom: 35px;
+        }
+
+        .title h2 {
+            font-size: 32px;
+            font-weight: 500;
+        }
+
+        .title p {
+            margin-top: 10px;
+            color: #999;
+        }
+
+        /* SEARCH */
+        .search {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .search select,
+        .search input {
+            height: 42px;
+            border: 1px solid #ddd;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .search select {
+            width: 120px;
+        }
+
+        .search input {
+            width: 250px;
+            margin-left: 5px;
+        }
+
+        .search button {
+            width: 70px;
+            height: 42px;
+            margin-left: 5px;
+            border: 0;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* STUDENT LIST */
+        .score-list {
+            border-top: 2px solid #333;
+            overflow-x: auto;
+        }
+
+        .score-row {
+            min-height: 70px;
+            display: grid;
+
+            grid-template-columns:
+                70px
+                150px
+                150px
+                100px
+                100px
+                100px
+                170px
+                130px
+                130px;
+
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .score-row:hover {
+            background: #fafafa;
+        }
+
+        .score-header {
+            min-height: 55px;
+            background: #fafafa;
+            font-weight: 600;
+        }
+
+        .score-row .name {
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        .score-row .hobby {
+            padding: 0 8px;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        /* BUTTON */
+        .remarks {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .remarks button {
+            min-width: 50px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid #ccc;
+            background: white;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .remarks button:hover {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        /* WRITE BUTTON */
+        .write-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .write-btn {
+            display: inline-flex;
+            width: 100px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            background: #333;
+            color: white;
+            font-size: 14px;
+        }
+
+        .write-btn:hover {
+            background: #555;
+        }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 45px;
+        }
+
+        .pagination a {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .pagination a.active {
+            background: #333;
+            color: white;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #333;
+            color: #aaa;
+        }
+
+        .footer-inner {
+            width: 1200px;
+            margin: auto;
+            padding: 45px 0;
+        }
+
+        .footer-menu {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .footer-menu a {
+            color: #ddd;
+            font-size: 13px;
+        }
+
+        .footer-info {
+            font-size: 12px;
+            line-height: 2;
+        }
+
+        /* MOBILE */
+        @media screen and (max-width: 768px) {
+            .top,
+            .container,
+            .footer-inner {
+                width: 90%;
+            }
+
+            .menu {
+                display: none;
+            }
+
+            .visual {
+                height: 220px;
+            }
+
+            .visual h1 {
+                font-size: 32px;
+            }
+
+            .container {
+                padding-top: 45px;
+            }
+
+            .search {
+                justify-content: stretch;
+            }
+
+            .search select {
+                width: 100px;
+            }
+
+            .search input {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .score-row {
+                width: 1100px;
+            }
+
+            .footer-menu {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="top">
+            <div class="logo">FOREST</div>
+
+            <ul class="menu">
+                <li><a href="#">소개</a></li>
+                <li><a href="#">뉴스</a></li>
+                <li><a href="#">학생관리</a></li>
+                <li><a href="#">학과정보</a></li>
+                <li><a href="#">문의</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- TOP BANNER -->
+    <section class="visual">
+        <div>
+            <h1>STUDENT</h1>
+            <p>학생 정보를 한눈에 확인하고 관리하세요.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT -->
+    <main>
+        <div class="container">
+
+            <!-- BREADCRUMB -->
+            <div class="breadcrumb">
+                HOME
+                <span>&gt;</span>
+                학생관리
+                <span>&gt;</span>
+                학생목록
+            </div>
+
+            <!-- TITLE -->
+            <div class="title">
+                <h2>학생 목록</h2>
+                <p>
+                    학생별 이름, 학과, 학년, 나이, 성별, 취미 정보를
+                    확인하고 관리할 수 있습니다.
+                </p>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search">
+                <select id="searchType">
+                    <option value="name">이름</option>
+                    <option value="number">번호</option>
+                    <option value="major">학과</option>
+                    <option value="all">전체</option>
+                </select>
+
+                <input
+                    type="text"
+                    id="searchKeyword"
+                    placeholder="검색어를 입력하세요."
+                >
+
+                <button type="button" onclick="searchStudents()">
+                    검색
+                </button>
+            </div>
+
+            <!-- STUDENT LIST -->
+            <div class="score-list">
+
+                <!-- HEADER -->
+                <div class="score-row score-header">
+                    <div>번호</div>
+                    <div>이름</div>
+                    <div>학과</div>
+                    <div>학년</div>
+                    <div>나이</div>
+                    <div>성별</div>
+                    <div>취미</div>
+                    <div>수정</div>
+                    <div>삭제</div>
+                </div>
+
+                <!-- STUDENT 1 -->
+                <div class="score-row student-row"
+                     data-number="1"
+                     data-name="홍길동"
+                     data-major="컴퓨터공학과">
+                    <div>1</div>
+                    <div class="name">홍길동</div>
+                    <div>컴퓨터공학과</div>
+                    <div>3학년</div>
+                    <div>22</div>
+                    <div>남</div>
+                    <div class="hobby">축구, 독서</div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="editStudent(this)">수정</button>
+                    </div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="deleteStudent(this)">삭제</button>
+                    </div>
+                </div>
+
+                <!-- STUDENT 2 -->
+                <div class="score-row student-row"
+                     data-number="2"
+                     data-name="김철수"
+                     data-major="경영학과">
+                    <div>2</div>
+                    <div class="name">김철수</div>
+                    <div>경영학과</div>
+                    <div>2학년</div>
+                    <div>21</div>
+                    <div>남</div>
+                    <div class="hobby">게임, 영화</div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="editStudent(this)">수정</button>
+                    </div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="deleteStudent(this)">삭제</button>
+                    </div>
+                </div>
+
+                <!-- STUDENT 3 -->
+                <div class="score-row student-row"
+                     data-number="3"
+                     data-name="이영희"
+                     data-major="디자인학과">
+                    <div>3</div>
+                    <div class="name">이영희</div>
+                    <div>디자인학과</div>
+                    <div>4학년</div>
+                    <div>23</div>
+                    <div>여</div>
+                    <div class="hobby">그림, 음악</div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="editStudent(this)">수정</button>
+                    </div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="deleteStudent(this)">삭제</button>
+                    </div>
+                </div>
+
+                <!-- STUDENT 4 -->
+                <div class="score-row student-row"
+                     data-number="4"
+                     data-name="박민수"
+                     data-major="전자공학과">
+                    <div>4</div>
+                    <div class="name">박민수</div>
+                    <div>전자공학과</div>
+                    <div>1학년</div>
+                    <div>20</div>
+                    <div>남</div>
+                    <div class="hobby">농구, 여행</div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="editStudent(this)">수정</button>
+                    </div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="deleteStudent(this)">삭제</button>
+                    </div>
+                </div>
+
+                <!-- STUDENT 5 -->
+                <div class="score-row student-row"
+                     data-number="5"
+                     data-name="최지우"
+                     data-major="컴퓨터공학과">
+                    <div>5</div>
+                    <div class="name">최지우</div>
+                    <div>컴퓨터공학과</div>
+                    <div>2학년</div>
+                    <div>21</div>
+                    <div>여</div>
+                    <div class="hobby">독서, 운동</div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="editStudent(this)">수정</button>
+                    </div>
+                    <div class="remarks">
+                        <button type="button"
+                                onclick="deleteStudent(this)">삭제</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- WRITE BUTTON -->
+            <div class="write-area">
+                <a href="student_write.html" class="write-btn">등록</a>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="pagination">
+                <a href="#">«</a>
+                <a href="#">‹</a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#">5</a>
+                <a href="#">›</a>
+                <a href="#">»</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+
+            <div class="footer-menu">
+                <a href="#">회사소개</a>
+                <a href="#">오시는 길</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">이용약관</a>
+            </div>
+
+            <div class="footer-info">
+                학생관리 시스템<br>
+                학생 정보 조회 및 관리 프로그램<br>
+                Copyright © 2026
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // 학생 검색
+        function searchStudents() {
+            const type = document.getElementById("searchType").value;
+            const keyword = document
+                .getElementById("searchKeyword")
+                .value.trim()
+                .toLowerCase();
+
+            const rows = document.querySelectorAll(".student-row");
+
+            rows.forEach(function(row) {
+                const number = row.dataset.number;
+                const name = row.dataset.name.toLowerCase();
+                const major = row.dataset.major.toLowerCase();
+
+                let match = false;
+
+                if (type === "name") {
+                    match = name.includes(keyword);
+                } else if (type === "number") {
+                    match = number.includes(keyword);
+                } else if (type === "major") {
+                    match = major.includes(keyword);
+                } else {
+                    match = row.textContent
+                        .toLowerCase()
+                        .includes(keyword);
+                }
+
+                row.style.display = match ? "grid" : "none";
+            });
+        }
+
+        // Enter 키로 검색
+        document.getElementById("searchKeyword")
+            .addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    searchStudents();
+                }
+            });
+
+        // 학생 정보 수정
+        function editStudent(button) {
+            const row = button.closest(".student-row");
+            const cells = row.children;
+
+            const number = cells[0].textContent.trim();
+            const name = cells[1].textContent.trim();
+            const major = cells[2].textContent.trim();
+            const grade = cells[3].textContent.trim();
+            const age = cells[4].textContent.trim();
+            const gender = cells[5].textContent.trim();
+            const hobby = cells[6].textContent.trim();
+
+            alert(
+                "학생 정보 수정\n\n" +
+                "번호: " + number + "\n" +
+                "이름: " + name + "\n" +
+                "학과: " + major + "\n" +
+                "학년: " + grade + "\n" +
+                "나이: " + age + "\n" +
+                "성별: " + gender + "\n" +
+                "취미: " + hobby + "\n\n" +
+                "실제 수정 기능은 수정 페이지와 연결해야 합니다."
+            );
+        }
+
+        // 학생 정보 삭제
+        function deleteStudent(button) {
+            const row = button.closest(".student-row");
+            const name = row.children[1].textContent.trim();
+
+            if (confirm(name + " 학생 정보를 삭제하시겠습니까?")) {
+                row.remove();
+            }
+        }
+    </script>
+
+</body>
+</html>
+

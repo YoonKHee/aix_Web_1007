@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLAST Shop - 게시글 상세보기</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #1a1a1a;
+    }
+    /* Header */
+    .header {
+      width: 100%;
+      height: 60px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 40px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .top-menu {
+      display: flex;
+      gap: 15px;
+      font-size: 13px;
+      color: #636363;
+      margin-right: 20px;
+    }
+    .top-menu a {
+      text-decoration: none;
+      color: #636363;
+    }
+    .top-menu a:hover {
+      color: #035fe0;
+    }
+    .icons {
+      display: flex;
+      gap: 15px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Detail Container */
+    .detail-container {
+      max-width: 800px;
+      margin: 80px auto;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+    .detail-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .detail-info {
+      display: flex;
+      justify-content: space-between;
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+    .detail-content {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #1a1a1a;
+      white-space: pre-wrap; /* 줄바꿈 유지 */
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 20px;
+    }
+
+    /* Buttons */
+    .detail-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+    .detail-buttons a,
+    .detail-buttons button {
+      text-decoration: none;
+      padding: 8px 18px;
+      font-size: 14px;
+      color: white;
+      background-color: #035fe0;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .detail-buttons a:hover,
+    .detail-buttons button:hover {
+      background-color: #0046b3;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid #ccc;
+      padding: 30px;
+      text-align: center;
+      font-size: 13px;
+      color: #A0A0A0;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; /* 숨김 */
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: #fff;
+      padding: 25px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .modal p {
+      font-size: 16px;
+      margin-bottom: 25px;
+      color: #1a1a1a;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .modal-buttons button {
+      padding: 8px 22px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .modal-buttons .confirm {
+      background-color: #d9534f;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .modal-buttons .confirm:hover {
+      background-color: #c9302c;
+    }
+    .modal-buttons .cancel {
+      background-color: #6c757d;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .modal-buttons .cancel:hover {
+      background-color: #5a6268;
+    }
+
+    /* 댓글 영역 */
+    #commentsSection {
+      max-width: 800px;
+      margin: 40px auto 100px;
+      padding: 0 20px;
+      box-sizing: border-box;
+      border-top: 1px solid #e0e0e0;
+    }
+    #commentsSection h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    #commentForm {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    #commentForm input[type="text"] {
+      flex: 0 0 150px;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #commentForm textarea {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      min-height: 40px;
+    }
+    #commentForm button {
+      padding: 8px 18px;
+      background-color: #035fe0;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #commentForm button:hover {
+      background-color: #0046b3;
+    }
+    #commentsList .comment {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    #commentsList .comment strong {
+      font-weight: bold;
+    }
+    #commentsList .comment span {
+      color: #888;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    #commentsList .comment p {
+      margin: 8px 0 0 0;
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+    /* 댓글 버튼 스타일 */
+    .comment-buttons {
+      margin-top: 8px;
+    }
+    .comment-buttons button {
+      padding: 4px 10px;
+      margin-right: 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      background-color: #035fe0;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .comment-buttons button:hover {
+      background-color: #0046b3;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="top-menu">
+      <a href="#">회원가입</a> |
+      <a href="#">로그인</a> |
+      <a href="#">주문조회</a> |
+      <a href="#">최근본상품</a>
+    </div>
+    <div class="icons">
+      <i class="fas fa-search"></i>
+      <i class="fas fa-user"></i>
+      <i class="fas fa-shopping-bag"></i>
+    </div>
+  </div>
+
+  <!-- Detail View -->
+  <div class="detail-container">
+    <div class="detail-title">[공지] 추석 연휴 배송 안내</div>
+    <div class="detail-info">
+      <div>작성자: 관리자</div>
+      <div>작성일: 2025-09-05</div>
+      <div>조회수: 123</div>
+    </div>
+    <div class="detail-content">
+      안녕하세요, 고객님.<br><br>
+      추석 연휴 기간 동안의 배송 일정에 대해 안내드립니다.<br>
+      9월 15일부터 9월 18일까지는 배송이 지연될 수 있으니 참고 부탁드립니다.<br><br>
+      풍성한 한가위 보내시길 바랍니다.<br><br>
+      감사합니다.<br>
+      VLAST Shop 운영팀 드림.
+    </div>
+    <div class="detail-buttons">
+      <a href="board.html">목록으로</a>
+      <a href="#">수정</a>
+      <button id="deleteBtn">삭제</button>
+    </div>
+  </div>
+
+  <!-- 댓글 섹션 -->
+  <div id="commentsSection">
+    <h3>댓글</h3>
+    <form id="commentForm">
+      <input type="text" id="commentName" placeholder="이름" maxlength="20" />
+      <textarea id="commentText" placeholder="댓글을 입력하세요." maxlength="200"></textarea>
+      <button type="submit">등록</button>
+    </form>
+    <div id="commentsList">
+      <div class="comment">
+        <strong>홍길동</strong> <span>(2025-09-08 14:32)</span>
+        <p>추석 연휴 배송 안내 감사합니다!</p>
+        <div class="comment-buttons">
+          <button class="edit-btn">수정</button>
+          <button class="delete-btn">삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <p>삭제하시겠습니까?</p>
+      <div class="modal-buttons">
+        <button class="confirm" id="confirmDelete">삭제</button>
+        <button class="cancel" id="cancelDelete">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Copyright © VLAST Shop. All rights reserved.
+  </footer>
+
+  <script>
+    const deleteBtn = document.getElementById('deleteBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const cancelDelete = document.getElementById('cancelDelete');
+
+    deleteBtn.addEventListener('click', () => {
+      modalOverlay.style.display = 'flex';
+    });
+
+    cancelDelete.addEventListener('click', () => {
+      modalOverlay.style.display = 'none';
+    });
+
+    confirmDelete.addEventListener('click', () => {
+      modalOverlay.style.display = 'none';
+      // 실제 삭제 로직 삽입 위치
+      alert('게시글이 삭제되었습니다.');
+      // 예: 목록 페이지로 이동
+      window.location.href = 'board.html';
+    });
+
+    // 모달 바깥 클릭 시 닫기
+    modalOverlay.addEventListener('click', (e) => {
+      if(e.target === modalOverlay) {
+        modalOverlay.style.display = 'none';
+      }
+    });
+
+    // 댓글 기능
+    const commentForm = document.getElementById('commentForm');
+    const commentsList = document.getElementById('commentsList');
+
+    commentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('commentName');
+      const textInput = document.getElementById('commentText');
+      const name = nameInput.value.trim();
+      const text = textInput.value.trim();
+
+      if (!name || !text) {
+        alert('이름과 댓글 내용을 모두 입력해주세요.');
+        return;
+      }
+
+      const now = new Date();
+      const formattedDate = now.getFullYear() + '-' +
+                            String(now.getMonth()+1).padStart(2,'0') + '-' +
+                            String(now.getDate()).padStart(2,'0') + ' ' +
+                            String(now.getHours()).padStart(2,'0') + ':' +
+                            String(now.getMinutes()).padStart(2,'0');
+
+      const newComment = document.createElement('div');
+      newComment.classList.add('comment');
+      newComment.style.padding = '12px 15px';
+      newComment.style.borderBottom = '1px solid #e0e0e0';
+
+      newComment.innerHTML = `
+        <strong>${escapeHtml(name)}</strong> <span>(${formattedDate})</span>
+        <p>${escapeHtml(text)}</p>
+        <div class="comment-buttons">
+          <button class="edit-btn">수정</button>
+          <button class="delete-btn">삭제</button>
+        </div>
+      `;
+
+      commentsList.appendChild(newComment);
+
+      nameInput.value = '';
+      textInput.value = '';
+    });
+
+    // 댓글 수정/삭제 이벤트 위임
+    commentsList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        // 삭제 버튼 클릭
+        if (confirm('이 댓글을 삭제하시겠습니까?')) {
+          const commentDiv = e.target.closest('.comment');
+          if (commentDiv) commentDiv.remove();
+        }
+      } else if (e.target.classList.contains('edit-btn')) {
+        // 수정 버튼 클릭
+        const commentDiv = e.target.closest('.comment');
+        if (!commentDiv) return;
+
+        const p = commentDiv.querySelector('p');
+        if (!p) return;
+
+        // 이미 수정 중이면 종료
+        if (commentDiv.querySelector('textarea')) return;
+
+        const originalText = p.textContent;
+
+        // textarea 생성 후 기존 텍스트로 채움
+        const textarea = document.createElement('textarea');
+        textarea.value = originalText;
+        textarea.style.width = '100%';
+        textarea.style.minHeight = '60px';
+
+        // 수정 완료, 취소 버튼 생성
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = '저장';
+        saveBtn.style.marginRight = '8px';
+        saveBtn.style.padding = '4px 10px';
+        saveBtn.style.cursor = 'pointer';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '취소';
+        cancelBtn.style.padding = '4px 10px';
+        cancelBtn.style.cursor = 'pointer';
+
+        // 기존 p, 수정/삭제 버튼 숨기기
+        p.style.display = 'none';
+        e.target.style.display = 'none'; // 수정버튼 숨김
+        const deleteBtn = commentDiv.querySelector('.delete-btn');
+        if (deleteBtn) deleteBtn.style.display = 'none';
+
+        // 수정 버튼 영역에 저장/취소 버튼 추가
+        const btnContainer = commentDiv.querySelector('.comment-buttons');
+        btnContainer.appendChild(saveBtn);
+        btnContainer.appendChild(cancelBtn);
+
+        // 수정 영역에 textarea 추가
+        commentDiv.insertBefore(textarea, btnContainer);
+
+        // 저장 버튼 클릭 시
+        saveBtn.addEventListener('click', () => {
+          const newText = textarea.value.trim();
+          if (!newText) {
+            alert('댓글 내용을 입력해주세요.');
+            return;
+          }
+          p.textContent = newText;
+          cleanupEdit();
+        });
+
+        // 취소 버튼 클릭 시
+        cancelBtn.addEventListener('click', () => {
+          cleanupEdit();
+        });
+
+        // 편집 모드 종료 함수
+        function cleanupEdit() {
+          textarea.remove();
+          saveBtn.remove();
+          cancelBtn.remove();
+          p.style.display = '';
+          e.target.style.display = '';
+          if (deleteBtn) deleteBtn.style.display = '';
+        }
+      }
+    });
+
+    // XSS 방지용 간단 함수
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
