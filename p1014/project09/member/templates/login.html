@@ -9,7 +9,12 @@
   <script>
     if('{{temp}}'=='1'){
       alert('로그인 되었습니다');
-      location.href='/'
+      location.href='/';
+    }else if('{{temp}}'=='0'){
+      alert('로그인에 실패하였습니다.');
+    }else if('{{temp}}'=='2'){
+      alert('로그아웃 되었습니다.');
+      location.href='/';
     }
   </script>
 </head>

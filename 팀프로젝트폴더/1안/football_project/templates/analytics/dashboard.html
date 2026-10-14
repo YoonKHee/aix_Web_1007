@@ -2,237 +2,245 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>K리그 전술 분석 & 베스트 11 필드 뷰</title>
+    <title>K리그 베스트 11 전술 필드 (가로형)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 축구 필드 스타일링 */
-        .football-pitch {
-            background: linear-gradient(to bottom, #2b7a3e, #1e562c);
-            border: 3px solid #ffffff;
+        /* 가로형 축구장 스타일 */
+        .football-pitch-horizontal {
+            background: linear-gradient(to right, #2b7a3e, #1e562c);
+            border: 4px solid #ffffff;
             border-radius: 15px;
-            min-height: 600px;
+            min-height: 520px;
             position: relative;
-            padding: 30px 15px;
+            padding: 20px 30px;
             box-shadow: inset 0 0 50px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
         }
-        .pitch-line-center {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: rgba(255,255,255,0.4);
+        /* 가로형 중앙선 및 센터클 */
+        .pitch-line-center-v {
+            position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: rgba(255,255,255,0.4);
         }
         .pitch-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            border: 2px solid rgba(255,255,255,0.4);
-            border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 130px; height: 130px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%;
         }
-        /* 선수 카드 (필드 위) */
+        /* 선수 칩 UI */
         .player-chip {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-radius: 10px;
+            padding: 8px 6px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            width: 130px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: 110px;
             margin: 0 auto;
-            transition: transform 0.2s;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
         }
         .player-chip:hover {
-            transform: scale(1.05);
+            transform: scale(1.08);
+            background: #ffffff;
+        }
+        .player-img {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0d6efd;
+            margin-bottom: 4px;
+        }
+        /* 좌측 선수 상세 창 스타일 */
+        .player-detail-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 20px;
+            border-left: 5px solid #198754;
+            animation: fadeIn 0.3s ease-in-out;
+            min-height: 520px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
     </style>
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-        <h1 class="mb-4 text-center fw-bold">⚽ K리그 데이터 분석 & Best 11 전술 필드</h1>
+    <div class="container-fluid px-4 py-4">
+        <!-- dashboard.html 상단 타이틀 영역 내부에 버튼 추가 -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="fw-bold fs-2">⚽ K리그 Best 11 가로 전술 필드</h1>
+        <div>
+            <a href="{% url 'team_battle' %}" class="btn btn-danger fw-bold me-2">⚔️ 팀 대 팀 맞대결 빌더</a>
+            <a href="{% url 'player_stats' %}" class="btn btn-outline-dark fw-bold">📊 전체 선수 점수표 보기 &rarr;</a>
+        </div>
+    </div>
         
-        <!-- 검색 및 설정 폼 -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
+        <!-- 옵션 설정 폼 -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body py-2">
                 <form method="GET" class="row g-3 align-items-center">
                     <div class="col-auto">
-                        <label class="fw-bold">구단 선택:</label>
-                        <select name="team" class="form-select">
+                        <label class="fw-bold small">구단 선택:</label>
+                        <select name="team" class="form-select form-select-sm">
                             {% for t in teams_list %}
                                 <option value="{{ t }}" {% if t == current_team %}selected{% endif %}>{{ t }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    
                     <div class="col-auto">
-                        <label class="fw-bold">포메이션:</label>
-                        <select name="formation" class="form-select">
+                        <label class="fw-bold small">포메이션:</label>
+                        <select name="formation" class="form-select form-select-sm">
                             {% for f in formations %}
                                 <option value="{{ f }}" {% if f == current_formation %}selected{% endif %}>{{ f }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    
                     <div class="col-auto">
-                        <label class="fw-bold">최소 출전시간(분):</label>
-                        <input type="number" name="min_mins" value="{{ current_mins }}" class="form-control" step="10">
+                        <label class="fw-bold small">최소 출전시간(분):</label>
+                        <input type="number" name="min_mins" value="{{ current_mins }}" class="form-control form-control-sm" step="10">
                     </div>
-                    
                     <div class="col-auto align-self-end">
-                        <button type="submit" class="btn btn-success fw-bold">필드 갱신하기</button>
+                        <button type="submit" class="btn btn-success btn-sm fw-bold">필드 갱신</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- 포지션별 평균 점수 요약 바 -->
-        <div class="row mb-4">
+        <!-- 포지션별 평균 점수 바 -->
+        <div class="row mb-3">
             <div class="col-12">
                 <div class="card shadow-sm bg-white">
-                    <div class="card-body d-flex justify-content-around text-center">
-                        <div>
-                            <span class="text-muted d-block small">포지션 평균 (FW)</span>
-                            <strong class="fs-4 text-danger">{{ position_averages.FW|default:"0.0" }}점</strong>
-                        </div>
+                    <div class="card-body py-2 d-flex justify-content-around text-center">
+                        <div><span class="text-muted d-block small">FW 평균</span><strong class="fs-5 text-danger">{{ position_averages.FW|default:"0.0" }}점</strong></div>
                         <div class="vr"></div>
-                        <div>
-                            <span class="text-muted d-block small">포지션 평균 (MF)</span>
-                            <strong class="fs-4 text-primary">{{ position_averages.MF|default:"0.0" }}점</strong>
-                        </div>
+                        <div><span class="text-muted d-block small">MF 평균</span><strong class="fs-5 text-primary">{{ position_averages.MF|default:"0.0" }}점</strong></div>
                         <div class="vr"></div>
-                        <div>
-                            <span class="text-muted d-block small">포지션 평균 (DF)</span>
-                            <strong class="fs-4 text-success">{{ position_averages.DF|default:"0.0" }}점</strong>
-                        </div>
+                        <div><span class="text-muted d-block small">DF 평균</span><strong class="fs-5 text-success">{{ position_averages.DF|default:"0.0" }}점</strong></div>
                         <div class="vr"></div>
-                        <div>
-                            <span class="text-muted d-block small">포지션 평균 (GK)</span>
-                            <strong class="fs-4 text-warning dark">{{ position_averages.GK|default:"0.0" }}점</strong>
-                        </div>
+                        <div><span class="text-muted d-block small">GK 평균</span><strong class="fs-5 text-warning">{{ position_averages.GK|default:"0.0" }}점</strong></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ⚽ 축구 필드 시각화 섹션 -->
-        <h3 class="mb-3 text-success fw-bold">🏆 [{{ current_team }}] Best 11 전술 필드 ({{ current_formation }})</h3>
-        <div class="football-pitch mb-5">
-            <div class="pitch-line-center"></div>
-            <div class="pitch-circle"></div>
+        <!-- 메인 레이아웃: [왼쪽] 상세 기록 창 (4열) | [오른쪽] 가로 축구장 (8열) -->
+        <div class="row">
+            <!-- 📋 [좌측] 필드에서 선택한 선수의 상세 기록 창 -->
+            <div class="col-lg-4 mb-4">
+                <div id="default-msg" class="player-detail-card text-center text-muted d-flex flex-column justify-content-center align-items-center">
+                    <h5 class="fw-bold">🏟️ 필드의 선수를 클릭하세요!</h5>
+                    <p class="small text-secondary mb-0">오른쪽 가로 축구장에 위치한 선수를 누르면<br>해당 선수의 세부 기록이 이곳에 나타납니다.</p>
+                </div>
 
-            <!-- FW 라인 -->
-            <div class="row justify-content-center mb-4 pt-3 position-relative">
-                <div class="text-center text-white mb-2 fw-bold small">--- 공격수 (FW) ---</div>
                 {% for p in best_11 %}
-                    {% if p.포지션 == 'FW' %}
-                    <div class="col-md-3 col-4">
-                        <div class="player-chip">
-                            <div class="badge bg-danger mb-1">{{ p.포지션 }}</div>
-                            <div class="small text-muted">{{ p.소속구단 }}</div>
-                            <div class="fw-bold text-dark text-truncate">{{ p.선수명 }}</div>
-                            <div class="text-primary fw-bold">{{ p.종합_평가점수 }}점</div>
+                <div id="player-card-{{ forloop.counter0 }}" class="player-detail-card d-none">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover;" class="border me-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">{{ p.선수명 }} <span class="badge bg-secondary fs-6">No.{{ p.등번호|floatformat:0 }}</span></h5>
+                            <span class="text-muted small">{{ p.소속구단 }} | {{ p.포지션 }}</span>
                         </div>
                     </div>
-                    {% endif %}
+                    <hr class="my-2">
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                        <li class="list-group-item d-flex justify-content-between px-0"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-success bg-opacity-10 rounded text-center">
+                        <span class="small text-success fw-bold d-block mb-1">종합 평가 점수</span>
+                        <div class="fs-3 fw-bold text-success">{{ p.종합_평가점수 }}점</div>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
 
-            <!-- MF 라인 -->
-            <div class="row justify-content-center mb-4 position-relative">
-                <div class="text-center text-white mb-2 fw-bold small">--- 미드필더 (MF) ---</div>
-                {% for p in best_11 %}
-                    {% if p.포지션 == 'MF' %}
-                    <div class="col-md-2 col-4 mb-2">
-                        <div class="player-chip">
-                            <div class="badge bg-primary mb-1">{{ p.포지션 }}</div>
-                            <div class="small text-muted">{{ p.소속구단 }}</div>
-                            <div class="fw-bold text-dark text-truncate">{{ p.선수명 }}</div>
-                            <div class="text-primary fw-bold">{{ p.종합_평가점수 }}점</div>
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
+            <!-- ⚽ [우측] 가로 축구장 UI -->
+            <div class="col-lg-8 mb-4">
+                <div class="football-pitch-horizontal">
+                    <div class="pitch-line-center-v"></div>
+                    <div class="pitch-circle"></div>
 
-            <!-- DF 라인 -->
-            <div class="row justify-content-center mb-4 position-relative">
-                <div class="text-center text-white mb-2 fw-bold small">--- 수비수 (DF) ---</div>
-                {% for p in best_11 %}
-                    {% if p.포지션 == 'DF' %}
-                    <div class="col-md-2 col-3 mb-2">
-                        <div class="player-chip">
-                            <div class="badge bg-success mb-1">{{ p.포지션 }}</div>
-                            <div class="small text-muted">{{ p.소속구단 }}</div>
-                            <div class="fw-bold text-dark text-truncate">{{ p.선수명 }}</div>
-                            <div class="text-primary fw-bold">{{ p.종합_평가점수 }}점</div>
+                    <!-- 가로 배치 (GK -> DF -> MF -> FW) -->
+                    <div class="w-100 d-flex justify-content-between align-items-center position-relative z-1">
+                        
+                        <!-- 1. GK 열 (왼쪽 끝) -->
+                        <div class="d-flex flex-column justify-content-center gap-3">
+                            {% for p in best_11 %}
+                                {% if p.포지션 == 'GK' %}
+                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
+                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                    <div class="badge bg-dark mb-1">{{ p.포지션 }}</div>
+                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
 
-            <!-- GK 라인 -->
-            <div class="row justify-content-center position-relative pb-3">
-                <div class="text-center text-white mb-2 fw-bold small">--- 골키퍼 (GK) ---</div>
-                {% for p in best_11 %}
-                    {% if p.포지션 == 'GK' %}
-                    <div class="col-md-3 col-4">
-                        <div class="player-chip">
-                            <div class="badge bg-dark mb-1">{{ p.포지션 }}</div>
-                            <div class="small text-muted">{{ p.소속구단 }}</div>
-                            <div class="fw-bold text-dark text-truncate">{{ p.선수명 }}</div>
-                            <div class="text-primary fw-bold">{{ p.종합_평가점수 }}점</div>
+                        <!-- 2. DF 열 -->
+                        <div class="d-flex flex-column justify-content-around h-100 gap-2">
+                            {% for p in best_11 %}
+                                {% if p.포지션 == 'DF' %}
+                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
+                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                    <div class="badge bg-success mb-1">{{ p.포지션 }}</div>
+                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
 
-        <!-- 전체 선수 순위 테이블 -->
-        <h3 class="mb-3 fw-bold">📊 [{{ current_team }}] 전체 선수 평가 순위</h3>
-        <div class="card shadow-sm">
-            <div class="card-body table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>순위</th>
-                            <th>선수명</th>
-                            <th>소속구단</th>
-                            <th>포지션</th>
-                            <th>등번호</th>
-                            <th>출전(분)</th>
-                            <th>득점</th>
-                            <th>도움</th>
-                            <th>공격점수</th>
-                            <th>빌드업점수</th>
-                            <th>수비점수</th>
-                            <th>종합점수</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in all_players %}
-                        <tr>
-                            <td class="fw-bold text-muted">{{ forloop.counter }}</td>
-                            <td class="fw-bold">{{ p.선수명 }}</td>
-                            <td><span class="badge bg-light text-dark border">{{ p.소속구단 }}</span></td>
-                            <td><span class="badge bg-info text-dark">{{ p.포지션 }}</span></td>
-                            <td>{{ p.등번호|floatformat:0 }}</td>
-                            <td>{{ p.출전시간_분|floatformat:0 }}</td>
-                            <td>{{ p.득점|floatformat:0 }}</td>
-                            <td>{{ p.도움|floatformat:0 }}</td>
-                            <td>{{ p.공격_점수 }}</td>
-                            <td>{{ p.빌드업_점수 }}</td>
-                            <td>{{ p.수비_점수 }}</td>
-                            <td class="fw-bold text-success fs-6">{{ p.종합_평가점수 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        <!-- 3. MF 열 -->
+                        <div class="d-flex flex-column justify-content-around h-100 gap-2">
+                            {% for p in best_11 %}
+                                {% if p.포지션 == 'MF' %}
+                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
+                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                    <div class="badge bg-primary mb-1">{{ p.포지션 }}</div>
+                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- 4. FW 열 (오른쪽 끝) -->
+                        <div class="d-flex flex-column justify-content-around h-100 gap-3">
+                            {% for p in best_11 %}
+                                {% if p.포지션 == 'FW' %}
+                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
+                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                    <div class="badge bg-danger mb-1">{{ p.포지션 }}</div>
+                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- ⚡ 자바스크립트: 선수 선택 시 좌측 상세 창 출력 -->
+    <script>
+        function showPlayerDetail(index) {
+            document.getElementById('default-msg').classList.add('d-none');
+            const allCards = document.querySelectorAll('[id^="player-card-"]');
+            allCards.forEach(card => card.classList.add('d-none'));
+
+            const targetCard = document.getElementById('player-card-' + index);
+            if (targetCard) {
+                targetCard.classList.remove('d-none');
+            }
+        }
+    </script>
 </body>
 </html>

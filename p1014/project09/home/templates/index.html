@@ -21,11 +21,11 @@
         </div>
         <ul class="main-menu">
             <li>
-                <a href="#">포레스트</a>
+                <a href="/students/slist/">학생리스트</a>
             </li>
 
             <li>
-                <a href="#">스파</a>
+                <a href="/students/swrite/">학생성적입력</a>
             </li>
 
             <li>
@@ -52,8 +52,12 @@
 
 
         <div class="header-right">
-            
+            {% if request.session.s_id %}
+            <a>{{request.session.s_nickname}}</a>
+            <a href="/member/logout/">로그아웃</a>
+            {% else %}
             <a href="/member/login/">로그인</a>
+            {% endif %}
             <a href="#">회원가입</a>
             <a href="/admin/">관리자</a>
         </div>

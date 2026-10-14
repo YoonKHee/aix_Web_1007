@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 목록</title>
+    <link rel="stylesheet" href="/static/css/slist.css">
+    
+</head>
+
+
+<body>
+
+<!-- HEADER -->
+<header>
+
+    <div class="top">
+
+        <div class="logo">
+            FOREST
+        </div>
+
+        <ul class="menu">
+            <li><a href="/">HOME</a></li>
+            <li><a href="#">뉴스</a></li>
+            <li><a href="#">학생관리</a></li>
+            <li><a href="#">객실</a></li>
+            <li><a href="#">예약</a></li>
+        </ul>
+
+    </div>
+
+</header>
+
+
+<!-- TOP BANNER -->
+<section class="visual">
+
+    <div>
+        <h1>SCORE</h1>
+        <p>학생을 한눈에 확인하고 관리하세요.</p>
+    </div>
+
+</section>
+
+
+<!-- CONTENT -->
+<main>
+
+    <div class="container">
+
+        <!-- BREADCRUMB -->
+        <div class="breadcrumb">
+            HOME
+            <span>></span>
+            학생관리
+            <span>></span>
+            학생목록
+        </div>
+
+
+        <!-- TITLE -->
+        <div class="title">
+            <h2>학생 목록</h2>
+            <p>
+                학생을 확인하고 관리할 수 있습니다.
+            </p>
+        </div>
+
+
+        <!-- SEARCH -->
+        <div class="search">
+
+            <select id='search'>
+                <option>이름</option>
+                <option>번호</option>
+                <option>학과</option>
+                <option>전체</option>
+            </select>
+
+            <input
+                type="text"
+                id = "searchKeyword"
+                placeholder="검색어를 입력하세요."
+            >
+
+            <button type="button">
+                검색
+            </button>
+
+        </div>
+
+
+        <!-- SCORE LIST -->
+        <div class="score-list">
+
+            <!-- HEADER -->
+            <div class="score-row score-header">
+
+                <div>번호</div>
+                <div>이름</div>
+                <div>학과</div>
+                <div>학년</div>
+                <div>나이</div>
+                <div>취미</div>
+                <div>수정</div>
+                <div>삭제</div>
+            </div>
+
+
+            <!-- STUDENT 1 -->
+            {% for stu in list %}
+            <div class="score-row students-row"
+                data-number='{{stu.no}}'
+                data-name='{{stu.name}}'
+                data-major='{{stu.major}}'>
+
+                <div class="name">{{stu.no}}</div>
+                <div>{{stu.name}}</div>
+                <div>{{stu.major}}</div>
+                <div>{{stu.grade}}</div>
+                <div>{{stu.age}}</div>
+                <div>{{stu.gender}}</div>
+                <div class="hobby">{{stu.hobby}}</div>
+                <div class="remarks">
+                    <button type="button" onclick='editStudent'(this)>수정</button>
+                    <button type="button" onclick=deleteSudents(this)>삭제</button>
+                </div>
+            </div>
+            {% endfor %}
+
+            
+        <!-- WRITE BUTTON -->
+        <div class="write-area">
+
+            <a href="#" class="write-btn">
+                등록
+            </a>
+
+        </div>
+
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+
+            <a href="#">«</a>
+            <a href="#">‹</a>
+
+            <a href="#" class="active">
+                1
+            </a>
+
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+
+            <a href="#">›</a>
+            <a href="#">»</a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- FOOTER -->
+<footer>
+
+    <div class="footer-inner">
+
+        <div class="footer-menu">
+            <a href="#">회사소개</a>
+            <a href="#">오시는 길</a>
+            <a href="#">개인정보처리방침</a>
+            <a href="#">이용약관</a>
+        </div>
+
+        <div class="footer-info">
+            학생관리 시스템<br>
+            학생 학생 조회 및 관리 프로그램<br>
+            Copyright © 2026
+        </div>
+
+    </div>
+
+</footer>
+
+</body>
+</html>
