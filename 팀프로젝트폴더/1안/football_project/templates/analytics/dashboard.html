@@ -5,17 +5,30 @@
     <title>K리그 베스트 11 전술 필드</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 🏟️ 확장된 와이드 가로형 축구장 */
+        /* ✅ 1. 화면 전체 가로 스크롤 방지 추가 */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ✅ 2. 오른쪽 끝(공격수 등)에서 왼쪽으로 팝업이 뜨게 만드는 클래스 추가 */
+        .player-popup-card.popup-left {
+            left: auto !important;
+            right: 140px !important; /* 선수 칩의 왼쪽 방향으로 위치 설정 */
+        }
+
+
+        /* 🏟️ 화면을 가득 채우는 와이드 축구장 */
         .football-pitch-wide {
             background: linear-gradient(90deg, #1b4d27 0%, #2b7a3e 50%, #1b4d27 100%);
             border: 4px solid #ffffff;
             border-radius: 20px;
-            min-height: 600px;
+            min-height: 700px;
             position: relative;
-            padding: 30px 40px;
-            box-shadow: inset 0 0 70px rgba(0,0,0,0.4);
+            padding: 40px 60px;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
+            width: 100%;
         }
         .pitch-line-center-v {
             position: absolute; top: 0; left: 50%; width: 3px; height: 100%; background: rgba(255,255,255,0.4);
@@ -47,39 +60,37 @@
             border: 2px solid #0d6efd;
             margin-bottom: 4px;
         }
-        /* ⬡ 6각형 스테이터스 배지 스타일 */
-        .hexagon-stat-badge {
-            width: 75px;
-            height: 65px;
-            background: #198754;
-            color: #fff;
+        
+        /* 📋 선수 칩과 팝업을 감싸는 래퍼 및 플로팅 팝업 카드 스타일 */
+        .player-wrapper {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin: 0 auto 10px auto;
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            transition: transform 0.2s;
+            display: inline-block;
         }
-        .hexagon-stat-badge:hover {
-            transform: scale(1.05);
-        }
-        /* 선수 옆에 뜨는 미니 상세 패널 */
-        .player-detail-panel {
+        .player-popup-card {
+            position: absolute;
+            left: 140px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 280px;
             background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            padding: 25px;
-            border-left: 6px solid #198754;
-            animation: fadeIn 0.3s ease-in-out;
-            min-height: 560px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 15px;
+            border-left: 5px solid #198754;
+            z-index: 100;
+            display: none;
+            text-align: left;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+
+                /* ✅ 1. 화면 전체 가로 스크롤 방지 */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ✅ 2. 오른쪽 끝(공격수)에서 왼쪽으로 팝업이 뜨도록 설정하는 클래스 */
+        .player-popup-card.popup-left {
+            left: auto !important;
+            right: 140px !important;
         }
     </style>
 </head>
@@ -87,7 +98,7 @@
     <div class="container-fluid py-4 px-4">
         <!-- 헤더 및 상단 내비게이션 -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="fw-bold fs-2">⚽ K리그 Best 11 전술 필드</h1>
+            <h1 class="fw-bold fs-2">⚽ K리그 Best 11 가로 전술 필드</h1>
             <div>
                 <a href="{% url 'player_stats' %}" class="btn btn-outline-dark fw-bold">📊 전체 선수 점수표 보기 &rarr;</a>
             </div>
@@ -141,53 +152,9 @@
             </div>
         </div>
 
-        <!-- 메인 레이아웃: [왼쪽] 선수의 6각형 스테이터스 및 상세 수치 | [오른쪽] 넓어진 가로형 축구장 -->
+        <!-- 메인 레이아웃: 화면 전체를 채우는 와이드 축구장 -->
         <div class="row">
-            <!-- 📋 [좌측] 선택한 선수의 6각형 스테이터스 패널 -->
-            <div class="col-lg-4 mb-4">
-                <div id="default-msg" class="player-detail-panel text-center text-muted d-flex flex-column justify-content-center align-items-center">
-                    <h5 class="fw-bold">🏟️ 필드의 선수를 클릭해보세요!</h5>
-                    <p class="small text-secondary mb-0">오른쪽 전술 필드의 선수 카드를 누르면<br>좌측에 6각형 스테이터스와 세부 수치가 나타납니다.</p>
-                </div>
-
-                {% for p in best_11 %}
-                <div id="player-card-{{ forloop.counter0 }}" class="player-detail-panel d-none">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" class="border me-3">
-                        <div>
-                            <h5 class="fw-bold mb-0">{{ p.선수명 }} <span class="badge bg-secondary fs-6">No.{{ p.등번호|floatformat:0 }}</span></h5>
-                            <span class="text-muted small">{{ p.소속구단 }} | {{ p.포지션 }}</span>
-                        </div>
-                    </div>
-                    <hr class="my-2">
-
-                    <!-- ⬡ 6각형 스테이터스 형태의 종합 평가점수 -->
-                    <div class="text-center my-3">
-                        <span class="text-muted small d-block mb-1">HEXAGON EVALUATION SCORE</span>
-                        <div class="hexagon-stat-badge">
-                            <span style="font-size: 0.65rem; opacity: 0.8;">TOTAL</span>
-                            <span style="font-size: 1rem; line-height: 1.1;">{{ p.종합_평가점수 }}</span>
-                        </div>
-                    </div>
-
-                    <!-- 📊 수치는 그 밑에 따로 깔끔하게 정렬 -->
-                    <div class="bg-light p-3 rounded border">
-                        <h6 class="fw-bold text-success mb-2 small">📈 세부 기록 및 지표</h6>
-                        <ul class="list-group list-group-flush small bg-transparent">
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
-                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
-                        </ul>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- ⚽ [우측] 넓어진 가로형 축구장 UI (GK -> DF -> MF -> FW) -->
-            <div class="col-lg-8 mb-4">
+            <div class="col-12 mb-4">
                 <div class="football-pitch-wide">
                     <div class="pitch-line-center-v"></div>
                     <div class="pitch-circle"></div>
@@ -198,11 +165,69 @@
                         <div class="d-flex flex-column justify-content-center gap-3">
                             {% for p in best_11 %}
                                 {% if p.포지션 == 'GK' %}
-                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
-                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
-                                    <div class="badge bg-dark mb-1">{{ p.포지션 }}</div>
-                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                <div class="player-wrapper">
+                                    <div class="player-chip" onclick="togglePlayerPopup('popup-gk-{{ forloop.counter }}')">
+                                        <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                        <div class="badge bg-dark mb-1">{{ p.포지션 }}</div>
+                                        <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
+                                            {% for cand in slot_candidates.GK %}
+                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                    </div>
+                                    
+                                    <!-- GK 선수 팝업 카드 -->
+                                    <div id="popup-gk-{{ forloop.counter }}" class="player-popup-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;" class="border me-2">
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark">{{ p.선수명 }} <span class="badge bg-secondary fs-7">No.{{ p.등번호|floatformat:0 }}</span></h6>
+                                                <span class="text-muted small" style="font-size: 0.75rem;">{{ p.소속구단 }} | {{ p.포지션 }}</span>
+                                            </div>
+                                            <button type="button" class="btn-close ms-auto" style="font-size: 0.7rem;" onclick="event.stopPropagation(); closePopup('popup-gk-{{ forloop.counter }}')"></button>
+                                        </div>
+                                        <hr class="my-1">
+
+                                        <!-- ⬡ 포지션별 맞춤형 육각형 능력치 레이더 그래프 (SVG) -->
+                                        <div class="text-center my-1">
+                                            <span class="text-muted small d-block mb-1 fw-bold" style="font-size: 0.75rem;">⬡ {{ p.포지션 }} 맞춤형 육각형 능력치</span>
+                                            <svg width="150" height="140" viewBox="0 0 180 170" class="mx-auto d-block">
+                                                <polygon points="90,25 137.5,52.5 137.5,107.5 90,135 42.5,107.5 42.5,52.5" fill="none" stroke="#dee2e6" stroke-width="1.5"></polygon>
+                                                <polygon points="90,45 120,62.5 120,97.5 90,115 60,97.5 60,62.5" fill="none" stroke="#e9ecef" stroke-width="1" stroke-dasharray="3,3"></polygon>
+                                                <line x1="90" y1="80" x2="90" y2="25" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="90" y2="135" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <polygon points="{{ p.hex_points }}" fill="rgba(25, 135, 84, 0.45)" stroke="#198754" stroke-width="2.5"></polygon>
+                                                <text x="90" y="15" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">선방능력</text>
+                                                <text x="145" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="start">킥력</text>
+                                                <text x="145" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="start">안정감</text>
+                                                <text x="90" y="148" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">클린시트</text>
+                                                <text x="35" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="end">세이빙</text>
+                                                <text x="35" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="end">종합점수</text>
+                                            </svg>
+                                            <div class="badge bg-success mt-1" style="font-size: 0.75rem;">종합 점수: {{ p.종합_평가점수 }}점</div>
+                                        </div>
+
+                                        <!-- 📊 세부 수치 표 -->
+                                        <div class="bg-light p-2 rounded border mt-1" style="font-size: 0.8rem;">
+                                            <h6 class="fw-bold text-success mb-1" style="font-size: 0.75rem;">📈 세부 기록 및 지표</h6>
+                                            <ul class="list-group list-group-flush bg-transparent">
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -212,11 +237,67 @@
                         <div class="d-flex flex-column justify-content-around h-100 gap-2">
                             {% for p in best_11 %}
                                 {% if p.포지션 == 'DF' %}
-                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
-                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
-                                    <div class="badge bg-success mb-1">{{ p.포지션 }}</div>
-                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                <div class="player-wrapper">
+                                    <div class="player-chip" onclick="togglePlayerPopup('popup-df-{{ forloop.counter }}')">
+                                        <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                        <div class="badge bg-success mb-1">{{ p.포지션 }}</div>
+                                        <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
+                                            {% for cand in slot_candidates.DF %}
+                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                    </div>
+                                    
+                                    <!-- DF 선수 팝업 카드 -->
+                                    <div id="popup-df-{{ forloop.counter }}" class="player-popup-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;" class="border me-2">
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark">{{ p.선수명 }} <span class="badge bg-secondary fs-7">No.{{ p.등번호|floatformat:0 }}</span></h6>
+                                                <span class="text-muted small" style="font-size: 0.75rem;">{{ p.소속구단 }} | {{ p.포지션 }}</span>
+                                            </div>
+                                            <button type="button" class="btn-close ms-auto" style="font-size: 0.7rem;" onclick="event.stopPropagation(); closePopup('popup-df-{{ forloop.counter }}')"></button>
+                                        </div>
+                                        <hr class="my-1">
+
+                                        <div class="text-center my-1">
+                                            <span class="text-muted small d-block mb-1 fw-bold" style="font-size: 0.75rem;">⬡ {{ p.포지션 }} 맞춤형 육각형 능력치</span>
+                                            <svg width="150" height="140" viewBox="0 0 180 170" class="mx-auto d-block">
+                                                <polygon points="90,25 137.5,52.5 137.5,107.5 90,135 42.5,107.5 42.5,52.5" fill="none" stroke="#dee2e6" stroke-width="1.5"></polygon>
+                                                <polygon points="90,45 120,62.5 120,97.5 90,115 60,97.5 60,62.5" fill="none" stroke="#e9ecef" stroke-width="1" stroke-dasharray="3,3"></polygon>
+                                                <line x1="90" y1="80" x2="90" y2="25" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="90" y2="135" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <polygon points="{{ p.hex_points }}" fill="rgba(25, 135, 84, 0.45)" stroke="#198754" stroke-width="2.5"></polygon>
+                                                <text x="90" y="15" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">대인방어</text>
+                                                <text x="145" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="start">빌드업</text>
+                                                <text x="145" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="start">태클</text>
+                                                <text x="90" y="148" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">공중볼</text>
+                                                <text x="35" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="end">클린시트</text>
+                                                <text x="35" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="end">종합점수</text>
+                                            </svg>
+                                            <div class="badge bg-success mt-1" style="font-size: 0.75rem;">종합 점수: {{ p.종합_평가점수 }}점</div>
+                                        </div>
+
+                                        <div class="bg-light p-2 rounded border mt-1" style="font-size: 0.8rem;">
+                                            <h6 class="fw-bold text-success mb-1" style="font-size: 0.75rem;">📈 세부 기록 및 지표</h6>
+                                            <ul class="list-group list-group-flush bg-transparent">
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -226,11 +307,67 @@
                         <div class="d-flex flex-column justify-content-around h-100 gap-2">
                             {% for p in best_11 %}
                                 {% if p.포지션 == 'MF' %}
-                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
-                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
-                                    <div class="badge bg-primary mb-1">{{ p.포지션 }}</div>
-                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                <div class="player-wrapper">
+                                    <div class="player-chip" onclick="togglePlayerPopup('popup-mf-{{ forloop.counter }}')">
+                                        <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                        <div class="badge bg-primary mb-1">{{ p.포지션 }}</div>
+                                        <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
+                                            {% for cand in slot_candidates.MF %}
+                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                    </div>
+                                    
+                                    <!-- MF 선수 팝업 카드 -->
+                                    <div id="popup-mf-{{ forloop.counter }}" class="player-popup-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;" class="border me-2">
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark">{{ p.선수명 }} <span class="badge bg-secondary fs-7">No.{{ p.등번호|floatformat:0 }}</span></h6>
+                                                <span class="text-muted small" style="font-size: 0.75rem;">{{ p.소속구단 }} | {{ p.포지션 }}</span>
+                                            </div>
+                                            <button type="button" class="btn-close ms-auto" style="font-size: 0.7rem;" onclick="event.stopPropagation(); closePopup('popup-mf-{{ forloop.counter }}')"></button>
+                                        </div>
+                                        <hr class="my-1">
+
+                                        <div class="text-center my-1">
+                                            <span class="text-muted small d-block mb-1 fw-bold" style="font-size: 0.75rem;">⬡ {{ p.포지션 }} 맞춤형 육각형 능력치</span>
+                                            <svg width="150" height="140" viewBox="0 0 180 170" class="mx-auto d-block">
+                                                <polygon points="90,25 137.5,52.5 137.5,107.5 90,135 42.5,107.5 42.5,52.5" fill="none" stroke="#dee2e6" stroke-width="1.5"></polygon>
+                                                <polygon points="90,45 120,62.5 120,97.5 90,115 60,97.5 60,62.5" fill="none" stroke="#e9ecef" stroke-width="1" stroke-dasharray="3,3"></polygon>
+                                                <line x1="90" y1="80" x2="90" y2="25" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="90" y2="135" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <polygon points="{{ p.hex_points }}" fill="rgba(25, 135, 84, 0.45)" stroke="#198754" stroke-width="2.5"></polygon>
+                                                <text x="90" y="15" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">패스</text>
+                                                <text x="145" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="start">빌드업</text>
+                                                <text x="145" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="start">활동량</text>
+                                                <text x="90" y="148" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">공격가담</text>
+                                                <text x="35" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="end">도움</text>
+                                                <text x="35" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="end">종합점수</text>
+                                            </svg>
+                                            <div class="badge bg-success mt-1" style="font-size: 0.75rem;">종합 점수: {{ p.종합_평가점수 }}점</div>
+                                        </div>
+
+                                        <div class="bg-light p-2 rounded border mt-1" style="font-size: 0.8rem;">
+                                            <h6 class="fw-bold text-success mb-1" style="font-size: 0.75rem;">📈 세부 기록 및 지표</h6>
+                                            <ul class="list-group list-group-flush bg-transparent">
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -240,11 +377,67 @@
                         <div class="d-flex flex-column justify-content-around h-100 gap-3">
                             {% for p in best_11 %}
                                 {% if p.포지션 == 'FW' %}
-                                <div class="player-chip" onclick="showPlayerDetail('{{ forloop.counter0 }}')">
-                                    <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
-                                    <div class="badge bg-danger mb-1">{{ p.포지션 }}</div>
-                                    <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                    <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                <div class="player-wrapper">
+                                    <div class="player-chip" onclick="togglePlayerPopup('popup-fw-{{ forloop.counter }}')">
+                                        <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
+                                        <div class="badge bg-danger mb-1">{{ p.포지션 }}</div>
+                                        <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
+                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
+                                            {% for cand in slot_candidates.FW %}
+                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
+                                    </div>
+                                    
+                                    <!-- FW 선수 팝업 카드 -->
+                                    <div id="popup-fw-{{ forloop.counter }}" class="player-popup-card popup-left">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;" class="border me-2">
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark">{{ p.선수명 }} <span class="badge bg-secondary fs-7">No.{{ p.등번호|floatformat:0 }}</span></h6>
+                                                <span class="text-muted small" style="font-size: 0.75rem;">{{ p.소속구단 }} | {{ p.포지션 }}</span>
+                                            </div>
+                                            <button type="button" class="btn-close ms-auto" style="font-size: 0.7rem;" onclick="event.stopPropagation(); closePopup('popup-fw-{{ forloop.counter }}')"></button>
+                                        </div>
+                                        <hr class="my-1">
+
+                                        <div class="text-center my-1">
+                                            <span class="text-muted small d-block mb-1 fw-bold" style="font-size: 0.75rem;">⬡ {{ p.포지션 }} 맞춤형 육각형 능력치</span>
+                                            <svg width="150" height="140" viewBox="0 0 180 170" class="mx-auto d-block">
+                                                <polygon points="90,25 137.5,52.5 137.5,107.5 90,135 42.5,107.5 42.5,52.5" fill="none" stroke="#dee2e6" stroke-width="1.5"></polygon>
+                                                <polygon points="90,45 120,62.5 120,97.5 90,115 60,97.5 60,62.5" fill="none" stroke="#e9ecef" stroke-width="1" stroke-dasharray="3,3"></polygon>
+                                                <line x1="90" y1="80" x2="90" y2="25" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="137.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="90" y2="135" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="107.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <line x1="90" y1="80" x2="42.5" y2="52.5" stroke="#dee2e6" stroke-width="1"></line>
+                                                <polygon points="{{ p.hex_points }}" fill="rgba(25, 135, 84, 0.45)" stroke="#198754" stroke-width="2.5"></polygon>
+                                                <text x="90" y="15" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">결정력</text>
+                                                <text x="145" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="start">연계</text>
+                                                <text x="145" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="start">압박</text>
+                                                <text x="90" y="148" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">득점력</text>
+                                                <text x="35" y="115" font-size="9" font-weight="bold" fill="#333" text-anchor="end">도움</text>
+                                                <text x="35" y="50" font-size="9" font-weight="bold" fill="#333" text-anchor="end">종합점수</text>
+                                            </svg>
+                                            <div class="badge bg-success mt-1" style="font-size: 0.75rem;">종합 점수: {{ p.종합_평가점수 }}점</div>
+                                        </div>
+
+                                        <div class="bg-light p-2 rounded border mt-1" style="font-size: 0.8rem;">
+                                            <h6 class="fw-bold text-success mb-1" style="font-size: 0.75rem;">📈 세부 기록 및 지표</h6>
+                                            <ul class="list-group list-group-flush bg-transparent">
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                                                <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -256,18 +449,49 @@
         </div>
     </div>
 
-    <!-- ⚡ 자바스크립트: 선수 선택 시 좌측 패널 전환 -->
+    <!-- ⚡ 자바스크립트: 팝업 토글 및 외부 클릭 제어 -->
     <script>
-        function showPlayerDetail(index) {
-            document.getElementById('default-msg').classList.add('d-none');
-            const allCards = document.querySelectorAll('[id^="player-card-"]');
-            allCards.forEach(card => card.classList.add('d-none'));
-
-            const targetCard = document.getElementById('player-card-' + index);
-            if (targetCard) {
-                targetCard.classList.remove('d-none');
+        function togglePlayerPopup(popupId) {
+            event.stopPropagation();
+            document.querySelectorAll('.player-popup-card').forEach(card => {
+                if (card.id !== popupId) {
+                    card.style.display = 'none';
+                }
+            });
+            
+            const popup = document.getElementById(popupId);
+            if (popup) {
+                popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
             }
         }
+
+        function closePopup(popupId) {
+            const popup = document.getElementById(popupId);
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('click', function() {
+            document.querySelectorAll('.player-popup-card').forEach(card => {
+                card.style.display = 'none';
+            });
+        });
+
+        // 🔍 찾을 곳: dashboard.html 하단의 <script> 태그 내부 맨 아래에 아래 함수를 추가해 주세요.
+
+        function changePlayer(selectElement) {
+            // 셀렉트박스에서 선택된 option의 텍스트나 데이터 처리
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const playerName = selectedOption.value;
+            
+            // 선택된 선수의 점수 등 변경 사항을 화면에 반영하는 로직
+            // (필요 시 선택된 선수의 데이터 갱신 처리)
+            console.log("선택된 선수:", playerName);
+        }
+
+
+
     </script>
 </body>
 </html>

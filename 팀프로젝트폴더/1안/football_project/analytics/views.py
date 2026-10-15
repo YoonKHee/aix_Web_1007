@@ -6,6 +6,11 @@ import glob
 import pandas as pd
 from django.shortcuts import render
 
+
+
+
+
+
 # 유틸리티 함수 안전 임포트 (없을 경우 기본 함수 대체)
 try:
     from .utils import process_football_data, load_all_teams_data
@@ -14,6 +19,22 @@ except ImportError:
         return [], []
     def load_all_teams_data():
         return pd.DataFrame()
+
+
+# analytics/views.py 의 dashboard_view 함수 부분 수정
+import math
+
+def calculate_hexagon_points(ratios, cx=90, cy=90, max_r=55):
+    # 6개 축 기준 (공격, 빌드업, 수비, 득점, 도움, 종합)
+    points = []
+    for i, val in enumerate(ratios):
+        angle_deg = -90 + (i * 60)
+        angle_rad = math.radians(angle_deg)
+        r = max_r * float(val)
+        x = cx + r * math.cos(angle_rad)
+        y = cy + r * math.sin(angle_rad)
+        points.append(f"{x:.1f},{y:.1f}")
+    return " ".join(points)
 
 
 def dashboard_view(request):
@@ -29,9 +50,27 @@ def dashboard_view(request):
             teams_list.append(name)
             
     all_players_dict, best_11_dict = process_football_data(team, formation, min_mins)
+
+    slot_candidates = {}
+    if all_players_dict:
+        df_all = pd.DataFrame(all_players_dict)
+        for pos in ['GK', 'DF', 'MF', 'FW']:
+            pos_df = df_all[df_all['포지션'] == pos].sort_values(by='종합_평가점수', ascending=False)
+            slot_candidates[pos] = pos_df.to_dict('records')
     
     for p in best_11_dict:
         p['이미지유형'] = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+        
+        # 육각형 그래프용 능력치 비율 계산 (0.15 ~ 1.0 스케일)
+        p['hex_attack'] = round(min(max(float(p.get('공격_점수', 0)) / 20.0, 0.15), 1.0), 2)
+        p['hex_buildup'] = round(min(max(float(p.get('빌드업_점수', 0)) / 20.0, 0.15), 1.0), 2)
+        p['hex_defense'] = round(min(max(float(p.get('수비_점수', 0)) / 20.0, 0.15), 1.0), 2)
+        p['hex_goal'] = round(min(max(float(p.get('득점', 0)) / 4.0, 0.15), 1.0), 2)
+        p['hex_assist'] = round(min(max(float(p.get('도움', 0)) / 4.0, 0.15), 1.0), 2)
+        p['hex_total'] = round(min(max(float(p.get('종합_평가점수', 0)) / 45.0, 0.15), 1.0), 2)
+        
+        ratios = [p['hex_attack'], p['hex_buildup'], p['hex_defense'], p['hex_goal'], p['hex_assist'], p['hex_total']]
+        p['hex_points'] = calculate_hexagon_points(ratios)
 
     position_averages = {}
     if all_players_dict:
@@ -39,8 +78,10 @@ def dashboard_view(request):
         if '포지션' in df_all.columns and '종합_평가점수' in df_all.columns:
             position_averages = df_all.groupby('포지션')['종합_평가점수'].mean().round(1).to_dict()
 
+
     context = {
         'best_11': best_11_dict,
+        'slot_candidates': slot_candidates,
         'position_averages': position_averages,
         'current_team': team,
         'teams_list': teams_list,
