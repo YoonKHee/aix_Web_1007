@@ -2,36 +2,35 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>K리그 베스트 11 전술 필드 (가로형)</title>
+    <title>K리그 베스트 11 전술 필드</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 가로형 축구장 스타일 */
-        .football-pitch-horizontal {
-            background: linear-gradient(to right, #2b7a3e, #1e562c);
+        /* 🏟️ 확장된 와이드 가로형 축구장 */
+        .football-pitch-wide {
+            background: linear-gradient(90deg, #1b4d27 0%, #2b7a3e 50%, #1b4d27 100%);
             border: 4px solid #ffffff;
-            border-radius: 15px;
-            min-height: 520px;
+            border-radius: 20px;
+            min-height: 600px;
             position: relative;
-            padding: 20px 30px;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.3);
+            padding: 30px 40px;
+            box-shadow: inset 0 0 70px rgba(0,0,0,0.4);
             display: flex;
             align-items: center;
         }
-        /* 가로형 중앙선 및 센터클 */
         .pitch-line-center-v {
-            position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: rgba(255,255,255,0.4);
+            position: absolute; top: 0; left: 50%; width: 3px; height: 100%; background: rgba(255,255,255,0.4);
         }
         .pitch-circle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 130px; height: 130px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%;
         }
-        /* 선수 칩 UI */
+        /* 선수 칩 디자인 */
         .player-chip {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            padding: 8px 6px;
+            border-radius: 12px;
+            padding: 8px;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            width: 110px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 125px;
             margin: 0 auto;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
@@ -41,22 +40,42 @@
             background: #ffffff;
         }
         .player-img {
-            width: 46px;
-            height: 46px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #0d6efd;
             margin-bottom: 4px;
         }
-        /* 좌측 선수 상세 창 스타일 */
-        .player-detail-card {
+        /* ⬡ 6각형 스테이터스 배지 스타일 */
+        .hexagon-stat-badge {
+            width: 75px;
+            height: 65px;
+            background: #198754;
+            color: #fff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin: 0 auto 10px auto;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            transition: transform 0.2s;
+        }
+        .hexagon-stat-badge:hover {
+            transform: scale(1.05);
+        }
+        /* 선수 옆에 뜨는 미니 상세 패널 */
+        .player-detail-panel {
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            padding: 20px;
-            border-left: 5px solid #198754;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 25px;
+            border-left: 6px solid #198754;
             animation: fadeIn 0.3s ease-in-out;
-            min-height: 520px;
+            min-height: 560px;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateX(-10px); }
@@ -65,15 +84,14 @@
     </style>
 </head>
 <body class="bg-light">
-    <div class="container-fluid px-4 py-4">
-        <!-- dashboard.html 상단 타이틀 영역 내부에 버튼 추가 -->
+    <div class="container-fluid py-4 px-4">
+        <!-- 헤더 및 상단 내비게이션 -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="fw-bold fs-2">⚽ K리그 Best 11 가로 전술 필드</h1>
-        <div>
-            <a href="{% url 'team_battle' %}" class="btn btn-danger fw-bold me-2">⚔️ 팀 대 팀 맞대결 빌더</a>
-            <a href="{% url 'player_stats' %}" class="btn btn-outline-dark fw-bold">📊 전체 선수 점수표 보기 &rarr;</a>
+            <h1 class="fw-bold fs-2">⚽ K리그 Best 11 전술 필드</h1>
+            <div>
+                <a href="{% url 'player_stats' %}" class="btn btn-outline-dark fw-bold">📊 전체 선수 점수표 보기 &rarr;</a>
+            </div>
         </div>
-    </div>
         
         <!-- 옵션 설정 폼 -->
         <div class="card shadow-sm mb-3">
@@ -123,49 +141,58 @@
             </div>
         </div>
 
-        <!-- 메인 레이아웃: [왼쪽] 상세 기록 창 (4열) | [오른쪽] 가로 축구장 (8열) -->
+        <!-- 메인 레이아웃: [왼쪽] 선수의 6각형 스테이터스 및 상세 수치 | [오른쪽] 넓어진 가로형 축구장 -->
         <div class="row">
-            <!-- 📋 [좌측] 필드에서 선택한 선수의 상세 기록 창 -->
+            <!-- 📋 [좌측] 선택한 선수의 6각형 스테이터스 패널 -->
             <div class="col-lg-4 mb-4">
-                <div id="default-msg" class="player-detail-card text-center text-muted d-flex flex-column justify-content-center align-items-center">
-                    <h5 class="fw-bold">🏟️ 필드의 선수를 클릭하세요!</h5>
-                    <p class="small text-secondary mb-0">오른쪽 가로 축구장에 위치한 선수를 누르면<br>해당 선수의 세부 기록이 이곳에 나타납니다.</p>
+                <div id="default-msg" class="player-detail-panel text-center text-muted d-flex flex-column justify-content-center align-items-center">
+                    <h5 class="fw-bold">🏟️ 필드의 선수를 클릭해보세요!</h5>
+                    <p class="small text-secondary mb-0">오른쪽 전술 필드의 선수 카드를 누르면<br>좌측에 6각형 스테이터스와 세부 수치가 나타납니다.</p>
                 </div>
 
                 {% for p in best_11 %}
-                <div id="player-card-{{ forloop.counter0 }}" class="player-detail-card d-none">
+                <div id="player-card-{{ forloop.counter0 }}" class="player-detail-panel d-none">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover;" class="border me-3">
+                        <img src="{{ p.이미지유형 }}" alt="선수 사진" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" class="border me-3">
                         <div>
                             <h5 class="fw-bold mb-0">{{ p.선수명 }} <span class="badge bg-secondary fs-6">No.{{ p.등번호|floatformat:0 }}</span></h5>
                             <span class="text-muted small">{{ p.소속구단 }} | {{ p.포지션 }}</span>
                         </div>
                     </div>
                     <hr class="my-2">
-                    <ul class="list-group list-group-flush small">
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
-                        <li class="list-group-item d-flex justify-content-between px-0"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
-                    </ul>
-                    <div class="mt-4 p-3 bg-success bg-opacity-10 rounded text-center">
-                        <span class="small text-success fw-bold d-block mb-1">종합 평가 점수</span>
-                        <div class="fs-3 fw-bold text-success">{{ p.종합_평가점수 }}점</div>
+
+                    <!-- ⬡ 6각형 스테이터스 형태의 종합 평가점수 -->
+                    <div class="text-center my-3">
+                        <span class="text-muted small d-block mb-1">HEXAGON EVALUATION SCORE</span>
+                        <div class="hexagon-stat-badge">
+                            <span style="font-size: 0.65rem; opacity: 0.8;">TOTAL</span>
+                            <span style="font-size: 1rem; line-height: 1.1;">{{ p.종합_평가점수 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- 📊 수치는 그 밑에 따로 깔끔하게 정렬 -->
+                    <div class="bg-light p-3 rounded border">
+                        <h6 class="fw-bold text-success mb-2 small">📈 세부 기록 및 지표</h6>
+                        <ul class="list-group list-group-flush small bg-transparent">
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>출전 시간</span><strong>{{ p.출전시간_분|floatformat:0 }}분</strong></li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>득점</span><strong class="text-danger">{{ p.득점|floatformat:0 }}골</strong></li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>도움</span><strong class="text-primary">{{ p.도움|floatformat:0 }}개</strong></li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>공격 점수</span><strong>{{ p.공격_점수 }}점</strong></li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>빌드업 점수</span><strong>{{ p.빌드업_점수 }}점</strong></li>
+                            <li class="list-group-item d-flex justify-content-between bg-transparent px-0 py-1"><span>수비 점수</span><strong>{{ p.수비_점수 }}점</strong></li>
+                        </ul>
                     </div>
                 </div>
                 {% endfor %}
             </div>
 
-            <!-- ⚽ [우측] 가로 축구장 UI -->
+            <!-- ⚽ [우측] 넓어진 가로형 축구장 UI (GK -> DF -> MF -> FW) -->
             <div class="col-lg-8 mb-4">
-                <div class="football-pitch-horizontal">
+                <div class="football-pitch-wide">
                     <div class="pitch-line-center-v"></div>
                     <div class="pitch-circle"></div>
 
-                    <!-- 가로 배치 (GK -> DF -> MF -> FW) -->
-                    <div class="w-100 d-flex justify-content-between align-items-center position-relative z-1">
+                    <div class="w-100 d-flex justify-content-between align-items-center position-relative z-1 px-3">
                         
                         <!-- 1. GK 열 (왼쪽 끝) -->
                         <div class="d-flex flex-column justify-content-center gap-3">
@@ -229,7 +256,7 @@
         </div>
     </div>
 
-    <!-- ⚡ 자바스크립트: 선수 선택 시 좌측 상세 창 출력 -->
+    <!-- ⚡ 자바스크립트: 선수 선택 시 좌측 패널 전환 -->
     <script>
         function showPlayerDetail(index) {
             document.getElementById('default-msg').classList.add('d-none');
