@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOREST - 회원수정</title>
+  <link rel="stylesheet" href="/static/css/mupdate.css">
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  
+
+</head>
+<body>
+  <header>
+    <div class="top">
+      <div class="logo"><a href="#">FOREST</a></div>
+      <nav aria-label="주 메뉴">
+        <ul class="menu">
+          <li><a href="#">소개</a></li>
+          <li><a href="#">뉴스</a></li>
+          <li><a href="#">학생관리</a></li>
+          <li><a href="#">학과정보</a></li>
+          <li><a href="#">문의</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="visual">
+    <div>
+      <h1>JOIN US</h1>
+      <p>FOREST 회원수정을 통해 다양한 서비스를 이용하세요.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="title">회원수정</div>
+    <div class="orderStep">
+      <ul>
+        <li>1. 약관동의</li>
+        <li><span class="current">2. 정보입력</span></li>
+        <li>3. 수정완료</li>
+      </ul>
+    </div>
+
+    <form id="signup-form" class="form-box" action={% url 'member:mupdate' request.session.s_id %} method='post' name='memberFrm'>
+      {% csrf_token %}
+      <table>
+        <tbody>
+          <tr>
+            <td><label for="user-id">아이디</label></td>
+            <td><div class="id-check-box">
+              <input value='{{member.id}}' disabled name= 'id' id="user-id" type="text" >
+              <button type="button" id="id-check">중복확인</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><label for="password">비밀번호</label></td>
+            <td><input name='pw' id="password" type="password"  ></td>
+          </tr>
+          <tr>
+            <td><label for="password-confirm">비밀번호 확인</label></td>
+            <td><input name='pw2' id="password-confirm" type="password" ></td>
+          </tr>
+          <tr>
+            <td><label for="name">이름</label></td>
+            <td><input name='name' id="name" type="text" value = '{{member.name}}'></td>
+          </tr>
+          <tr>
+            <td><label for="nickname">닉네임</label></td>
+            <td><input name='nickname' id="nickname" type="text" value = '{{member.nickname}}'></td>
+          </tr>
+          <tr>
+            <td><label for="phone1">휴대전화</label></td>
+            <td><div class="phone-input">
+              <select name='tel1'id="phone1" aria-label="휴대전화 앞자리">
+                <option {% if '010' in tel.0 %}checked{% endif %}>010</option>
+                <option {% if '02' in tel.0 %}checked{% endif %}>02</option>
+                <option {% if '032' in tel.0 %}checked{% endif %}>032</option>
+                <option {% if '051' in tel.0 %}checked{% endif %}>051</option>
+              </select>
+              <span>-</span><input name='tel2' value={{tel.1}} type="text" aria-label="휴대전화 가운데 자리" maxlength="4" inputmode="numeric" required>
+              <span>-</span><input name='tel3' value={{tel.2}} type="text" aria-label="휴대전화 끝자리" maxlength="4" inputmode="numeric" required>
+            </div></td>
+          </tr>
+          <tr>
+            <td>성별</td>
+            <td>
+              <div class="choice-group" role="group" aria-label="성별">
+                <label><input type="radio" name="gender" value="남자" 
+                  {% if '남자' in member.gender %}checked{% endif %}> 남자</label>
+                <label><input type="radio" name="gender" value="여자"
+                  {% if '여자' in member.gender %}checked{% endif %}> 여자</label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>취미</td>
+            <td>
+              <div class="choice-group hobby-group" role="group" aria-label="취미">
+                <label><input type="checkbox" name="hobby" value="게임" {% if '게임' in member.hobby %}checked{% endif %}> 게임</label>
+                <label><input type="checkbox" name="hobby" value="골프" {% if '골프' in member.hobby %}checked{% endif %}> 골프</label>
+                <label><input type="checkbox" name="hobby" value="수영" {% if '수영' in member.hobby %}checked{% endif %}> 수영</label>
+                <label><input type="checkbox" name="hobby" value="조깅" {% if '골프' in member.hobby %}checked{% endif %}> 조깅</label>
+                <label><input type="checkbox" name="hobby" value="독서" {% if '독서' in member.hobby %}checked{% endif %}> 독서</label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="btn-box">
+        <button type="button" class="btn cancel" onclick="history.back()">취소</button>
+        <button type="button" onclick=updateBtn() class="btn submit">수정</button>
+      </div>
+    </form>
+
+    <script>
+      function updateBtn(){
+        alert('확인')
+        const pw = $('#password').val();
+        const pw2 = $('#password-confirm').val();
+        console.log('pw,pw2 :',pw,pw2);
+        if (pw!=pw2){
+          alert('비밀번호를 확인해주세요');
+          return;
+        }
+        alert('{{request.session.s_nickname}}님의 회원정보를 수정합니다.')
+        memberFrm.submit()
+
+      }
+    </script>
+  </main>
+
+  <footer>Copyright © FOREST. All rights reserved.</footer>
+
+</body>
+</html>
