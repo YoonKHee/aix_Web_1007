@@ -242,12 +242,16 @@
                                         <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
                                         <div class="badge bg-success mb-1">{{ p.포지션 }}</div>
                                         <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
-                                            {% for cand in slot_candidates.DF %}
-                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
-                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
-                                                </option>
-                                            {% endfor %}
+                                        <select class="form-select form-select-sm fw-bold text-center my-1 slot-player-select" 
+                                            style="font-size:0.75rem; padding:2px;" 
+                                            data-pos="{{ p.포지션 }}"
+                                            onchange="checkDuplicateSelection(this)"
+                                            onclick="event.stopPropagation();">
+                                        {% for cand in p.slot_candidates %}
+                                            <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                            </option>
+                                        {% endfor %}
                                         </select>
                                         <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
                                     </div>
@@ -312,12 +316,16 @@
                                         <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
                                         <div class="badge bg-primary mb-1">{{ p.포지션 }}</div>
                                         <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
-                                            {% for cand in slot_candidates.MF %}
-                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
-                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
-                                                </option>
-                                            {% endfor %}
+                                        <select class="form-select form-select-sm fw-bold text-center my-1 slot-player-select" 
+                                            style="font-size:0.75rem; padding:2px;" 
+                                            data-pos="{{ p.포지션 }}"
+                                            onchange="checkDuplicateSelection(this)"
+                                            onclick="event.stopPropagation();">
+                                        {% for cand in p.slot_candidates %}
+                                            <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                            </option>
+                                        {% endfor %}
                                         </select>
                                         <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
                                     </div>
@@ -382,12 +390,16 @@
                                         <img src="{{ p.이미지유형 }}" alt="선수" class="player-img">
                                         <div class="badge bg-danger mb-1">{{ p.포지션 }}</div>
                                         <div class="fw-bold text-dark text-truncate small">{{ p.선수명 }}</div>
-                                        <select class="form-select form-select-sm fw-bold text-center my-1" style="font-size:0.75rem; padding:2px;" onclick="event.stopPropagation();">
-                                            {% for cand in slot_candidates.FW %}
-                                                <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
-                                                    {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
-                                                </option>
-                                            {% endfor %}
+                                        <select class="form-select form-select-sm fw-bold text-center my-1 slot-player-select" 
+                                            style="font-size:0.75rem; padding:2px;" 
+                                            data-pos="{{ p.포지션 }}"
+                                            onchange="checkDuplicateSelection(this)"
+                                            onclick="event.stopPropagation();">
+                                        {% for cand in p.slot_candidates %}
+                                            <option value="{{ cand.선수명 }}" {% if cand.선수명 == p.선수명 %}selected{% endif %}>
+                                                {{ cand.선수명 }} ({{ cand.종합_평가점수 }}점)
+                                            </option>
+                                        {% endfor %}
                                         </select>
                                         <div class="text-primary fw-bold small">{{ p.종합_평가점수 }}점</div>
                                     </div>
@@ -451,6 +463,42 @@
 
     <!-- ⚡ 자바스크립트: 팝업 토글 및 외부 클릭 제어 -->
     <script>
+        // 동일 포지션 내 슬롯 간 실시간 중복 선택 차단 함수
+function checkDuplicateSelection(selectElement) {
+    const currentPosition = selectElement.getAttribute('data-pos');
+    const selectedValue = selectElement.value;
+    
+    // 같은 포지션을 가진 모든 드롭다운 요소를 탐색
+    const positionSelects = document.querySelectorAll(`.slot-player-select[data-pos="${currentPosition}"]`);
+    
+    let duplicateCount = 0;
+    positionSelects.forEach(sel => {
+        if (sel.value === selectedValue) {
+            duplicateCount++;
+        }
+    });
+
+    // 중복 선택된 경우 경고 및 이전 값으로 복원
+    if (duplicateCount > 1) {
+        alert(`[${selectedValue}] 선수는 해당 포지션의 다른 슬롯에 이미 선택되어 있습니다.`);
+        selectElement.value = selectElement.dataset.previousValue || selectElement.options[0].value;
+        return false;
+    }
+    
+    // 정상 선택 시 현재 값을 이전 값으로 갱신 저장
+    selectElement.dataset.previousValue = selectedValue;
+}
+
+// 페이지 로드 시 초기 선택 상태 저장
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.slot-player-select').forEach(sel => {
+        sel.dataset.previousValue = sel.value;
+    });
+});
+
+
+
+
         function togglePlayerPopup(popupId) {
             event.stopPropagation();
             document.querySelectorAll('.player-popup-card').forEach(card => {

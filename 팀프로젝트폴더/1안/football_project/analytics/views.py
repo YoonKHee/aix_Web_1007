@@ -57,8 +57,36 @@ def dashboard_view(request):
         for pos in ['GK', 'DF', 'MF', 'FW']:
             pos_df = df_all[df_all['포지션'] == pos].sort_values(by='종합_평가점수', ascending=False)
             slot_candidates[pos] = pos_df.to_dict('records')
+
+    selected_in_best11 = {p['선수명'] for p in best_11_dict}
     
+    all_players_dict, best_11_dict = process_football_data(team, formation, min_mins)
+
+    # 1. 전체 선수 목록을 포지션별로 분류
+    slot_candidates = {}
+    if all_players_dict:
+        df_all = pd.DataFrame(all_players_dict)
+        for pos in ['GK', 'DF', 'MF', 'FW']:
+            pos_df = df_all[df_all['포지션'] == pos].sort_values(by='종합_평가점수', ascending=False)
+            slot_candidates[pos] = pos_df.to_dict('records')
+
+    # 2. 현재 베스트 11에 선택된 포지션별 선수명 집합 생성
+    pos_selected_map = {'GK': set(), 'DF': set(), 'MF': set(), 'FW': set()}
     for p in best_11_dict:
+        pos = p.get('포지션', 'MF')
+        if pos in pos_selected_map:
+            pos_selected_map[pos].add(p.get('선수명'))
+
+    # 3. 각 슬롯마다 자신을 제외한 타 슬롯의 선수들을 필터링한 전용 후보군(p['slot_candidates']) 부여
+    for p in best_11_dict:
+        pos = p.get('포지션', 'MF')
+        other_selected = {name for name in pos_selected_map[pos] if name != p.get('선수명')}
+        
+        candidates_for_this_slot = []
+        for cand in slot_candidates.get(pos, []):
+            if cand['선수명'] not in other_selected:
+                candidates_for_this_slot.append(cand)
+        p['slot_candidates'] = candidates_for_this_slot
         p['이미지유형'] = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
         
         # 육각형 그래프용 능력치 비율 계산 (0.15 ~ 1.0 스케일)
