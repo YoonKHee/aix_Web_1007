@@ -67,11 +67,10 @@
 
 
             <!-- POST HEADER -->
-
             <div class="post-header">
 
                 <h3>
-                    가을 시즌 특별 패키지 출시 안내
+                    {{board.btitle}}
                 </h3>
 
                 <div class="post-info">
@@ -81,15 +80,15 @@
                     </span>
 
                     <span>
-                        작성자 : 관리자
+                        작성자 : {{board.id}}
                     </span>
 
                     <span>
-                        2026.09.15
+                        {{board.bdate|date:'Y.m.d'}}
                     </span>
 
                     <span>
-                        조회수 : 125
+                        {{board.bhit}}
                     </span>
 
                 </div>
@@ -97,42 +96,28 @@
             </div>
 
 
+            
+            
+            <!-- POST CONTENT -->
+            
+            <div class="post-content">
+                
+                <p>
+                    {{board.bcontent}}
+                </p>
+                
+                
+                
+            </div>
             <!-- POST IMAGE -->
 
             <div class="post-image">
-
+                {% if board.bfile %}
                 <img
-                    src="https://images.unsplash.com/photo-1501785888041-af3ef285b470"
-                    alt="가을 시즌 특별 패키지"
+                src="{{board.bfile.url}}"
+                alt="{{board.btitle}}"
                 >
-
-            </div>
-
-
-            <!-- POST CONTENT -->
-
-            <div class="post-content">
-
-                <p>
-                    아름다운 가을을 맞아 포레스트에서
-                    특별한 시즌 패키지를 준비했습니다.
-                </p>
-
-                <p>
-                    깊어가는 가을의 자연을 가까이에서 느끼며
-                    편안한 휴식과 다양한 프로그램을 함께
-                    즐겨보시기 바랍니다.
-                </p>
-
-                <p>
-                    이번 패키지는 객실 숙박과 조식,
-                    다양한 부대시설 이용 혜택을 포함하고 있습니다.
-                </p>
-
-                <p>
-                    자세한 이용 기간과 예약 방법은
-                    홈페이지를 통해 확인하실 수 있습니다.
-                </p>
+                {% endif %}
 
             </div>
 
@@ -193,7 +178,7 @@
 
             <div class="button-left">
 
-                <a href="#" class="btn btn-dark">
+                <a href="/board/blist/" class="btn btn-dark">
                     목록
                 </a>
 
@@ -204,16 +189,20 @@
 
             <div class="button-right">
 
-                <a href="#" class="btn">
-                    수정
-                </a>
+                <a href="/board/bupdate/{{board.bno}}/" class="btn">수정</a>
 
-                <a href="#" class="btn btn-delete">
+                <a onclick=deleteBtn() style=cursor: pointer; class="btn btn-delete">
                     삭제
                 </a>
 
             </div>
-
+            <script>
+                function deleteBtn(){
+                    if(confirm('{{board.bno}}번 게시글을 삭제하시겠습니까.')){
+                        location.href ='/board/bdelete/{{board.bno}}/';
+                    }
+                }
+            </script>
         </div>
 
 

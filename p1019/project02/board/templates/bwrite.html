@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/bwrite.css/">
     <title>뉴스 글쓰기</title>
+    <script>
+        if('{{temp}}'=='1'){
+            alert('등록되었습니다.');
+            location.href = '/board/blist/';
+        }else if('{{temp}}'=='0'){
+            alert('{{bno}}번 게시글을 삭제합니다.');
+            location.href = '/board/blist/';
+        }else if('{{temp}}'=='2'){
+            alert('{{bno}}번 게시글을 수정합니다.');
+            location.href = '/board/blist/';   
+        }
+    </script>
 
 
 </head>
@@ -81,76 +93,28 @@
         <!-- =========================
              WRITE FORM
         ========================= -->
-
         <form
-            class="write-form"
-            action="#"
-            method="post"
-            enctype="multipart/form-data"
+        class="write-form"
+        action="/board/bwrite/"
+        method="post"
+        enctype="multipart/form-data"
         >
-
-
-            <!-- CATEGORY -->
-
+        
+        <!-- TITLE -->
+        
+            {% csrf_token %}
             <div class="form-row">
-
-                <div class="form-label">
-                    분류
+                <div class="form-label">제목
                     <span class="required">*</span>
                 </div>
-
                 <div class="form-input">
-
-                    <select
-                        class="category-select"
-                        name="category"
-                    >
-
-                        <option value="forest">
-                            FOREST
-                        </option>
-
-                        <option value="news">
-                            NEWS
-                        </option>
-
-                        <option value="notice">
-                            공지사항
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <!-- TITLE -->
-
-            <div class="form-row">
-
-                <div class="form-label">
-
-                    제목
-
-                    <span class="required">
-                        *
-                    </span>
-
-                </div>
-
-
-                <div class="form-input">
-
                     <input
                         type="text"
-                        name="title"
+                        name="btitle"
                         placeholder="제목을 입력하세요."
                         required
                     >
-
                 </div>
-
             </div>
 
 
@@ -173,7 +137,7 @@
 
                     <input
                         type="text"
-                        name="author"
+                        name="id"
                         class="author-input"
                         placeholder="작성자"
                         required
@@ -182,63 +146,6 @@
                 </div>
 
             </div>
-
-
-            <!-- PASSWORD -->
-
-            <div class="form-row">
-
-                <div class="form-label">
-
-                    비밀번호
-
-                    <span class="required">
-                        *
-                    </span>
-
-                </div>
-
-
-                <div class="form-input">
-
-                    <input
-                        type="password"
-                        name="password"
-                        class="password-input"
-                        placeholder="비밀번호"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- IMAGE -->
-
-            <div class="form-row">
-
-                <div class="form-label">
-                    대표 이미지
-                </div>
-
-
-                <div class="form-input image-input">
-
-                    <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
-                    >
-
-                    <span class="image-guide">
-                        JPG, PNG, WEBP 이미지
-                    </span>
-
-                </div>
-
-            </div>
-
 
             <!-- CONTENT -->
 
@@ -258,7 +165,7 @@
                 <div class="form-input content-input">
 
                     <textarea
-                        name="content"
+                        name="bcontent"
                         placeholder="내용을 입력하세요."
                         required
                     ></textarea>
@@ -277,34 +184,34 @@
                 </div>
 
 
-                <div class="form-input file-input">
+                    <div class="form-input file-input">
 
-                    <input
-                        type="file"
-                        name="file"
-                    >
+                        <input
+                            type="file"
+                            name="bfile"
+                        >
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <!-- =========================
+                    BUTTON
+                ========================= -->
 
-            <!-- =========================
-                 BUTTON
-            ========================= -->
+                <div class="button-area">
 
-            <div class="button-area">
-
-                <a
-                    href="#"
-                    class="btn"
-                >
-                    목록
-                </a>
+                    <a
+                        href="/"
+                        class="btn"
+                    >
+                        목록
+                    </a>
 
 
                 <a
-                    href="#"
+                    href="/board/blist/"
                     class="btn btn-cancel"
                 >
                     취소

@@ -29,7 +29,7 @@ def bupdate(request,bno):
         bfile = request.POST.get('bfile')
         qs = Board.objects.get(bno=bno)
         qs.btitle = btitle
-        qs.content = bcontent
+        qs.bcontent = bcontent
         if bfile:
             qs.bfile = bfile
         qs.save()
