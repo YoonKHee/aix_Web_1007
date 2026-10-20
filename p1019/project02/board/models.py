@@ -1,12 +1,12 @@
 from django.db import models
-
+from member.models import Member
 # Create your models here.
 class Board(models.Model):
     bno = models.AutoField(primary_key=True)
     # 다른테이블에 primary_key등록이 되어 있는 것을 다른 테이블에서 사용할때
     # Board데이터가 등록될때 Member에서 id값을 확인해서 있는지 체크
-    # member = models.ForeignKey(Member,on_delete=models.DO_NOTHING,blank=True)
-    id = models.CharField(max_length=30)  # member -> primary_key
+    member = models.ForeignKey(Member,on_delete=models.DO_NOTHING,blank=True,null=True)
+    # id = models.CharField(max_length=30)  # member -> primary_key
     btitle = models.CharField(max_length=1000)
     bcontent = models.TextField()    # 대용량Text
     # 답변달기
