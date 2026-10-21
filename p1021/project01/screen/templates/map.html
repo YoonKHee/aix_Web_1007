@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0d905f22c986dc108eddc76abbc56426"></script>
+<title>카카오맵</title>
+<link rel='stylesheet' href='/static/css/bview.css'>
+<style>
+        /* 커스텀 오버레이(마우스 오버 시 구 이름 표시) 스타일 */
+        .area-label {
+            position: relative;
+            bottom: 35px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            border-bottom: 2px solid #94a3b8;
+            padding: 4px 10px;
+            background: #ffffff;
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        /* 인포윈도우(클릭 시 상세 정보 표시) 스타일 */
+        .info-window {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #1e293b;
+            line-height: 1.5;
+            min-width: 190px;
+            background: white;
+            border-radius: 8px;
+        }
+        .info-window .title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #2563eb;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+            margin-bottom: 6px;
+        }
+        .info-window .size {
+            font-size: 13px;
+            color: #475569;
+        }
+</style>
+</head>
+
+<body>
+<!-- HEADER -->
+<header>
+    <div class="top">
+        <div class="logo">
+            FOREST
+        </div>
+        <ul class="menu">
+            <li><a href="#">소개</a></li>
+            <li><a href="#">뉴스</a></li>
+            <li><a href="#">학생관리</a></li>
+            <li><a href="#">학과정보</a></li>
+            <li><a href="#">문의</a></li>
+        </ul>
+    </div>
+</header>
+
+<!-- VISUAL -->
+<section class="visual">
+    <div>
+        <h1>NEWS</h1>
+        <p>포레스트의 새로운 소식을 만나보세요.</p>
+    </div>
+</section>
+
+<!-- 지도 및 검색 영역 -->
+<main>
+    <div class="container">
+        <input type="text" name='search_word' id='search_word' placeholder="구 이름 입력 (예: 강남구)">
+        <button type="button" onclick='searchBtn()'>검색</button>
+        <br><br>
+        <!-- 카카오맵 지도표시 -->
+        <div id="map" style="width:100%;height:500px;border-radius:12px;border:1px solid #cbd5e1;"></div>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-menu">
+            <a href="#">회사소개</a>
+            <a href="#">오시는 길</a>
+            <a href="#">개인정보처리방침</a>
+            <a href="#">이용약관</a>
+            <a href="#">이메일무단수집거부</a>
+        </div>
+        <div class="footer-info">
+            포레스트 리조트<br>
+            충청북도 제천시 백운면 금봉로 365<br>
+            대표번호 : 043-649-6000
+        </div>
+    </div>
+</footer>
+
+<script>
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.566826, 126.9786567), // 서울시청 기준 중심 좌표
+            level: 8 // 지도 확대 레벨
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption),
+        customOverlay = new kakao.maps.CustomOverlay({}),
+        infowindow = new kakao.maps.InfoWindow({ removable: true });
+
+    var polygonList = [];
+
+    // 대한민국 서울시 자치구 25개 경계 GeoJSON 로드 (CORS 이슈 대응 포함)
+    $(document).ready(function() {
+        $.ajax({
+            url: "https://raw.githubusercontent.com/southkorea/seoul-maps/master/kostat/2013/json/seoul_municipalities_geo_simple.json",
+            type: "GET",
+            dataType: "json",
+            success: function(geojson) {
+                var units = geojson.features;
+                $.each(units, function(index, unit) {
+                    var coordinates = unit.geometry.coordinates[0];
+                    var name = unit.properties.SIG_KOR_NM; // 구 이름 (예: 강남구, 종로구 등)
+                    var path = [];
+
+                    $.each(coordinates, function(i, coordinate) {
+                        path.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));
+                    });
+
+                    // 구 이름과 경계 좌표 배열 전달
+                    displayArea({ name: name, path: path });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("데이터 로드 실패: ", error);
+                alert("지도를 불러오는 도중 오류가 발생했습니다. 카카오 앱키 및 도메인을 확인해주세요.");
+            }
+        });
+    });
+
+    // 다각형(폴리곤)을 생성하고 이벤트를 등록하는 함수
+    function displayArea(area) {
+        var polygon = new kakao.maps.Polygon({
+            map: map,
+            path: area.path,
+            strokeWeight: 2,
+            strokeColor: '#004c80',
+            strokeOpacity: 0.8,
+            fillColor: '#ffffff',
+            fillOpacity: 0.7
+        });
+
+        // 폴리곤 객체에 구 이름 보관
+        polygon.name = area.name;
+        polygonList.push(polygon);
+
+        // mouseover 이벤트: 폴리곤 색상 변경 및 구 이름 표시
+        kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
+            polygon.setOptions({ fillColor: '#09f', fillOpacity: 0.8 });
+            customOverlay.setContent('<div class="area-label">' + area.name + '</div>');
+            customOverlay.setPosition(mouseEvent.latLng);
+            customOverlay.setMap(map);
+        });
+
+        // mousemove 이벤트: 커서 위치를 따라 라벨 이동
+        kakao.maps.event.addListener(polygon, 'mousemove', function(mouseEvent) {
+            customOverlay.setPosition(mouseEvent.latLng);
+        });
+
+        // mouseout 이벤트: 원래 색상 복원 및 라벨 제거
+        kakao.maps.event.addListener(polygon, 'mouseout', function() {
+            polygon.setOptions({ fillColor: '#ffffff', fillOpacity: 0.7 });
+            customOverlay.setMap(null);
+        });
+
+        // click 이벤트: 클릭 시 해당 구 이름 및 총 면적 표시
+        kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+            var areaSqM = Math.floor(polygon.getArea());
+            var areaSqKm = (areaSqM / 1000000).toFixed(2);
+
+            var content = '<div class="info-window">' +
+                          '   <div class="title">' + area.name + '</div>' +
+                          '   <div class="size">총 면적: 약 <b>' + areaSqM.toLocaleString() + '</b> m<sup>2</sup> (' + areaSqKm + ' km<sup>2</sup>)</div>' +
+                          '</div>';
+
+            infowindow.setContent(content);
+            infowindow.setPosition(mouseEvent.latLng);
+            infowindow.setMap(map);
+        });
+    }
+
+    // 자치구 검색 기능
+    function searchBtn() {
+        var keyword = $('#search_word').val().trim();
+        if (!keyword) {
+            alert('검색할 구 이름을 입력해주세요.');
+            return;
+        }
+
+        var found = false;
+        $.each(polygonList, function(i, polygon) {
+            if (polygon.name.indexOf(keyword) !== -1) {
+                var bounds = new kakao.maps.LatLngBounds();
+                var path = polygon.getPath();
+                for (var j = 0; j < path.length; j++) {
+                    bounds.extend(path[j]);
+                }
+
+                map.setBounds(bounds);
+                polygon.setOptions({ fillColor: '#0284c7', fillOpacity: 0.9 });
+
+                setTimeout(function() {
+                    polygon.setOptions({ fillColor: '#ffffff', fillOpacity: 0.7 });
+                }, 2000);
+
+                found = true;
+                return false;
+            }
+        });
+
+        if (!found) {
+            alert('입력하신 구 이름을 찾을 수 없습니다.');
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맞춤형 베스트 11 구축 및 모의게임 플랫폼</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f4; font-family: 'Pretendard', sans-serif; }
+        .main-card { background: #ffffff; border-radius: 12px; border: 1px solid #e0e6e0; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* 중앙 그린 피치 스타일 */
+        .tactical-pitch {
+            background-color: #125a78;
+            border-radius: 10px;
+            height: 380px;
+            position: relative;
+            border: 2px solid #0d435a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        /* 슬롯 칩 스타일 */
+        .player-chip {
+            background: rgba(255, 255, 255, 0.9);
+            color: #212529;
+            border-radius: 8px;
+            padding: 5px;
+            width: 110px;
+            text-align: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        /* 팝업 카드 스타일 */
+        .popup-card {
+            display: none;
+            position: absolute;
+            z-index: 100;
+            width: 280px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            padding: 15px;
+            color: #333;
+        }
+
+        .btn-simulation {
+            background-color: #ffd700;
+            color: #212529;
+            font-weight: bold;
+            border: 1px solid #e6c200;
+        }
+        .btn-simulation:hover { background-color: #e6c200; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid py-3 px-4">
+    <div class="row g-3">
+        
+        <!-- [좌측 영역] 메뉴 선택 & 기획 노트 -->
+        <div class="col-md-2">
+            <div class="main-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-success border-bottom pb-2 mb-3">메뉴</h5>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-success text-start fw-bold">국내 / 해외</button>
+                        <button class="btn btn-outline-success text-start fw-bold">K리그 1군</button>
+                        <button class="btn btn-outline-success text-start fw-bold">구단 선택</button>
+                    </div>
+                </div>
+
+                <!-- 하단 기획서 목차 노트 -->
+                <div class="bg-light p-2 border rounded mt-3 text-muted" style="font-size: 0.75rem;">
+                    <strong class="d-block text-dark mb-1">[ 프로젝트 기획서 ]</strong>
+                    1. 프로젝트명<br>
+                    2. 기획의도<br>
+                    3. 업무분장<br>
+                    4. 화면설계<br>
+                    5. 주요기능<br>
+                    6. 프로젝트 일정
+                </div>
+            </div>
+        </div>
+
+        <!-- [중앙 영역] 와이드 전술 피치 & 데이터 누적 노트 -->
+        <div class="col-md-7">
+            <!-- 피치 상단 타이틀 -->
+            <div class="bg-dark text-white text-center py-2 rounded-top fw-bold">
+                맞춤형 베스트 11명 구축
+            </div>
+
+            <!-- 와이드 그린 전술 피치 -->
+            <div class="tactical-pitch rounded-bottom">
+                <div class="text-center">
+                    <p class="mb-1 fw-bold fs-5">클릭 시 선수기록 팝업</p>
+                    <p class="small text-light mb-0">(이름, 등번호, 사진, 육각 그래프 적용)</p>
+                </div>
+            </div>
+
+            <!-- 피치 하단 데이터 연동 노트 -->
+            <div class="main-card mt-3" style="font-size: 0.85rem;">
+                <div class="fw-bold text-success mb-1">💡 컨디션 조작 &amp; 시뮬레이션 노트</div>
+                <ul class="mb-0 ps-3 text-secondary">
+                    <li>선수기록(컨디션 수동 조작 가능)</li>
+                    <li>모의경기를 통한 데이터 누적</li>
+                    <li>해외파 자료 연동 및 미래의 대한민국 국가대표 팀 구성 예상</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- [우측 영역] 경기 모의게임 & 선수 상세 정보 패널 -->
+        <div class="col-md-3">
+            <div class="main-card h-100 d-flex flex-column gap-2">
+                <!-- 시뮬레이션 버튼 -->
+                <button class="btn btn-simulation w-100 py-2 fs-6">⚡ 축구 경기 모의게임</button>
+                <button class="btn btn-outline-secondary w-100 fw-bold">홈 vs 어웨이</button>
+
+                <!-- 우측 상세 정보 & 육각 그래프 패널 -->
+                <div class="border rounded p-3 bg-light flex-grow-1 mt-2">
+                    <h6 class="fw-bold text-dark border-bottom pb-2">선수 상세 정보</h6>
+                    <div class="row g-2 my-2 align-items-center">
+                        <div class="col-5">
+                            <div class="bg-secondary text-white text-center rounded py-4" style="font-size: 0.8rem;">사진</div>
+                        </div>
+                        <div class="col-7">
+                            <div class="fw-bold text-dark" style="font-size: 0.9rem;">선수 정보</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">소속구단 / 포지션</div>
+                        </div>
+                    </div>
+
+                    <!-- 육각 그래프 영역 -->
+                    <div class="border bg-white rounded p-3 text-center mt-3">
+                        <span class="fw-bold text-success d-block mb-2" style="font-size: 0.85rem;">육각 그래프 (Radar Chart)</span>
+                        <div style="height: 120px;" class="d-flex align-items-center justify-content-center text-muted small border border-dashed">
+                            [ SVG Radar Chart 위치 ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
