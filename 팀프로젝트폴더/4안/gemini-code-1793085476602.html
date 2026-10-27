@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>감독? 내가한다! - 축구 포메이션 & 라인업 빌더</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            pitch: {
+              light: '#2d8a4e',
+              dark: '#1b5a32',
+              line: '#ffffff',
+              stripe: '#257843'
+            },
+            accent: {
+              DEFAULT: '#f59e0b',
+              hover: '#d97706'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS (XLSX) CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      user-select: none;
+    }
+
+    /* Custom Pitch Patterns */
+    .pitch-bg {
+      background-color: #247543;
+      background-image: repeating-linear-gradient(
+        0deg,
+        #247543,
+        #247543 40px,
+        #1f663a 40px,
+        #1f663a 80px
+      );
+    }
+
+    .pitch-bg-horizontal {
+      background-color: #247543;
+      background-image: repeating-linear-gradient(
+        90deg,
+        #247543,
+        #247543 40px,
+        #1f663a 40px,
+        #1f663a 80px
+      );
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    /* Card Glow Effects */
+    .card-glow-fw { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+    .card-glow-mf { box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+    .card-glow-df { box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+    .card-glow-gk { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="bg-emerald-500 text-slate-950 p-2 rounded-xl font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-futbol"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 bg-clip-text text-transparent">
+            감독? 내가한다!
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">아마추어 & 동호회 축구 포메이션 빌더</p>
+        </div>
+      </div>
+
+      <!-- Controls Header Bar -->
+      <div class="flex items-center gap-2 flex-wrap text-sm">
+        <!-- Formation Selector -->
+        <div class="flex items-center gap-1.5 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700">
+          <i class="fa-solid fa-diagram-project text-amber-400 pl-1"></i>
+          <label for="formationSelect" class="text-xs font-semibold text-slate-400 hidden md:inline">포메이션:</label>
+          <select id="formationSelect" class="bg-transparent text-slate-100 font-bold focus:outline-none cursor-pointer text-xs sm:text-sm">
+            <option value="4-3-3" class="bg-slate-800">4-3-3 (공격형)</option>
+            <option value="4-2-3-1" class="bg-slate-800" selected>4-2-3-1 (더블 볼란테)</option>
+            <option value="4-4-2" class="bg-slate-800">4-4-2 (플랫)</option>
+            <option value="3-5-2" class="bg-slate-800">3-5-2 (윙백)</option>
+            <option value="3-4-3" class="bg-slate-800">3-4-3 (스리톱)</option>
+            <option value="4-1-4-1" class="bg-slate-800">4-1-4-1 (원볼란테)</option>
+          </select>
+        </div>
+        <!-- Main Page Navigation Tabs -->
+        <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 gap-1">
+          <button id="btnNavPitch" onclick="switchMainPage('pitch')" class="px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-600 text-white transition">
+            <i class="fa-solid fa-futbol mr-1"></i>축구장 피치
+          </button>
+          <button id="btnNavSquad" onclick="switchMainPage('squad')" class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-users mr-1"></i>선수단 관리
+          </button>
+        </div>
+
+        <!-- Orientation Toggle -->
+        <button id="toggleOrientationBtn" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" title="피치 방향 전환">
+          <i class="fa-solid fa-rotate"></i>
+          <span class="hidden sm:inline" id="orientationLabel">세로 모드</span>
+        </button>
+
+        <!-- Excel Actions Dropdown/Buttons -->
+        <button onclick="document.getElementById('excelInput').click()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+          <i class="fa-solid fa-file-excel"></i>
+          <span class="hidden sm:inline">다중 파일 등록</span>
+        </button>
+        <!-- multiple 및 CSV/XLSX/XLS 모두 지정 -->
+        <input type="file" id="excelInput" accept=".xlsx, .xls, .csv, image/*" multiple webkitdirectory directory class="hidden">
+
+        <button onclick="downloadSampleExcel()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 py-2 rounded-lg text-xs transition" title="엑셀 샘플 서식 다운로드">
+          <i class="fa-solid fa-download"></i>
+        </button>
+
+        <!-- Data Reset Button -->
+        <button onclick="refreshSquadData()" class="bg-indigo-600/60 hover:bg-indigo-500 text-indigo-100 px-3 py-2 rounded-lg text-xs font-semibold border border-indigo-500 transition flex items-center gap-1.5" title="K리그1 및 해외파 기본 선수단 새로고침/동기화">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span class="hidden sm:inline">선수 새로고침</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg text-amber-400 transition" title="다크/라이트 모드">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+<main class="max-w-7xl mx-auto px-2 sm:px-4 py-4 flex-1 w-full">
+
+  <!-- PAGE 1: 축구장 피치 전면 화면 (기본 표시) -->
+  <section id="sectionPitch" class="flex flex-col gap-3">
+    
+    <!-- Pitch Header / Stats Summary Bar -->
+    <div class="bg-slate-800/60 backdrop-blur rounded-xl p-3 border border-slate-700/60 flex items-center justify-between text-xs sm:text-sm">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-slate-300 flex items-center gap-1">
+          <i class="fa-solid fa-users text-emerald-400"></i> 선발 등록:
+          <strong id="selectedCount" class="text-amber-400 text-base">0</strong>/11 명
+        </span>
+        <span class="text-slate-500">|</span>
+        <span class="font-bold text-slate-300">
+          팀 평균: <strong id="teamAvgOverall" class="text-emerald-400 text-base">0</strong>점
+        </span>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="clearLineup()" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-2.5 py-1.5 rounded border border-rose-500/30 transition">
+          <i class="fa-solid fa-trash-can mr-1"></i>초기화
+        </button>
+        <button onclick="autoFillSquad()" class="text-xs bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 px-2.5 py-1.5 rounded border border-indigo-500/30 transition">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>자동 추천
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN PITCH & SIDE STATS CONTAINER (피치를 넓게 가로형으로 배치) -->
+    <!-- MAIN PITCH CONTAINER (축구장을 화면 최대 크기로 확장) -->
+    <div class="w-full bg-slate-950 rounded-2xl p-2 sm:p-4 border-2 border-slate-700/80 shadow-2xl overflow-hidden flex items-center justify-center min-h-[550px] sm:min-h-[720px]">
+      <div id="pitchBoard" class="relative w-full h-[550px] sm:h-[700px] pitch-bg-horizontal rounded-xl border-2 border-white/70 shadow-inner overflow-hidden transition-all duration-300">
+        
+        <!-- Pitch Markings -->
+        <div class="pitch-lines absolute inset-0 pointer-events-none">
+          <div id="centerLine" class="absolute w-full h-0.5 bg-white/60 top-1/2 -translate-y-1/2"></div>
+          <div class="absolute w-28 h-28 sm:w-44 sm:h-44 border-2 border-white/60 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+          <div class="absolute w-2 h-2 bg-white/80 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+          <div id="boxTop" class="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-1/5 border-b-2 border-x-2 border-white/60"></div>
+          <div id="goalAreaTop" class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[8%] border-b-2 border-x-2 border-white/60"></div>
+          <div id="boxBottom" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/5 h-1/5 border-t-2 border-x-2 border-white/60"></div>
+          <div id="goalAreaBottom" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/3 h-[8%] border-t-2 border-x-2 border-white/60"></div>
+        </div>
+
+        <!-- SLOTS CONTAINER -->
+        <div id="pitchSlots" class="absolute inset-0 z-10"></div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- Quick Action Footbar -->
+    <div class="flex items-center justify-between text-xs text-slate-400 bg-slate-800/40 p-2.5 rounded-lg border border-slate-700/40 mt-1">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-amber-400"></i> 피치 위 선수를 누르면 해당 선수의 육각 스탯이 표시됩니다.</span>
+      <button onclick="openLineupSummaryModal()" class="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+        <i class="fa-solid fa-share-nodes"></i> 라인업 카드 보기
+      </button>
+    </div>
+
+  </section>
+
+
+  <!-- PAGE 2: 선수단 관리 전용 페이지 (처음엔 숨김) -->
+  <section id="sectionSquad" class="hidden flex flex-col gap-3">
+    
+    <!-- Search & Filter Controls -->
+    <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 flex flex-col sm:flex-row gap-2">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="searchInput" oninput="renderSquadList()" placeholder="선수 이름 검색..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+      </div>
+      
+      <!-- K-League Team Filter -->
+      <select id="teamFilter" onchange="renderSquadList()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+        <option value="ALL">전체 팀</option>
+        <option value="울산 HD">울산 HD</option>
+        <option value="전북 현대">전북 현대</option>
+        <option value="포항 스틸러스">포항 스틸러스</option>
+        <option value="FC 서울">FC 서울</option>
+        <option value="해외파">해외파</option>
+      </select>
+
+      <!-- Position Filter -->
+      <select id="positionFilter" onchange="renderSquadList()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+        <option value="ALL">전체 포지션</option>
+        <option value="FW">FW (공격수)</option>
+        <option value="MF">MF (미드필더)</option>
+        <option value="DF">DF (수비수)</option>
+        <option value="GK">GK (골키퍼)</option>
+      </select>
+
+      <!-- Add Player Button -->
+      <button onclick="openAddPlayerModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1">
+        <i class="fa-solid fa-user-plus"></i> 추가
+      </button>
+    </div>
+
+    <!-- Squad Player Cards List -->
+    <div id="squadListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[600px] overflow-y-auto pr-1">
+      <!-- Dynamically populated -->
+    </div>
+
+  </section>
+
+</main>
+
+  <!-- MODAL: ASSIGN / CHANGE PLAYER TO SLOT -->
+  <div id="slotAssignModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-100" id="assignModalTitle">포지션 선수 배치</h3>
+          <p class="text-xs text-slate-400" id="assignModalSub">선택 포지션: FW</p>
+        </div>
+        <button onclick="closeAssignModal()" class="text-slate-400 hover:text-slate-200 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Current Assigned Player Info if any -->
+      <div id="currentSlotPlayerCard" class="hidden bg-slate-900 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="currentSlotAvatar" class="w-10 h-10 rounded-full bg-slate-700 font-bold flex items-center justify-center text-sm border-2 border-amber-400">
+            -
+          </div>
+          <div>
+            <div id="currentSlotName" class="font-bold text-sm">선수이름</div>
+            <div id="currentSlotPos" class="text-xs text-slate-400">포지션</div>
+          </div>
+        </div>
+        <button onclick="unassignCurrentSlot()" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-3 py-1.5 rounded-lg transition font-semibold">
+          선발 해제
+        </button>
+      </div>
+
+      <!-- Select Player List -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-slate-400">교체/배치할 선수 선택:</label>
+        <div id="modalPlayerList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-700">
+        <button onclick="closeAssignModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT PLAYER -->
+  <div id="playerFormModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <h3 class="text-base font-bold text-slate-100" id="playerFormTitle">신규 선수 등록</h3>
+        <button onclick="closePlayerFormModal()" class="text-slate-400 hover:text-slate-200 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="playerForm" onsubmit="savePlayerForm(event)" class="space-y-3">
+        <input type="hidden" id="formPlayerId">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">선수 이름 *</label>
+            <input type="text" id="formName" required placeholder="예: 손흥민" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">주 포지션 *</label>
+            <select id="formPosition" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+              <option value="FW">FW (공격수)</option>
+              <option value="MF">MF (미드필더)</option>
+              <option value="DF">DF (수비수)</option>
+              <option value="GK">GK (골키퍼)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">등번호</label>
+            <input type="number" id="formBackNumber" min="1" max="99" placeholder="7" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">프로필 이미지 (URL, 선택)</label>
+            <input type="url" id="formAvatar" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <!-- Slider Stats -->
+        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60 space-y-3">
+          <div class="text-xs font-bold text-amber-400">능력치 설정 (0 ~ 99)</div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-slate-400">공격력 (ATT)</span>
+                <span id="valAttText" class="font-bold text-rose-400">80</span>
+              </div>
+              <input type="range" id="formAtt" min="30" max="99" value="80" oninput="document.getElementById('valAttText').innerText=this.value" class="w-full accent-rose-500">
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-slate-400">패스 (PAS)</span>
+                <span id="valPasText" class="font-bold text-amber-400">75</span>
+              </div>
+              <input type="range" id="formPas" min="30" max="99" value="75" oninput="document.getElementById('valPasText').innerText=this.value" class="w-full accent-amber-500">
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-slate-400">수비력 (DEF)</span>
+                <span id="valDefText" class="font-bold text-blue-400">60</span>
+              </div>
+              <input type="range" id="formDef" min="30" max="99" value="60" oninput="document.getElementById('valDefText').innerText=this.value" class="w-full accent-blue-500">
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-slate-400">스피드 (SPD)</span>
+                <span id="valSpdText" class="font-bold text-cyan-400">85</span>
+              </div>
+              <input type="range" id="formSpd" min="30" max="99" value="85" oninput="document.getElementById('valSpdText').innerText=this.value" class="w-full accent-cyan-500">
+            </div>
+
+            <div class="col-span-1 sm:col-span-2">
+              <div class="flex justify-between mb-1">
+                <span class="text-slate-400">체력/활동량 (STA)</span>
+                <span id="valStaText" class="font-bold text-emerald-400">80</span>
+              </div>
+              <input type="range" id="formSta" min="30" max="99" value="80" oninput="document.getElementById('valStaText').innerText=this.value" class="w-full accent-emerald-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between gap-2 pt-2 border-t border-slate-700">
+          <button type="button" id="deletePlayerBtn" onclick="deletePlayerFromForm()" class="hidden bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 px-3 py-2 rounded-xl text-xs font-bold transition">
+            선수 삭제
+          </button>
+          <div class="flex gap-2 ml-auto">
+            <button type="button" onclick="closePlayerFormModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition">
+              취소
+            </button>
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow-lg">
+              저장하기
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LINEUP SUMMARY CARD (SHARE/EXPORT VIEW) -->
+  <div id="summaryModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-user text-emerald-400"></i> Best 11 라인업 카드
+        </h3>
+        <button onclick="closeSummaryModal()" class="text-slate-400 hover:text-slate-200 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Printable / View Card -->
+      <div id="summaryCardContent" class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+        <div class="text-center border-b border-slate-800 pb-2">
+          <h4 class="font-black text-amber-400 text-lg" id="sumTeamName">감독? 내가한다! BEST 11</h4>
+          <p class="text-xs text-slate-400" id="sumFormationText">포메이션: 4-2-3-1</p>
+        </div>
+
+        <div class="space-y-1.5 text-xs" id="sumPlayerList">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="pt-2 border-t border-slate-800 flex justify-between text-xs text-slate-400">
+          <span>팀 평균 스탯: <strong id="sumAvg" class="text-emerald-400">0</strong></span>
+          <span>라인업 완성도: <strong id="sumComp" class="text-amber-400">0%</strong></span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="copyLineupText()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-copy"></i> 텍스트 복사
+        </button>
+        <button onclick="closeSummaryModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-800 border border-emerald-500 text-slate-100 px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs font-semibold pointer-events-none">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <!-- MODAL: PLAYER RADAR CHART MODAL (선수 육각 능력치 팝업 창) -->
+  <div id="playerStatsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col items-center gap-3">
+      <div class="flex items-center justify-between w-full border-b border-slate-700 pb-2">
+        <h3 id="modalPlayerTitle" class="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-radar text-emerald-400"></i> 선수 상세 능력치
+        </h3>
+        <button onclick="closePlayerStatsModal()" class="text-slate-400 hover:text-slate-200 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Radar Chart Canvas -->
+      <div class="w-full aspect-square relative flex items-center justify-center p-2">
+        <canvas id="teamRadarChart"></canvas>
+      </div>
+
+      <div class="flex gap-2 w-full pt-2 border-t border-slate-700">
+        <button id="btnModalChangePlayer" onclick="" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
+          선수 교체/지정
+        </button>
+        <button onclick="closePlayerStatsModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ==========================================
+       1. INITIAL STATE & SAMPLE DATA
+    ========================================== */
+    const DEFAULT_SQUAD = [
+  // 해외파
+  { 
+  id: 1, 
+  name: '손흥민', 
+  pos: 'FW', 
+  number: 7, 
+  att: 92, pas: 82, def: 45, spd: 91, sta: 88, 
+  team: '토트넘 홋스퍼', 
+  teamLogo: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg', 
+  avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Son_Heung-min_2021.jpg/220px-Son_Heung-min_2021.jpg' 
+},
+{ 
+  id: 2, 
+  name: '김민재', 
+  pos: 'DF', 
+  number: 3, 
+  att: 55, pas: 72, def: 91, spd: 86, sta: 90, 
+  team: '바이에른 뮌헨', 
+  teamLogo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg', 
+  avatar: '' 
+},
+  { id: 3, name: '이강인', pos: 'MF', number: 18, att: 84, pas: 90, def: 55, spd: 79, sta: 82, team: '파리 생제르맹', avatar: '' },
+  { id: 4, name: '황희찬', pos: 'FW', number: 11, att: 85, pas: 74, def: 50, spd: 89, sta: 86, team: '울버햄튼', avatar: '' },
+  { id: 5, name: '조규성', pos: 'FW', number: 9, att: 81, pas: 68, def: 48, spd: 78, sta: 84, team: '미트윌란', avatar: '' },
+  { id: 6, name: '황인범', pos: 'MF', number: 6, att: 76, pas: 86, def: 74, spd: 76, sta: 91, team: '페예노르트', avatar: '' },
+  { id: 7, name: '이재성', pos: 'MF', number: 10, att: 78, pas: 83, def: 68, spd: 77, sta: 92, team: '마인츠 05', avatar: '' },
+  { id: 8, name: '설영우', pos: 'DF', number: 22, att: 72, pas: 75, def: 78, spd: 82, sta: 87, team: '즈베즈다', avatar: '' },
+  { id: 9, name: '김영권', pos: 'DF', number: 19, att: 50, pas: 70, def: 83, spd: 68, sta: 76, team: '울산 HD', avatar: '' },
+  { id: 10, name: '조현우', pos: 'GK', number: 21, att: 25, pas: 62, def: 86, spd: 60, sta: 75, team: '울산 HD', avatar: '' },
+  { id: 11, name: '정우영', pos: 'MF', number: 5, att: 65, pas: 78, def: 81, spd: 72, sta: 85, team: '울산 HD', avatar: '' },
+
+  // K리그1 주요 선수 추가
+  { id: 12, name: '주민규', pos: 'FW', number: 18, att: 83, pas: 72, def: 40, spd: 74, sta: 82, team: '울산 HD', avatar: '' },
+  { id: 13, name: '이승우', pos: 'FW', number: 10, att: 82, pas: 76, def: 45, spd: 85, sta: 80, team: '전북 현대', avatar: '' },
+  { id: 14, name: '기성용', pos: 'MF', number: 8, att: 75, pas: 89, def: 76, spd: 65, sta: 82, team: 'FC 서울', avatar: '' },
+  { id: 15, name: '오세훈', pos: 'FW', number: 20, att: 79, pas: 65, def: 45, spd: 72, sta: 83, team: 'FC 서울', avatar: '' },
+  { id: 16, name: '인하오', pos: 'MF', number: 14, att: 77, pas: 80, def: 72, spd: 78, sta: 86, team: '포항 스틸러스', avatar: '' },
+  { id: 17, name: '제카', pos: 'FW', number: 19, att: 81, pas: 74, def: 42, spd: 75, sta: 81, team: '포항 스틸러스', avatar: '' },
+  { id: 18, name: '송범근', pos: 'GK', number: 1, att: 20, pas: 60, def: 82, spd: 58, sta: 75, team: '전북 현대', avatar: '' },
+  { id: 19, name: '홍정호', pos: 'DF', number: 26, att: 52, pas: 73, def: 84, spd: 70, sta: 78, team: '전북 현대', avatar: '' },
+  { id: 20, name: '세징야', pos: 'FW', number: 11, att: 85, pas: 82, def: 50, spd: 84, sta: 83, team: '대구 FC', avatar: '' }
+];
+
+    let squad = [];
+    let currentLineup = Array(11).fill(null);
+    let currentFormation = '4-2-3-1';
+    let isHorizontalPitch = false;
+    let activeModalSlotIndex = null;
+    let radarChartInstance = null;
+
+    // Formations Preset Slot Definitions
+    const FORMATIONS = {
+      '4-3-3': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'LB', posGroup: 'DF', x: 15, y: 72 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 38, y: 76 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 62, y: 76 },
+        { slotId: 4, label: 'RB', posGroup: 'DF', x: 85, y: 72 },
+        { slotId: 5, label: 'DM', posGroup: 'MF', x: 50, y: 56 },
+        { slotId: 6, label: 'CM', posGroup: 'MF', x: 32, y: 42 },
+        { slotId: 7, label: 'CM', posGroup: 'MF', x: 68, y: 42 },
+        { slotId: 8, label: 'LW', posGroup: 'FW', x: 18, y: 18 },
+        { slotId: 9, label: 'ST', posGroup: 'FW', x: 50, y: 14 },
+        { slotId: 10, label: 'RW', posGroup: 'FW', x: 82, y: 18 }
+      ],
+      '4-2-3-1': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'LB', posGroup: 'DF', x: 15, y: 73 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 38, y: 77 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 62, y: 77 },
+        { slotId: 4, label: 'RB', posGroup: 'DF', x: 85, y: 73 },
+        { slotId: 5, label: 'LDM', posGroup: 'MF', x: 35, y: 58 },
+        { slotId: 6, label: 'RDM', posGroup: 'MF', x: 65, y: 58 },
+        { slotId: 7, label: 'LAM', posGroup: 'MF', x: 20, y: 36 },
+        { slotId: 8, label: 'CAM', posGroup: 'MF', x: 50, y: 34 },
+        { slotId: 9, label: 'RAM', posGroup: 'MF', x: 80, y: 36 },
+        { slotId: 10, label: 'ST', posGroup: 'FW', x: 50, y: 14 }
+      ],
+      '4-4-2': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'LB', posGroup: 'DF', x: 15, y: 72 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 38, y: 75 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 62, y: 75 },
+        { slotId: 4, label: 'RB', posGroup: 'DF', x: 85, y: 72 },
+        { slotId: 5, label: 'LM', posGroup: 'MF', x: 18, y: 44 },
+        { slotId: 6, label: 'CM', posGroup: 'MF', x: 38, y: 48 },
+        { slotId: 7, label: 'CM', posGroup: 'MF', x: 62, y: 48 },
+        { slotId: 8, label: 'RM', posGroup: 'MF', x: 82, y: 44 },
+        { slotId: 9, label: 'ST', posGroup: 'FW', x: 35, y: 18 },
+        { slotId: 10, label: 'ST', posGroup: 'FW', x: 65, y: 18 }
+      ],
+      '3-5-2': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'CB', posGroup: 'DF', x: 25, y: 76 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 50, y: 78 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 75, y: 76 },
+        { slotId: 4, label: 'LWB', posGroup: 'MF', x: 12, y: 48 },
+        { slotId: 5, label: 'DM', posGroup: 'MF', x: 50, y: 58 },
+        { slotId: 6, label: 'CM', posGroup: 'MF', x: 34, y: 42 },
+        { slotId: 7, label: 'CM', posGroup: 'MF', x: 66, y: 42 },
+        { slotId: 8, label: 'RWB', posGroup: 'MF', x: 88, y: 48 },
+        { slotId: 9, label: 'ST', posGroup: 'FW', x: 35, y: 18 },
+        { slotId: 10, label: 'ST', posGroup: 'FW', x: 65, y: 18 }
+      ],
+      '3-4-3': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'CB', posGroup: 'DF', x: 25, y: 76 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 50, y: 78 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 75, y: 76 },
+        { slotId: 4, label: 'LM', posGroup: 'MF', x: 15, y: 46 },
+        { slotId: 5, label: 'CM', posGroup: 'MF', x: 38, y: 48 },
+        { slotId: 6, label: 'CM', posGroup: 'MF', x: 62, y: 48 },
+        { slotId: 7, label: 'RM', posGroup: 'MF', x: 85, y: 46 },
+        { slotId: 8, label: 'LW', posGroup: 'FW', x: 20, y: 18 },
+        { slotId: 9, label: 'ST', posGroup: 'FW', x: 50, y: 15 },
+        { slotId: 10, label: 'RW', posGroup: 'FW', x: 80, y: 18 }
+      ],
+      '4-1-4-1': [
+        { slotId: 0, label: 'GK', posGroup: 'GK', x: 50, y: 90 },
+        { slotId: 1, label: 'LB', posGroup: 'DF', x: 15, y: 73 },
+        { slotId: 2, label: 'CB', posGroup: 'DF', x: 38, y: 76 },
+        { slotId: 3, label: 'CB', posGroup: 'DF', x: 62, y: 76 },
+        { slotId: 4, label: 'RB', posGroup: 'DF', x: 85, y: 73 },
+        { slotId: 5, label: 'DM', posGroup: 'MF', x: 50, y: 58 },
+        { slotId: 6, label: 'LM', posGroup: 'MF', x: 18, y: 38 },
+        { slotId: 7, label: 'AM', posGroup: 'MF', x: 38, y: 38 },
+        { slotId: 8, label: 'AM', posGroup: 'MF', x: 62, y: 38 },
+        { slotId: 9, label: 'RM', posGroup: 'MF', x: 82, y: 38 },
+        { slotId: 10, label: 'ST', posGroup: 'FW', x: 50, y: 15 }
+      ]
+    };
+
+    /* ==========================================
+       LOCAL STORAGE DATA PERSISTENCE
+    ========================================== */
+    function saveDataToStorage() {
+      try {
+        localStorage.setItem('builder_squad_data', JSON.stringify(squad));
+        localStorage.setItem('builder_lineup_data', JSON.stringify(currentLineup));
+        localStorage.setItem('builder_formation', currentFormation);
+      } catch (e) {
+        console.warn('LocalStorage 저장 실패', e);
+      }
+    }
+
+    function loadDataFromStorage() {
+      try {
+        const savedSquad = localStorage.getItem('builder_squad_data');
+        const savedLineup = localStorage.getItem('builder_lineup_data');
+        const savedFormation = localStorage.getItem('builder_formation');
+
+        if (savedSquad) {
+          squad = JSON.parse(savedSquad);
+        } else {
+          squad = JSON.parse(JSON.stringify(DEFAULT_SQUAD));
+        }
+
+        if (savedLineup) {
+          currentLineup = JSON.parse(savedLineup);
+        }
+
+        if (savedFormation && FORMATIONS[savedFormation]) {
+          currentFormation = savedFormation;
+          document.getElementById('formationSelect').value = savedFormation;
+        }
+      } catch (e) {
+        console.warn('LocalStorage 복원 실패', e);
+        squad = JSON.parse(JSON.stringify(DEFAULT_SQUAD));
+      }
+    }
+
+    function resetAllData() {
+      if (confirm('저장된 선수단 및 라인업 데이터를 초기화하시겠습니까? 기본 선수단으로 복원됩니다.')) {
+        localStorage.removeItem('builder_squad_data');
+        localStorage.removeItem('builder_lineup_data');
+        localStorage.removeItem('builder_formation');
+        squad = JSON.parse(JSON.stringify(DEFAULT_SQUAD));
+        currentLineup = Array(11).fill(null);
+        autoFillSquad();
+        renderSquadList();
+        renderPitch();
+        showToast('데이터가 초기화되었습니다.');
+      }
+    }
+
+    /* ==========================================
+       2. HELPER FUNCTIONS & OVERALL COMPUTATION
+    ========================================== */
+    function calcOverall(p) {
+      if (!p) return 0;
+      return Math.round((p.att + p.pas + p.def + p.spd + p.sta) / 5);
+    }
+
+    function getPosBadgeColor(pos) {
+      switch(pos) {
+        case 'FW': return 'bg-rose-500 text-white';
+        case 'MF': return 'bg-amber-500 text-slate-950';
+        case 'DF': return 'bg-blue-500 text-white';
+        case 'GK': return 'bg-emerald-500 text-white';
+        default: return 'bg-slate-600 text-white';
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    /* ==========================================
+       3. RENDERERS (PITCH & SQUAD LIST)
+    ========================================== */
+    function renderPitch() {
+  const slotsContainer = document.getElementById('pitchSlots');
+  slotsContainer.innerHTML = '';
+
+  const slots = FORMATIONS[currentFormation] || FORMATIONS['4-2-3-1'];
+
+  slots.forEach((slot, index) => {
+    const assignedPlayerId = currentLineup[index];
+    const player = squad.find(p => p.id === assignedPlayerId);
+    
+    let leftPct = slot.x;
+    let topPct = slot.y;
+
+    if (isHorizontalPitch) {
+      leftPct = slot.y;
+      topPct = 100 - slot.x;
+    }
+
+    const slotEl = document.createElement('div');
+    slotEl.className = 'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer group transition-all duration-300';
+    slotEl.style.left = `${leftPct}%`;
+    slotEl.style.top = `${topPct}%`;
+    slotEl.onclick = () => selectPitchPlayer(index);
+
+    if (player) {
+      const overall = calcOverall(player);
+      const isPosMatched = player.pos === slot.posGroup;
+
+      slotEl.innerHTML = `
+        <div class="relative group">
+          <!-- 선수 사진/아바타 (크기 확대 반영) -->
+          <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 ${isPosMatched ? 'border-amber-400' : 'border-rose-400'} bg-slate-900 shadow-2xl flex items-center justify-center overflow-hidden transition transform group-hover:scale-110">
+            ${player.avatar 
+              ? `<img src="${player.avatar}" class="w-full h-full object-cover">` 
+              : `<div class="flex flex-col items-center justify-center bg-slate-800 w-full h-full"><i class="fa-solid fa-user text-slate-400 text-lg sm:text-2xl"></i></div>`}
+          </div>
+          <!-- 오버롤 뱃지 -->
+          <div class="absolute -top-1 -right-1 bg-slate-950 text-amber-400 border border-amber-400/60 text-[10px] sm:text-xs font-black w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow">
+            ${overall}
+          </div>
+          <!-- 포지션 라벨 뱃지 -->
+          <div class="absolute -bottom-1 -left-1 ${getPosBadgeColor(player.pos)} text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md shadow">
+            ${slot.label}
+          </div>
+        </div>
+        <!-- 선수 이름 라벨 -->
+        <div class="mt-1 bg-slate-950/90 text-white font-bold text-[10px] sm:text-xs px-2 py-0.5 rounded-full border border-slate-700/80 max-w-[90px] truncate text-center shadow">
+          ${player.name}
+        </div>
+      `;
+    } else {
+      slotEl.innerHTML = `
+        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-dashed border-white/50 bg-black/30 backdrop-blur-xs flex flex-col items-center justify-center text-white/80 transition group-hover:border-amber-400 group-hover:bg-amber-500/20 group-hover:scale-110">
+          <span class="text-xs sm:text-sm font-black">${slot.label}</span>
+          <i class="fa-solid fa-plus text-[10px] mt-0.5 text-amber-400"></i>
+        </div>
+      `;
+    }
+
+    slotsContainer.appendChild(slotEl);
+  });
+
+  updateStatsSummary();
+  saveDataToStorage();
+}
+    function renderSquadList() {
+      const container = document.getElementById('squadListContainer');
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      const posFilter = document.getElementById('positionFilter').value;
+
+      const squadCountEl = document.getElementById('squadCount');
+      if (squadCountEl) squadCountEl.innerText = squad.length;
+
+      const teamFilter = document.getElementById('teamFilter').value;
+
+      const filtered = squad.filter(p => {
+        const matchesName = p.name.toLowerCase().includes(searchVal);
+        const matchesPos = posFilter === 'ALL' || p.pos === posFilter;
+        const matchesTeam = teamFilter === 'ALL' || (p.team && p.team.includes(teamFilter));
+        return matchesName && matchesPos && matchesTeam;
+});
+
+      container.innerHTML = '';
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">조건에 맞는 선수가 없습니다.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const isSelected = currentLineup.includes(p.id);
+        const overall = calcOverall(p);
+
+        const card = document.createElement('div');
+        card.className = `p-2.5 rounded-xl border transition flex items-center justify-between ${isSelected ? 'bg-slate-800/90 border-emerald-500/60' : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800/70'}`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-slate-200 overflow-hidden">
+              ${p.avatar ? `<img src="${p.avatar}" class="w-full h-full object-cover">` : p.name.substring(0, 2)}
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-xs sm:text-sm text-slate-100">${p.name}</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${getPosBadgeColor(p.pos)}">${p.pos}</span>
+              <span class="text-[10px] text-slate-400 font-mono">#${p.number || '-'}</span>
+            </div>
+            <!-- 소속팀 표시 추가 -->
+            <div class="flex items-center gap-1 mt-0.5">
+              ${p.teamLogo ? `<img src="${p.teamLogo}" class="w-3.5 h-3.5 object-contain">` : '<i class="fa-solid fa-shield-cat text-[10px] text-slate-500"></i>'}
+              <span class="text-[10px] text-emerald-400 font-medium">${p.team || '소속 미지정'}</span>
+            </div>
+              <div class="text-[10px] text-slate-400 mt-0.5 flex gap-2">
+                <span>공:${p.att}</span> <span>패:${p.pas}</span> <span>수:${p.def}</span> <span>스:${p.spd}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="text-right">
+              <div class="text-xs font-black text-amber-400">${overall}</div>
+              <div class="text-[9px] text-slate-500">OVR</div>
+            </div>
+            
+            <button onclick="openEditPlayerModal(${p.id})" class="text-slate-400 hover:text-slate-200 p-1 text-xs" title="선수 수정">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+
+            ${isSelected ? 
+              `<button onclick="removeFromLineupByPlayerId(${p.id})" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-2 py-1 rounded-lg transition font-semibold">
+                해제
+               </button>` :
+              `<button onclick="quickAssignPlayer(${p.id})" class="text-xs bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 px-2 py-1 rounded-lg transition font-semibold">
+                배치
+               </button>`
+            }
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* ==========================================
+       4. LINEUP LOGIC & AUTO FILL
+    ========================================== */
+    function openAssignModal(slotIndex) {
+      activeModalSlotIndex = slotIndex;
+      const slots = FORMATIONS[currentFormation];
+      const slotInfo = slots[slotIndex];
+
+      document.getElementById('assignModalTitle').innerText = `${slotInfo.label} 포지션 선수 지정`;
+      document.getElementById('assignModalSub').innerText = `추천 주 포지션: ${slotInfo.posGroup}`;
+
+      const assignedPlayerId = currentLineup[slotIndex];
+      const currentCard = document.getElementById('currentSlotPlayerCard');
+
+      if (assignedPlayerId) {
+        const p = squad.find(x => x.id === assignedPlayerId);
+        if (p) {
+          currentCard.classList.remove('hidden');
+          document.getElementById('currentSlotName').innerText = p.name;
+          document.getElementById('currentSlotPos').innerText = `주포지션: ${p.pos} | OVR: ${calcOverall(p)}`;
+          document.getElementById('currentSlotAvatar').innerText = p.name.substring(0, 2);
+        }
+      } else {
+        currentCard.classList.add('hidden');
+      }
+
+      const modalList = document.getElementById('modalPlayerList');
+      modalList.innerHTML = '';
+
+      const candidates = [...squad].sort((a, b) => {
+        const aFit = a.pos === slotInfo.posGroup ? 100 : 0;
+        const bFit = b.pos === slotInfo.posGroup ? 100 : 0;
+        return (bFit + calcOverall(b)) - (aFit + calcOverall(a));
+      });
+
+      candidates.forEach(p => {
+        const isAssignedSomewhere = currentLineup.includes(p.id);
+        const isCurrentSlotPlayer = (assignedPlayerId === p.id);
+        const overall = calcOverall(p);
+
+        const item = document.createElement('div');
+        item.className = `p-2 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition ${isCurrentSlotPlayer ? 'bg-amber-500/20 border-amber-500' : isAssignedSomewhere ? 'opacity-40 bg-slate-900 border-slate-800' : 'bg-slate-900/80 border-slate-700/80 hover:border-emerald-500'}`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="font-bold ${getPosBadgeColor(p.pos)} px-1.5 py-0.5 rounded text-[10px]">${p.pos}</span>
+            <span class="font-bold text-slate-100">${p.name}</span>
+            ${p.pos === slotInfo.posGroup ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 rounded">적합</span>' : ''}
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-amber-400">OVR ${overall}</span>
+            <button onclick="assignPlayerToActiveSlot(${p.id})" ${isAssignedSomewhere && !isCurrentSlotPlayer ? 'disabled' : ''} class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition">
+              ${isCurrentSlotPlayer ? '선택됨' : '선택'}
+            </button>
+          </div>
+        `;
+        modalList.appendChild(item);
+      });
+
+      document.getElementById('slotAssignModal').classList.remove('hidden');
+    }
+
+    function closeAssignModal() {
+      document.getElementById('slotAssignModal').classList.add('hidden');
+      activeModalSlotIndex = null;
+    }
+
+    function assignPlayerToActiveSlot(playerId) {
+      if (activeModalSlotIndex === null) return;
+      
+      const existingSlotIndex = currentLineup.indexOf(playerId);
+      if (existingSlotIndex !== -1) {
+        currentLineup[existingSlotIndex] = null;
+      }
+
+      currentLineup[activeModalSlotIndex] = playerId;
+      renderPitch();
+      renderSquadList();
+      closeAssignModal();
+      showToast('선수가 포지션에 배치되었습니다.');
+    }
+
+    function unassignCurrentSlot() {
+      if (activeModalSlotIndex === null) return;
+      currentLineup[activeModalSlotIndex] = null;
+      renderPitch();
+      renderSquadList();
+      closeAssignModal();
+      showToast('선발 해제되었습니다.');
+    }
+
+    function quickAssignPlayer(playerId) {
+      const emptyIndex = currentLineup.findIndex(slot => slot === null);
+      if (emptyIndex === -1) {
+        showToast('이미 11명이 모두 채워졌습니다.');
+        return;
+      }
+      currentLineup[emptyIndex] = playerId;
+      renderPitch();
+      renderSquadList();
+      showToast('선수가 라인업에 추가되었습니다.');
+    }
+
+    function removeFromLineupByPlayerId(playerId) {
+      const idx = currentLineup.indexOf(playerId);
+      if (idx !== -1) {
+        currentLineup[idx] = null;
+        renderPitch();
+        renderSquadList();
+        showToast('라인업에서 제외되었습니다.');
+      }
+    }
+
+    function clearLineup() {
+      if (confirm('현재 라인업을 모두 초기화하시겠습니까?')) {
+        currentLineup = Array(11).fill(null);
+        renderPitch();
+        renderSquadList();
+        showToast('라인업이 초기화되었습니다.');
+      }
+    }
+
+    function autoFillSquad() {
+      const slots = FORMATIONS[currentFormation];
+      const usedIds = new Set();
+      const newLineup = Array(11).fill(null);
+
+      slots.forEach((slot, idx) => {
+        const matched = squad
+          .filter(p => !usedIds.has(p.id) && p.pos === slot.posGroup)
+          .sort((a, b) => calcOverall(b) - calcOverall(a));
+
+        if (matched.length > 0) {
+          newLineup[idx] = matched[0].id;
+          usedIds.add(matched[0].id);
+        }
+      });
+
+      slots.forEach((slot, idx) => {
+        if (!newLineup[idx]) {
+          const remaining = squad
+            .filter(p => !usedIds.has(p.id))
+            .sort((a, b) => calcOverall(b) - calcOverall(a));
+
+          if (remaining.length > 0) {
+            newLineup[idx] = remaining[0].id;
+            usedIds.add(remaining[0].id);
+          }
+        }
+      });
+
+      currentLineup = newLineup;
+      renderPitch();
+      renderSquadList();
+      showToast('추천 라인업으로 자동 채우기가 완료되었습니다.');
+    }
+
+    /* ==========================================
+       5. STATS, CHART.JS ANALYTICS & BREAKDOWN
+    ========================================== */
+    function updateStatsSummary() {
+      const selectedPlayers = currentLineup
+        .map(id => squad.find(p => p.id === id))
+        .filter(Boolean);
+
+      const count = selectedPlayers.length;
+      document.getElementById('selectedCount').innerText = count;
+
+      if (count === 0) {
+        document.getElementById('teamAvgOverall').innerText = 0;
+        document.getElementById('squadCompleteness').innerText = '0%';
+        document.getElementById('positionFitScore').innerText = '0점';
+        updateBar('Att', 0); updateBar('Pas', 0); updateBar('Def', 0); updateBar('Spd', 0); updateBar('Sta', 0);
+        updateRadarChart([0,0,0,0,0]);
+        return;
+      }
+
+      let attSum = 0, pasSum = 0, defSum = 0, spdSum = 0, staSum = 0;
+      let fitMatchCount = 0;
+
+      const slots = FORMATIONS[currentFormation];
+      currentLineup.forEach((pId, idx) => {
+        if (!pId) return;
+        const p = squad.find(x => x.id === pId);
+        if (p) {
+          attSum += p.att; pasSum += p.pas; defSum += p.def; spdSum += p.spd; staSum += p.sta;
+          if (p.pos === slots[idx].posGroup) fitMatchCount++;
+        }
+      });
+
+      const attAvg = Math.round(attSum / count);
+      const pasAvg = Math.round(pasSum / count);
+      const defAvg = Math.round(defSum / count);
+      const spdAvg = Math.round(spdSum / count);
+      const staAvg = Math.round(staSum / count);
+
+      const overallTeamAvg = Math.round((attAvg + pasAvg + defAvg + spdAvg + staAvg) / 5);
+
+      document.getElementById('teamAvgOverall').innerText = overallTeamAvg;
+      document.getElementById('squadCompleteness').innerText = `${Math.round((count / 11) * 100)}%`;
+      document.getElementById('positionFitScore').innerText = `${Math.round((fitMatchCount / count) * 100)}점`;
+
+      updateBar('Att', attAvg);
+      updateBar('Pas', pasAvg);
+      updateBar('Def', defAvg);
+      updateBar('Spd', spdAvg);
+      updateBar('Sta', staAvg);
+
+      updateRadarChart([attAvg, pasAvg, defAvg, spdAvg, staAvg]);
+    }
+
+    function updateBar(key, val) {
+      document.getElementById(`statVal${key}`).innerText = val;
+      document.getElementById(`statBar${key}`).style.width = `${val}%`;
+    }
+
+    function initRadarChart() {
+      const ctx = document.getElementById('teamRadarChart').getContext('2d');
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['공격력', '패스', '수비력', '스피드', '체력'],
+          datasets: [{
+            label: '팀 평균 스탯',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(16, 185, 129, 0.25)',
+            borderColor: '#10b981',
+            borderWidth: 2,
+            pointBackgroundColor: '#f59e0b',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#f59e0b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+              grid: { color: 'rgba(255, 255, 255, 0.15)' },
+              pointLabels: {
+                color: '#cbd5e1',
+                font: { size: 11, weight: 'bold' }
+              },
+              ticks: {
+                display: false,
+                min: 0,
+                max: 100
+              },
+              suggestedMin: 30,
+              suggestedMax: 100
+            }
+          }
+        }
+      });
+    }
+
+    function updateRadarChart(dataArr, labelName = '팀 평균 스탯') {
+  if (!radarChartInstance) return;
+  radarChartInstance.data.datasets[0].label = labelName;
+  radarChartInstance.data.datasets[0].data = dataArr;
+  radarChartInstance.update();
+}
+
+    /* ==========================================
+       6. AUTOMATED MULTI-FILE EXCEL & CSV UPLOAD + FLEXIBLE COLUMN MATCHING
+    ========================================== */
+
+    // 유연한 헤더 매핑 유틸리티
+    function getValueByKeys(row, keys) {
+      const rowKeys = Object.keys(row);
+      for (const k of keys) {
+        // 정확히 일치하는 경우
+        if (row[k] !== undefined) return row[k];
+        // 대소문자 구분 없이 또는 부분 일치 검색
+        const foundKey = rowKeys.find(rk => rk.trim().toLowerCase() === k.toLowerCase());
+        if (foundKey && row[foundKey] !== undefined) return row[foundKey];
+      }
+      return undefined;
+    }
+
+    function normalizePosition(posRaw) {
+      if (!posRaw) return 'FW';
+      const str = String(posRaw).toUpperCase().trim();
+      if (str.includes('GK') || str.includes('골키퍼') || str.includes('키퍼')) return 'GK';
+      if (str.includes('DF') || str.includes('수비') || str.includes('CB') || str.includes('LB') || str.includes('RB') || str.includes('WB')) return 'DF';
+      if (str.includes('MF') || str.includes('미드') || str.includes('CM') || str.includes('DM') || str.includes('AM') || str.includes('LM') || str.includes('RM')) return 'MF';
+      return 'FW';
+    }
+
+    function parseNumericStat(val, defaultVal = 70) {
+      const parsed = parseInt(val);
+      if (isNaN(parsed) || parsed < 0) return defaultVal;
+      return Math.min(99, Math.max(1, parsed));
+    }
+
+  document.getElementById('excelInput').addEventListener('change', async function(e) {
+  const files = Array.from(e.target.files);
+  if (!files || files.length === 0) return;
+
+  let totalAddedCount = 0;
+  let totalUpdatedCount = 0;
+  let imageMatchedCount = 0;
+
+  for (const file of files) {
+    const fileName = file.name;
+    const fileExt = fileName.split('.').pop().toLowerCase();
+
+    // 1. 이미지 파일인 경우 (선수 이름과 파일명이 일치하면 프로필 사진으로 자동 매칭)
+    if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(fileExt) || file.type.startsWith('image/')) {
+      const playerNameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')).trim();
+
+      const targetPlayer = squad.find(p => p.name.trim() === playerNameWithoutExt);
+      if (targetPlayer) {
+        await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            targetPlayer.avatar = evt.target.result; // 이미지를 Base64 데이터로 변환하여 적용
+            imageMatchedCount++;
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      continue;
+    }
+
+    // 2. 엑셀 / CSV 파일인 경우 (기존 데이터 처리)
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array' });
+
+      workbook.SheetNames.forEach(sheetName => {
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+
+        jsonRows.forEach(row => {
+          const rawName = getValueByKeys(row, ['이름', '선수명', '성명', 'Name', 'player_name', 'player']);
+          if (!rawName) return;
+
+          const cleanName = String(rawName).trim();
+          const rawPos = getValueByKeys(row, ['포지션', '주포지션', 'Position', 'pos', 'role']);
+          const pos = normalizePosition(rawPos);
+
+          // 팀명 자동 인식 (없으면 '기타 K리그'로 지정)
+          const rawTeam = getValueByKeys(row, ['팀', '소속', '구단', 'Team', 'team']);
+          const team = rawTeam ? String(rawTeam).trim() : '기타 K리그';
+
+          const rawNumber = getValueByKeys(row, ['등번호', '번호', 'Number', 'back_number', 'no', 'num']);
+          const number = parseInt(rawNumber) || (squad.length + 1);
+
+          const att = parseNumericStat(getValueByKeys(row, ['공격력', '공격', 'ATT', 'attack', 'offense']));
+          const pas = parseNumericStat(getValueByKeys(row, ['패스', 'PAS', 'pass', 'passing']));
+          const def = parseNumericStat(getValueByKeys(row, ['수비력', '수비', 'DEF', 'defense']));
+          const spd = parseNumericStat(getValueByKeys(row, ['스피드', '속도', '주력', 'SPD', 'speed', 'pace']));
+          const sta = parseNumericStat(getValueByKeys(row, ['체력', '활동량', 'STA', 'stamina', 'physical']));
+          const avatar = String(getValueByKeys(row, ['이미지', '프로필', 'Avatar', 'avatar', 'image']) || '').trim();
+
+          const existingIndex = squad.findIndex(p => p.name === cleanName && p.pos === pos);
+
+          if (existingIndex !== -1) {
+            squad[existingIndex] = {
+              ...squad[existingIndex],
+              number: number || squad[existingIndex].number,
+              att, pas, def, spd, sta,
+              avatar: avatar || squad[existingIndex].avatar
+            };
+            totalUpdatedCount++;
+          } else {
+            squad.push({
+              id: Date.now() + Math.floor(Math.random() * 100000),
+              name: cleanName,
+              pos: pos,
+              number: number,
+              att: att,
+              pas: pas,
+              def: def,
+              spd: spd,
+              sta: sta,
+              avatar: avatar,
+              team: team,
+            });
+            totalAddedCount++;
+          }
+        });
+      });
+    } catch (err) {
+      console.error(`${file.name} 처리 중 오류 발생:`, err);
+    }
+  }
+
+  renderSquadList();
+  renderPitch();
+  saveDataToStorage();
+
+  showToast(`파일 처리 완료! (신규 ${totalAddedCount}명, 업데이트 ${totalUpdatedCount}명, 사진매칭 ${imageMatchedCount}개)`);
+  e.target.value = '';
+});
+    function downloadSampleExcel() {
+      const sampleData = [
+        { 이름: '손흥민', 포지션: 'FW', 등번호: 7, 공격력: 92, 패스: 82, 수비력: 45, 스피드: 91, 체력: 88 },
+        { 이름: '김민재', 포지션: 'DF', 등번호: 3, 공격력: 55, 패스: 72, 수비력: 91, 스피드: 86, 체력: 90 },
+        { 이름: '이강인', 포지션: 'MF', 등번호: 18, 공격력: 84, 패스: 90, 수비력: 55, 스피드: 79, 체력: 82 },
+        { 이름: '조현우', 포지션: 'GK', 등번호: 21, 공격력: 25, 패스: 62, 수비력: 86, 스피드: 60, 체력: 75 }
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(sampleData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, '선수단명단');
+      XLSX.writeFile(workbook, '감독내가한다_선수단_샘플.xlsx');
+    }
+
+    /* ==========================================
+       7. PLAYER ADD / EDIT / DELETE FORM MODALS
+    ========================================== */
+    function openAddPlayerModal() {
+      document.getElementById('formPlayerId').value = '';
+      document.getElementById('playerFormTitle').innerText = '신규 선수 등록';
+      document.getElementById('playerForm').reset();
+      document.getElementById('deletePlayerBtn').classList.add('hidden');
+      
+      document.getElementById('valAttText').innerText = 75;
+      document.getElementById('valPasText').innerText = 75;
+      document.getElementById('valDefText').innerText = 75;
+      document.getElementById('valSpdText').innerText = 75;
+      document.getElementById('valStaText').innerText = 75;
+
+      document.getElementById('playerFormModal').classList.remove('hidden');
+    }
+
+    function openEditPlayerModal(playerId) {
+      const p = squad.find(x => x.id === playerId);
+      if (!p) return;
+
+      document.getElementById('formPlayerId').value = p.id;
+      document.getElementById('playerFormTitle').innerText = '선수 정보 수정';
+      document.getElementById('deletePlayerBtn').classList.remove('hidden');
+
+      document.getElementById('formName').value = p.name;
+      document.getElementById('formPosition').value = p.pos;
+      document.getElementById('formBackNumber').value = p.number || '';
+      document.getElementById('formAvatar').value = p.avatar || '';
+
+      document.getElementById('formAtt').value = p.att; document.getElementById('valAttText').innerText = p.att;
+      document.getElementById('formPas').value = p.pas; document.getElementById('valPasText').innerText = p.pas;
+      document.getElementById('formDef').value = p.def; document.getElementById('valDefText').innerText = p.def;
+      document.getElementById('formSpd').value = p.spd; document.getElementById('valSpdText').innerText = p.spd;
+      document.getElementById('formSta').value = p.sta; document.getElementById('valStaText').innerText = p.sta;
+
+      document.getElementById('playerFormModal').classList.remove('hidden');
+    }
+
+    function closePlayerFormModal() {
+      document.getElementById('playerFormModal').classList.add('hidden');
+    }
+
+    function deletePlayerFromForm() {
+      const idVal = document.getElementById('formPlayerId').value;
+      if (!idVal) return;
+
+      if (confirm('이 선수를 선수단에서 삭제하시겠습니까?')) {
+        const pId = parseInt(idVal);
+        squad = squad.filter(x => x.id !== pId);
+        removeFromLineupByPlayerId(pId);
+        renderSquadList();
+        renderPitch();
+        closePlayerFormModal();
+        saveDataToStorage();
+        showToast('선수가 삭제되었습니다.');
+      }
+    }
+
+    function savePlayerForm(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('formPlayerId').value;
+      const name = document.getElementById('formName').value.trim();
+      const pos = document.getElementById('formPosition').value;
+      const number = parseInt(document.getElementById('formBackNumber').value) || 0;
+      const avatar = document.getElementById('formAvatar').value.trim();
+
+      const att = parseInt(document.getElementById('formAtt').value);
+      const pas = parseInt(document.getElementById('formPas').value);
+      const def = parseInt(document.getElementById('formDef').value);
+      const spd = parseInt(document.getElementById('formSpd').value);
+      const sta = parseInt(document.getElementById('formSta').value);
+
+      if (idVal) {
+        const p = squad.find(x => x.id === parseInt(idVal));
+        if (p) {
+          p.name = name; p.pos = pos; p.number = number; p.avatar = avatar;
+          p.att = att; p.pas = pas; p.def = def; p.spd = spd; p.sta = sta;
+          showToast('선수 정보가 수정되었습니다.');
+        }
+      } else {
+        const newP = {
+          id: Date.now(),
+          name, pos, number, avatar,
+          att, pas, def, spd, sta
+        };
+        squad.push(newP);
+        showToast('새로운 선수가 등록되었습니다.');
+      }
+
+      renderSquadList();
+      renderPitch();
+      saveDataToStorage();
+      closePlayerFormModal();
+    }
+
+    /* ==========================================
+       8. SUMMARY MODAL & SHARE EXPORT
+    ========================================== */
+    function openLineupSummaryModal() {
+      document.getElementById('sumFormationText').innerText = `포메이션: ${currentFormation}`;
+      const listContainer = document.getElementById('sumPlayerList');
+      listContainer.innerHTML = '';
+
+      const slots = FORMATIONS[currentFormation];
+      let assignedCount = 0;
+
+      slots.forEach((slot, idx) => {
+        const pId = currentLineup[idx];
+        const p = squad.find(x => x.id === pId);
+
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded border border-slate-800';
+
+        if (p) {
+          assignedCount++;
+          row.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-amber-400 w-8">${slot.label}</span>
+              <span class="font-bold text-slate-200">${p.name} (#${p.number || '-'})</span>
+            </div>
+            <span class="text-slate-400 font-mono">OVR ${calcOverall(p)}</span>
+          `;
+        } else {
+          row.innerHTML = `
+            <div class="flex items-center gap-2 text-slate-500">
+              <span class="font-bold w-8">${slot.label}</span>
+              <span>(미지정)</span>
+            </div>
+            <span class="text-slate-600">-</span>
+          `;
+        }
+        listContainer.appendChild(row);
+      });
+
+      document.getElementById('sumAvg').innerText = document.getElementById('teamAvgOverall').innerText;
+      document.getElementById('sumComp').innerText = `${Math.round((assignedCount / 11) * 100)}%`;
+
+      document.getElementById('summaryModal').classList.remove('hidden');
+    }
+
+
+
+    function refreshSquadData() {
+  if (confirm('선수단, 프로필 사진 및 팀 로고 데이터를 최신으로 동기화하시겠습니까?')) {
+    DEFAULT_SQUAD.forEach(defaultPlayer => {
+      const exists = squad.find(p => p.name === defaultPlayer.name);
+      if (!exists) {
+        squad.push({ ...defaultPlayer });
+      } else {
+        exists.team = defaultPlayer.team;
+        exists.teamLogo = defaultPlayer.teamLogo || exists.teamLogo;
+        exists.avatar = defaultPlayer.avatar || exists.avatar;
+        exists.att = defaultPlayer.att; exists.pas = defaultPlayer.pas;
+        exists.def = defaultPlayer.def; exists.spd = defaultPlayer.spd; exists.sta = defaultPlayer.sta;
+      }
+    });
+    renderSquadList();
+    renderPitch();
+    saveDataToStorage();
+    showToast('선수 데이터 및 로고/사진 동기화 완료!');
+  }
+}
+    function closeSummaryModal() {
+      document.getElementById('summaryModal').classList.add('hidden');
+    }
+
+    function copyLineupText() {
+      const slots = FORMATIONS[currentFormation];
+      let text = `[감독? 내가한다!] ${currentFormation} 베스트 11 라인업\n---------------------\n`;
+
+      slots.forEach((slot, idx) => {
+        const pId = currentLineup[idx];
+        const p = squad.find(x => x.id === pId);
+        text += `${slot.label}: ${p ? p.name + ' (#' + (p.number || '-') + ')' : '미지정'}\n`;
+      });
+
+      text += `---------------------\n팀 평균 스탯: ${document.getElementById('teamAvgOverall').innerText}점`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('라인업 텍스트가 클립보드에 복사되었습니다.');
+      }).catch(() => {
+        showToast('복사에 실패했습니다.');
+      });
+    }
+
+    /* ==========================================
+       9. UI TABS & EVENT LISTENERS
+    ========================================== */
+    function switchRightTab(tabKey) {
+      const btnSquad = document.getElementById('tabBtnSquad');
+      const btnStats = document.getElementById('tabBtnStats');
+      const contentSquad = document.getElementById('tabContentSquad');
+      const contentStats = document.getElementById('tabContentStats');
+
+      if (tabKey === 'squad') {
+        btnSquad.className = 'flex-1 py-2 text-center rounded-lg bg-emerald-600 text-white transition shadow-md font-bold';
+        btnStats.className = 'flex-1 py-2 text-center rounded-lg text-slate-400 hover:text-slate-200 transition font-bold';
+        contentSquad.classList.remove('hidden');
+        contentStats.classList.add('hidden');
+      } else {
+        btnStats.className = 'flex-1 py-2 text-center rounded-lg bg-emerald-600 text-white transition shadow-md font-bold';
+        btnSquad.className = 'flex-1 py-2 text-center rounded-lg text-slate-400 hover:text-slate-200 transition font-bold';
+        contentStats.classList.remove('hidden');
+        contentSquad.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('formationSelect').addEventListener('change', (e) => {
+      currentFormation = e.target.value;
+      renderPitch();
+      saveDataToStorage();
+    });
+
+    document.getElementById('toggleOrientationBtn').addEventListener('click', () => {
+      isHorizontalPitch = !isHorizontalPitch;
+      const board = document.getElementById('pitchBoard');
+      const label = document.getElementById('orientationLabel');
+
+      if (isHorizontalPitch) {
+        board.classList.remove('pitch-bg');
+        board.classList.add('pitch-bg-horizontal');
+        label.innerText = '가로 모드';
+      } else {
+        board.classList.remove('pitch-bg-horizontal');
+        board.classList.add('pitch-bg');
+        label.innerText = '세로 모드';
+      }
+      renderPitch();
+    });
+
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        document.body.classList.remove('bg-slate-900', 'text-slate-100');
+        document.body.classList.add('bg-slate-100', 'text-slate-900');
+        showToast('라이트 모드로 전환되었습니다.');
+      } else {
+        htmlEl.classList.add('dark');
+        document.body.classList.remove('bg-slate-100', 'text-slate-900');
+        document.body.classList.add('bg-slate-900', 'text-slate-100');
+        showToast('다크 모드로 전환되었습니다.');
+      }
+    });
+
+    /* ==========================================
+       10. APP INITIALIZATION
+    ========================================== */
+    window.onload = function() {
+      initRadarChart();
+      loadDataFromStorage();
+      
+      if (squad.length === 0) {
+        squad = JSON.parse(JSON.stringify(DEFAULT_SQUAD));
+        autoFillSquad();
+      }
+
+      renderSquadList();
+      renderPitch();
+    };
+    // 페이지 전환 (피치 화면 <-> 선수단 목록)
+function switchMainPage(pageKey) {
+  const pitchSec = document.getElementById('sectionPitch');
+  const squadSec = document.getElementById('sectionSquad');
+  const btnPitch = document.getElementById('btnNavPitch');
+  const btnSquad = document.getElementById('btnNavSquad');
+
+  if (pageKey === 'pitch') {
+    pitchSec.classList.remove('hidden');
+    squadSec.classList.add('hidden');
+    btnPitch.className = 'px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-600 text-white transition';
+    btnSquad.className = 'px-3 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition';
+  } else {
+    pitchSec.classList.add('hidden');
+    squadSec.classList.remove('hidden');
+    btnSquad.className = 'px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-600 text-white transition';
+    btnPitch.className = 'px-3 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition';
+    renderSquadList(); // 선수단 목록 갱신
+  }
+}
+
+// 피치 위 선수 클릭 시 육각 그래프 팝업 창 오픈
+function selectPitchPlayer(slotIndex) {
+  activeModalSlotIndex = slotIndex;
+  const pId = currentLineup[slotIndex];
+  const player = squad.find(p => p.id === pId);
+
+  if (player) {
+    // 1. 차트 레이블/데이터 업데이트
+    updateRadarChart([player.att, player.pas, player.def, player.spd, player.sta], `${player.name} 스탯`);
+
+    // 2. 모달 타이틀 수정
+    const titleEl = document.getElementById('modalPlayerTitle');
+    if (titleEl) {
+      titleEl.innerHTML = `<i class="fa-solid fa-user text-emerald-400"></i> ${player.name} (${player.pos}) 능력치`;
+    }
+
+    // 3. 교체 버튼에 함수 연결
+    const changeBtn = document.getElementById('btnModalChangePlayer');
+    if (changeBtn) {
+      changeBtn.onclick = () => {
+        closePlayerStatsModal();
+        openAssignModal(slotIndex);
+      };
+    }
+
+    // 4. 모달 창 표시
+    document.getElementById('playerStatsModal').classList.remove('hidden');
+  } else {
+    // 빈 슬롯이면 선수 교체/지정 모달 바로 열기
+    openAssignModal(slotIndex);
+  }
+}
+
+function closePlayerStatsModal() {
+  document.getElementById('playerStatsModal').classList.add('hidden');
+}
+
+  </script>
+</body>
+</html>
