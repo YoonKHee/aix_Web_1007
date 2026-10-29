@@ -1,0 +1,20 @@
+{% extends 'board/base.html' %}
+{% block title %}{{ mode }}{% endblock %}
+{% block content %}
+<div class="bd-title"><div><h1>{{ mode }}</h1><p>욕설·비하·혐오 표현이 들어 있으면 등록되지 않습니다.</p></div></div>
+<form class="card form wide" method="post">{% csrf_token %}
+  <div class="field"><label for="id_title">제목</label>{{ form.title }}
+    {% for e in form.title.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+  <div class="field"><label for="id_content">내용</label>{{ form.content }}
+    {% for e in form.content.errors %}<div class="err">{{ e }}</div>{% endfor %}
+    <div class="count"><span id="cnt">0</span> / 5000자</div></div>
+  <div class="formfoot">
+    <a class="btn sub" href="{% if post %}{% url 'board:detail' post.pk %}{% else %}{% url 'board:list' %}{% endif %}">취소</a>
+    <button class="btn" type="submit">{% if post %}수정 완료{% else %}등록{% endif %}</button>
+  </div>
+</form>
+<script>
+(function(){var t=document.getElementById('id_content'),c=document.getElementById('cnt');
+function u(){c.textContent=t.value.length}t.addEventListener('input',u);u();})();
+</script>
+{% endblock %}

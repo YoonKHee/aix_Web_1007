@@ -1,0 +1,15 @@
+{% extends 'board/base.html' %}
+{% block title %}회원가입{% endblock %}
+{% block content %}
+<form class="card form" method="post">{% csrf_token %}
+  <h1 style="margin-top:0">회원가입</h1>
+  <p class="muted" style="margin-top:-6px">아이디, 별명, 비밀번호만 입력하면 끝!</p>
+  {% for f in form %}
+  <div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}
+    {% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}
+    {% for e in f.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+  {% endfor %}
+  <button class="btn" type="submit" style="width:100%">가입하기</button>
+  <div class="auth-sub">이미 회원이신가요? <a href="{% url 'board:login' %}">로그인</a></div>
+</form>
+{% endblock %}

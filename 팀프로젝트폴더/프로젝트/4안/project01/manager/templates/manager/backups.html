@@ -1,0 +1,18 @@
+{% extends 'manager/base.html' %}
+{% block title %}백업{% endblock %}
+{% block content %}
+<h1>자동 백업 · 되돌리기</h1>
+<p>데이터를 반영하기 직전에 자동으로 백업됩니다. 최근 {{ keep }}개만 보관합니다. 파일 위치: <code>manager_backups/</code></p>
+<form method="post" action="{% url 'manager:backup_now' %}">{% csrf_token %}
+  <input type="text" name="reason" placeholder="메모 (선택)" size="30"> <button>지금 백업</button>
+</form>
+<table>
+  <tr><th>시각</th><th>사유</th><th>업로드</th><th>만든 사람</th><th class="num">크기</th><th></th></tr>
+  {% for b in items %}
+  <tr><td>{{ b.created|default:b.name }}</td><td>{{ b.reason|default:"-" }}</td>
+      <td>{% if b.batch %}<a href="{% url 'manager:import_report' b.batch %}">#{{ b.batch }}</a>{% endif %}</td>
+      <td>{{ b.user }}</td><td class="num">{{ b.size|filesizeformat }}</td>
+      <td><a href="{% url 'manager:backup_restore' b.name %}">되돌리기</a></td></tr>
+  {% empty %}<tr><td colspan="6">아직 백업이 없습니다.</td></tr>{% endfor %}
+</table>
+{% endblock %}
