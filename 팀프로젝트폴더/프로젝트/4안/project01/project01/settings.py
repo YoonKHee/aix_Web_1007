@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'team',
     'manager',
     'board',
+    'soccer_game',
 ]
 
 MIDDLEWARE = [

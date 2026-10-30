@@ -1,0 +1,141 @@
+{% extends 'manager/base.html' %}
+{% block title %}점검 결과{% endblock %}
+{% block content %}
+<h1>점검 결과 <small>{{ batch.filenames }}</small></h1>
+<div class="cards">
+  <div class="card">새로 등록<b>{{ plan.summary.create }}</b></div>
+  <div class="card">기존 수정<b>{{ plan.summary.update }}</b></div>
+  <div class="card">이적 의심<b>{{ plan.summary.transfer }}</b></div>
+  <div class="card">사진 연결<b>{{ plan.summary.photos_ok }}/{{ plan.summary.photos }}</b></div>
+  <div class="card error">오류<b>{{ plan.summary.errors }}</b></div>
+  <div class="card warn">주의<b>{{ plan.summary.warns }}</b></div>
+  <div class="card fix">자동 수정<b>{{ plan.summary.fixes }}</b></div>
+  <div class="card warn">이상 의심 선수<b>{{ plan.summary.anomalies }}</b></div>
+</div>
+
+{% if plan.unmatched %}
+<h2 class="error">매치되지 않은 항목 {{ plan.unmatched|length }}건</h2>
+<p>아래는 어느 선수와도 확실하게 연결하지 못해서 <b>반영하지 않은</b> 항목입니다.</p>
+<table>
+  <tr><th>종류</th><th>대상</th><th>이유</th></tr>
+  {% for u in plan.unmatched %}<tr><td>{{ u.kind }}</td><td>{{ u.label }}</td><td>{{ u.reason }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+
+<h2>파일별 분류</h2>
+{% for f in plan.files %}
+  <h4>{{ f.file }}</h4>
+  {% for n in f.notes %}<small>{{ n }}</small><br>{% endfor %}
+  {% if f.tables %}
+  <table>
+    <tr><th>표</th><th>종류</th><th class="num">줄 수</th><th>저장할 항목</th><th>새 컬럼(원래 이름 유지)</th></tr>
+    {% for t in f.tables %}
+    <tr>
+      <td>{{ t.label }}</td><td>{{ t.kind }}</td><td class="num">{{ t.rows }}</td>
+      <td>{% if t.mapped %}<details><summary>{{ t.mapped|length }}개</summary>{{ t.mapped|join:", " }}</details>{% endif %}</td>
+      <td>{{ t.extra|join:", " }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+{% endfor %}
+
+{% if errors %}
+<h2 class="error">오류 {{ errors|length }}종류</h2>
+<table>
+  <tr><th>위치</th><th>항목 / 값</th><th>무슨 문제인가</th><th>어떻게 처리했나</th></tr>
+  {% for i in errors %}<tr><td>{{ i.where }}</td><td>{{ i.column }} {% if i.value %}<code>{{ i.value }}</code>{% endif %}</td><td>{{ i.message }}{% if i.count > 1 %} <b>(×{{ i.count }})</b>{% endif %}</td><td>{{ i.action }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+
+{% if warns %}
+<h2 class="warn">주의 {{ warns|length }}종류</h2>
+<table>
+  <tr><th>위치</th><th>항목 / 값</th><th>내용</th><th>처리</th></tr>
+  {% for i in warns %}<tr><td>{{ i.where }}</td><td>{{ i.column }} {% if i.value %}<code>{{ i.value }}</code>{% endif %}</td><td>{{ i.message }}{% if i.count > 1 %} <b>(×{{ i.count }})</b>{% endif %}</td><td>{{ i.action }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+
+{% if fixes %}
+<h2 class="fix">자동으로 고친 것 {{ fixes|length }}종류</h2>
+<table>
+  <tr><th>위치</th><th>항목 / 값</th><th>내용</th><th>처리</th></tr>
+  {% for i in fixes %}<tr><td>{{ i.where }}</td><td>{{ i.column }}</td><td>{{ i.message }}{% if i.count > 1 %} <b>(×{{ i.count }})</b>{% endif %}</td><td>{{ i.action }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+
+{% if infos %}
+<details><summary class="info">참고 {{ infos|length }}건 (자동으로 처리된 내용)</summary>
+<table>
+  {% for i in infos %}<tr><td>{{ i.where }}</td><td>{{ i.message }}</td><td>{{ i.action }}</td></tr>{% endfor %}
+</table></details>
+{% endif %}
+
+<h2>변경 전 → 변경 후 <small>({{ changed_total }}명에게 바뀌는 값이 있음{% if changed_total > 80 %}, 앞 80명만 표시{% endif %})</small></h2>
+{% if changed %}
+<table>
+  <tr><th>선수</th><th>구분</th><th>항목</th><th>변경 전</th><th>변경 후</th></tr>
+  {% for p in changed %}{% for c in p.changes %}
+  <tr {% if c.flag %}style="background:#fdecea"{% endif %}>
+    {% if forloop.first %}<td rowspan="{{ p.changes|length }}">{{ p.team }}<br><b>{{ p.name }}</b><br><small>{% if p.action == 'create' %}새로 등록{% elif p.action == 'transfer' %}이적 의심 ({{ p.note }}){% else %}수정{% endif %}</small></td>{% endif %}
+    <td>{{ c.section }}</td><td>{{ c.field }}</td>
+    <td><span class="old">{{ c.old|default_if_none:"" }}</span></td>
+    <td><span class="new">{{ c.new }}</span> {% if c.flag %}<b class="error">⚠ {{ c.flag }}</b>{% endif %}</td>
+  </tr>
+  {% endfor %}{% endfor %}
+</table>
+{% else %}<p>바뀌는 선수 값이 없습니다 (이미 DB와 같거나, 사진·새 컬럼만 있는 업로드).</p>{% endif %}
+
+{% if plan.photos %}
+<h2>사진 매칭 ({{ plan.summary.photos_ok }}/{{ plan.summary.photos }}장 연결)</h2>
+<table>
+  <tr><th>파일</th><th>인식한 선수</th><th>결과</th><th>설명</th></tr>
+  {% for ph in plan.photos %}
+  <tr>
+    <td>{{ ph.file }}</td>
+    <td>{% if ph.player_team %}{{ ph.player_team }} {% endif %}{{ ph.name }}</td>
+    <td>{% if ph.status == 'matched' %}<b class="ok">연결</b>{% elif ph.status == 'duplicate' %}<b class="warn">중복 사진</b>{% elif ph.status == 'ambiguous' %}<b class="error">동명이인</b>{% else %}<b class="error">매치 안 됨</b>{% endif %}</td>
+    <td>{{ ph.note }}{% if ph.candidates %}<br><small>{{ ph.candidates|join:" / " }}</small>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if batch.status == '반영됨' %}
+  <p class="ok"><b>이미 반영된 업로드입니다.</b> {{ batch.result }}</p>
+  {% if batch.result.backup %}<p>반영 직전 백업: <code>{{ batch.result.backup }}</code> — <a href="{% url 'manager:backup_restore' batch.result.backup %}">이 반영 전으로 되돌리기</a></p>{% endif %}
+  {% if batch.schema_file %}<p>구조 변경 기록 파일: <code>{{ batch.schema_file }}</code></p>{% endif %}
+{% else %}
+<form method="post" action="{% url 'manager:import_apply' batch.pk %}">
+  {% csrf_token %}
+
+  {% if plan.proposals %}
+  <h2>새 컬럼 제안 — DB 구조 변경 확인</h2>
+  <p>업로드 파일에 DB에 정해진 칸이 없는 컬럼이 있습니다. 아래 변경 전/후와 데이터 점검 결과를 보고 <b>저장할 컬럼만 체크</b>하세요.
+     체크하지 않은 컬럼의 값은 저장하지 않습니다. 승인하면 변경 내용이 <code>manager/schema_log/</code>에 새 파일로 기록됩니다.</p>
+  <div class="cols">
+    <div class="box"><b>변경 전 (등록된 추가 컬럼)</b><br>{% for c in registered %}<code>{{ c }}</code> {% empty %}없음{% endfor %}</div>
+    <div class="box"><b>변경 후 (모두 승인할 경우)</b><br>{% for c in after_columns %}<code {% if c not in registered %}style="background:#d4efdf"{% endif %}>{{ c }}</code> {% endfor %}</div>
+  </div>
+  <table>
+    <tr><th>승인</th><th>컬럼 (원래 이름)</th><th>종류</th><th>값이 있는 선수</th><th>범위</th><th>예시</th><th>데이터 점검</th></tr>
+    {% for x in plan.proposals %}
+    <tr>
+      <td><input type="checkbox" name="approve_col" value="{{ x.name }}" {% if not x.problems %}checked{% endif %}></td>
+      <td><b>{{ x.name }}</b></td><td>{{ x.kind }}</td><td class="num">{{ x.filled }}/{{ x.total }}</td>
+      <td>{% if x.min != None %}{{ x.min }} ~ {{ x.max }}{% endif %}</td>
+      <td><small>{% for s in x.sample %}{{ s }}<br>{% endfor %}</small></td>
+      <td>{% if x.problems %}{% for p in x.problems %}<span class="warn">⚠ {{ p }}</span><br>{% endfor %}{% else %}<span class="ok">이상 없음</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><small>⚠ 점검에서 문제가 나온 컬럼은 기본으로 체크 해제되어 있습니다.</small></p>
+  {% endif %}
+
+  {% if has_transfer %}<p><label><input type="checkbox" name="allow_transfer"> 이적 의심 선수의 팀도 바꿉니다</label></p>{% endif %}
+  <p>오류가 있는 줄·선수·사진은 건너뛰고 나머지만 저장합니다. <b>변경할까요?</b></p>
+  <button type="submit">승인하고 DB에 반영</button>
+  <a href="{% url 'manager:import_upload' %}">취소하고 다시 올리기</a>
+</form>
+{% endif %}
+{% endblock %}

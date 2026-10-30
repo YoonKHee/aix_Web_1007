@@ -1,0 +1,10 @@
+{# 메인 화면에 붙이는 "최신 글" 박스:  {% load board_tags %} {% latest_posts 5 %} #}
+{% load board_tags %}
+<section class="board-latest">
+  <h3>자유게시판 <a href="{% url 'board:list' %}" style="font-size:13px">더보기 ›</a></h3>
+  <ul class="latest" style="list-style:none;padding:0">
+    {% for p in posts %}
+    <li><a href="{% url 'board:detail' p.pk %}">{{ p.title }}</a><small>{{ p.author|who }}</small></li>
+    {% empty %}<li>아직 글이 없습니다.</li>{% endfor %}
+  </ul>
+</section>

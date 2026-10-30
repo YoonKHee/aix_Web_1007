@@ -1,0 +1,4800 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>2026 K리그 BEST11</title>
+
+    <!-- 육각형 그래프 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        /* =====================================================
+           전체 화면
+        ===================================================== */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+
+        /* =====================================================
+           전체 영역
+        ===================================================== */
+
+        .container {
+            width: 1000px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+
+        /* =====================================================
+           제목
+        ===================================================== */
+
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title h1 {
+            margin-bottom: 10px;
+        }
+
+
+
+        /* =====================================================
+           구단 / 포메이션 선택
+        ===================================================== */
+
+        .best11-filter {
+            width: 900px;
+            margin: 0 auto 25px;
+            background-color: white;
+            padding: 20px 25px;
+            border-radius: 14px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .filter-group select {
+            width: 220px;
+            height: 42px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 0 12px;
+            background-color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .filter-button {
+            height: 42px;
+            padding: 0 24px;
+            border: none;
+            border-radius: 8px;
+            background-color: #222;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .selection-info {
+            width: 900px;
+            margin: 0 auto 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .formation-guide {
+            font-size: 13px;
+            font-weight: normal;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* 4-2-3-1 전용 MF 2줄 */
+        .mf-split-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .position-row.row-3 {
+            width: 72%;
+            margin: 0 auto;
+        }
+
+        .position-row.row-2 {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           후보 정보
+        ===================================================== */
+
+        .candidate-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+
+        /* =====================================================
+           축구장
+        ===================================================== */
+
+        .football-field {
+            width: 900px;
+            height: 1100px;
+
+            margin: 0 auto;
+
+            background-color: #4f9d55;
+
+            border: 5px solid white;
+
+            position: relative;
+
+            box-sizing: border-box;
+
+            padding: 40px 30px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+
+        /* 가운데 선 */
+
+        .center-line {
+            position: absolute;
+
+            left: 0;
+            top: 50%;
+
+            width: 100%;
+
+            border-top: 3px solid rgba(255, 255, 255, 0.8);
+        }
+
+
+        /* 센터 서클 */
+
+        .center-circle {
+            position: absolute;
+
+            width: 160px;
+            height: 160px;
+
+            border: 3px solid rgba(255, 255, 255, 0.8);
+
+            border-radius: 50%;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+        }
+
+
+        /* =====================================================
+           포지션 한 줄
+        ===================================================== */
+
+        .position-row {
+            display: flex;
+
+            justify-content: space-around;
+            align-items: center;
+
+            position: relative;
+
+            z-index: 10;
+        }
+
+
+        /* =====================================================
+           선수 카드
+        ===================================================== */
+
+        .player-card {
+            width: 160px;
+
+            text-align: center;
+
+            color: white;
+        }
+
+
+        /* =====================================================
+           선수 클릭
+        ===================================================== */
+
+        .player-popup-link {
+            color: white;
+
+            text-decoration: none;
+
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           선수 사진
+        ===================================================== */
+
+        .player-photo {
+            width: 120px;
+            height: 120px;
+
+            margin: 0 auto 8px;
+
+            border-radius: 50%;
+
+            background-color: white;
+
+            overflow: hidden;
+
+            border: 4px solid white;
+
+            transition: 0.2s;
+        }
+
+
+        .player-popup-link:hover .player-photo {
+            transform: scale(1.05);
+        }
+
+
+        .player-photo img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+            object-position: center bottom;
+
+            display: block;
+        }
+
+
+        .no-photo {
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           선수 이름
+        ===================================================== */
+
+        .player-name {
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 4px;
+        }
+
+
+        /* =====================================================
+           팀 이름
+        ===================================================== */
+
+        .team-name {
+            font-size: 13px;
+
+            margin-bottom: 3px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+
+        .team-mini-logo {
+            width: 20px;
+            height: 20px;
+
+            object-fit: contain;
+
+            background-color: rgba(255, 255, 255, 0.95);
+
+            border-radius: 50%;
+
+            padding: 2px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           선택된 구단 상단 표시
+        ===================================================== */
+
+        .selected-team-header {
+            width: 900px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+
+        .selected-team-logo {
+            width: 58px;
+            height: 58px;
+
+            object-fit: contain;
+
+            background-color: white;
+
+            border-radius: 50%;
+
+            padding: 6px;
+
+            box-sizing: border-box;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* =====================================================
+           BEST11 점수
+        ===================================================== */
+
+        .player-score {
+            font-size: 14px;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           포지션 제목
+        ===================================================== */
+
+        .position-title {
+            text-align: center;
+
+            color: white;
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =====================================================
+           TOP10
+        ===================================================== */
+
+        .ranking-area {
+            width: 900px;
+
+            margin: 40px auto;
+
+            background-color: white;
+
+            padding: 30px;
+
+            box-sizing: border-box;
+        }
+
+
+        .ranking-area h2 {
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+
+        .ranking-area h2:first-child {
+            margin-top: 0;
+        }
+
+
+        .ranking-row {
+            padding: 10px;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        .ranking-row a {
+            font-weight: bold;
+
+            color: #1976d2;
+
+            text-decoration: none;
+
+            cursor: pointer;
+        }
+
+
+        .ranking-row a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           팝업 전체 배경
+        ===================================================== */
+
+        .player-modal {
+            display: none;
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background-color: rgba(0, 0, 0, 0.65);
+
+            z-index: 9999;
+
+            overflow-y: auto;
+
+            padding: 40px 20px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           팝업 본체
+        ===================================================== */
+
+.player-modal-content {
+    width: 620px;
+    max-width: 92%;
+
+    margin: 0 auto;
+
+    background-color: white;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    box-sizing: border-box;
+
+    position: relative;
+}
+
+
+        /* =====================================================
+           닫기 버튼
+        ===================================================== */
+
+        .modal-close {
+            position: absolute;
+
+            right: 20px;
+            top: 15px;
+
+            border: none;
+
+            background: none;
+
+            font-size: 32px;
+
+            cursor: pointer;
+
+            z-index: 10;
+        }
+
+
+        /* =====================================================
+           팝업 상단
+        ===================================================== */
+
+        .modal-player-header {
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+            margin-bottom: 25px;
+
+            padding-right: 30px;
+        }
+
+
+.modal-player-photo {
+    width: 115px;
+    height: 115px;
+
+    background-color: #f2f2f2;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
+}
+
+
+        .modal-player-photo img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+            object-position: center bottom;
+        }
+
+
+        .modal-player-no-photo {
+            width: 100%;
+            height: 100%;
+
+            display: none;
+
+            justify-content: center;
+            align-items: center;
+
+            color: #888;
+
+            font-size: 14px;
+        }
+
+
+        .modal-player-name {
+            font-size: 30px;
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+        }
+
+
+        .modal-player-team {
+            font-size: 17px;
+
+            color: #666;
+
+            margin-bottom: 10px;
+        }
+
+
+        .modal-best11-score {
+            font-size: 18px;
+
+            font-weight: bold;
+
+            color: #1976d2;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           기본 기록
+        ===================================================== */
+
+        .modal-stats {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 10px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .modal-stat-box {
+            background-color: #f5f5f5;
+
+            padding: 15px 10px;
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+
+        .modal-stat-title {
+            font-size: 13px;
+
+            color: #777;
+
+            margin-bottom: 7px;
+        }
+
+
+        .modal-stat-value {
+            font-size: 20px;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           육각형 그래프
+        ===================================================== */
+
+        .radar-section {
+            margin-top: 15px;
+        }
+
+
+        .radar-section h3 {
+            text-align: center;
+
+            margin-bottom: 5px;
+        }
+
+
+        .radar-description {
+            text-align: center;
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 10px;
+        }
+
+
+.radar-area {
+    width: 360px;
+    max-width: 100%;
+
+    margin: 0 auto;
+
+    position: relative;
+}
+
+
+        /* =====================================================
+           90분당 기록
+        ===================================================== */
+
+        .per90-area {
+            margin-top: 18px;
+        }
+
+
+        .per90-area h3 {
+            margin-bottom: 15px;
+        }
+
+
+        .per90-grid {
+            display: grid;
+
+            grid-template-columns: repeat(5, 1fr);
+
+            gap: 8px;
+        }
+
+
+        .per90-box {
+            background-color: #f7f7f7;
+
+            border: 1px solid #ddd;
+
+            padding: 10px 5px;
+
+            text-align: center;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+        }
+
+
+        .per90-box strong {
+            display: inline-block;
+
+            margin-top: 5px;
+
+            font-size: 17px;
+        }
+
+
+        /* =====================================================
+           모바일
+        ===================================================== */
+
+        @media (max-width: 1000px) {
+
+            .container {
+                width: 100%;
+            }
+
+
+            .football-field,
+            .ranking-area,
+            .best11-filter,
+            .selection-info {
+                width: 94%;
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .modal-player-header {
+                flex-direction: column;
+
+                text-align: center;
+            }
+
+
+            .modal-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+
+            .per90-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+    
+        /* =====================================================
+           BEST11 경기장 디자인 업그레이드
+        ===================================================== */
+
+        .football-field {
+            position: relative;
+            overflow: hidden;
+
+            border: 4px solid rgba(255, 255, 255, 0.88);
+            border-radius: 24px;
+
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.18),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.045) 0,
+                    rgba(255, 255, 255, 0.045) 90px,
+                    rgba(0, 0, 0, 0.035) 90px,
+                    rgba(0, 0, 0, 0.035) 180px
+                ),
+                linear-gradient(
+                    180deg,
+                    #2f8f4e 0%,
+                    #257d43 100%
+                );
+        }
+
+        .football-field::before {
+            content: "";
+
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            top: 50%;
+
+            height: 2px;
+
+            background: rgba(255, 255, 255, 0.65);
+
+            transform: translateY(-50%);
+
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .football-field::after {
+            content: "";
+
+            position: absolute;
+            left: 50%;
+            top: 50%;
+
+            width: 120px;
+            height: 120px;
+
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 50%;
+
+            transform: translate(-50%, -50%);
+
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .field-lines {
+            position: absolute;
+            inset: 18px;
+
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 10px;
+
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .field-lines::before,
+        .field-lines::after {
+            content: "";
+
+            position: absolute;
+            left: 50%;
+
+            width: 280px;
+            height: 92px;
+
+            border: 2px solid rgba(255, 255, 255, 0.58);
+
+            transform: translateX(-50%);
+        }
+
+        .field-lines::before {
+            top: -2px;
+
+            border-top: 0;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .field-lines::after {
+            bottom: -2px;
+
+            border-bottom: 0;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .position-row,
+        .mf-split-area {
+            position: relative;
+            z-index: 2;
+        }
+
+        .player-card {
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28);
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px) scale(1.025);
+
+            box-shadow:
+                0 13px 25px rgba(0, 0, 0, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .player-score {
+            display: inline-block;
+
+            margin-top: 5px;
+            padding: 4px 9px;
+
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+
+        /* =====================================================
+           가로형 BEST11 전술판 FINAL
+           모든 포메이션 대응
+           GK → DF → MF → FW
+        ===================================================== */
+
+        .football-field {
+            width: 1180px !important;
+            max-width: calc(100vw - 44px) !important;
+
+            height: 760px !important;
+            min-height: 760px !important;
+
+            margin: 28px auto 42px !important;
+            padding: 42px 54px !important;
+
+            box-sizing: border-box !important;
+
+            display: grid !important;
+            grid-template-columns:
+                0.72fr
+                1.18fr
+                1.48fr
+                1.02fr !important;
+            grid-template-areas:
+                "gk df mf fw" !important;
+
+            column-gap: 22px !important;
+            align-items: stretch !important;
+
+            overflow: hidden !important;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255,255,255,0.045) 0,
+                    rgba(255,255,255,0.045) 92px,
+                    rgba(0,0,0,0.035) 92px,
+                    rgba(0,0,0,0.035) 184px
+                ),
+                linear-gradient(
+                    90deg,
+                    #257d43 0%,
+                    #2f8f4e 50%,
+                    #257d43 100%
+                ) !important;
+        }
+
+
+        /* =====================================================
+           경기장 라인
+        ===================================================== */
+
+        .football-field::before {
+            left: 50% !important;
+            right: auto !important;
+            top: 18px !important;
+            bottom: 18px !important;
+
+            width: 2px !important;
+            height: auto !important;
+
+            transform: translateX(-50%) !important;
+
+            background: rgba(255,255,255,0.65) !important;
+        }
+
+        .football-field::after {
+            left: 50% !important;
+            top: 50% !important;
+
+            width: 132px !important;
+            height: 132px !important;
+
+            transform: translate(-50%, -50%) !important;
+        }
+
+        .field-lines {
+            inset: 16px !important;
+        }
+
+        .field-lines::before,
+        .field-lines::after {
+            top: 50% !important;
+            bottom: auto !important;
+
+            width: 112px !important;
+            height: 286px !important;
+
+            transform: translateY(-50%) !important;
+
+            border: 2px solid rgba(255,255,255,0.58) !important;
+        }
+
+        .field-lines::before {
+            left: -2px !important;
+            right: auto !important;
+
+            border-left: 0 !important;
+            border-radius: 0 10px 10px 0 !important;
+        }
+
+        .field-lines::after {
+            right: -2px !important;
+            left: auto !important;
+
+            border-right: 0 !important;
+            border-radius: 10px 0 0 10px !important;
+        }
+
+        /* 예전 세로형 라인은 사용하지 않음 */
+        .football-field > .center-line,
+        .football-field > .center-circle {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           포지션 영역
+        ===================================================== */
+
+        .formation-line {
+            position: relative !important;
+            z-index: 4 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+            margin: 0 !important;
+            padding: 30px 0 10px !important;
+
+            box-sizing: border-box !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+
+            min-width: 0 !important;
+            min-height: 0 !important;
+        }
+
+        .gk-line { grid-area: gk !important; }
+        .df-line { grid-area: df !important; }
+        .mf-line { grid-area: mf !important; }
+        .fw-line { grid-area: fw !important; }
+
+
+        /* 포지션 이름 */
+        .formation-line > .position-title {
+            position: absolute !important;
+
+            top: 0 !important;
+            left: 50% !important;
+
+            transform: translateX(-50%) !important;
+
+            margin: 0 !important;
+            padding: 4px 11px !important;
+
+            border-radius: 999px !important;
+
+            background: rgba(0,0,0,0.22) !important;
+
+            font-size: 13px !important;
+            line-height: 1 !important;
+            font-weight: 800 !important;
+
+            z-index: 8 !important;
+        }
+
+
+        /* =====================================================
+           일반 포지션 선수 배치
+           1~5명 모두 경기장 안에 들어오도록 함
+        ===================================================== */
+
+        .formation-line > .position-row {
+            width: 100% !important;
+            height: 100% !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-evenly !important;
+            align-items: center !important;
+
+            gap: 3px !important;
+
+            min-height: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+
+        /* =====================================================
+           4-2-3-1 전용 MF 배치
+
+           GK | DF | 수비형MF 2 | 공격형MF 3 | FW
+
+           기존 HTML:
+           첫 번째 row = 3명
+           두 번째 row = 2명
+        ===================================================== */
+
+        .formation-line > .mf-split-area {
+            width: 100% !important;
+            height: 100% !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            display: grid !important;
+
+            /* 왼쪽: 수비형 2명 / 오른쪽: 공격형 3명 */
+            grid-template-columns: 0.92fr 1.08fr !important;
+            grid-template-areas: "dm am" !important;
+
+            gap: 10px !important;
+
+            align-items: stretch !important;
+
+            min-height: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        /* HTML상 첫 번째가 3명 → 오른쪽 공격형 */
+        .formation-line > .mf-split-area > .row-3 {
+            grid-area: am !important;
+        }
+
+        /* HTML상 두 번째가 2명 → 왼쪽 수비형 */
+        .formation-line > .mf-split-area > .row-2 {
+            grid-area: dm !important;
+        }
+
+        .formation-line > .mf-split-area > .position-row {
+            width: 100% !important;
+            height: 100% !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-evenly !important;
+            align-items: center !important;
+
+            gap: 4px !important;
+
+            min-height: 0 !important;
+        }
+
+
+        /* =====================================================
+           선수 카드 크기
+           5명이 세로로 들어가도 잘리지 않도록 컴팩트하게
+        ===================================================== */
+
+        .football-field .player-card {
+            width: 132px !important;
+            min-width: 132px !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            flex: 0 0 auto !important;
+
+            text-align: center !important;
+        }
+
+        .football-field .player-popup-link {
+            display: block !important;
+
+            width: 100% !important;
+
+            text-align: center !important;
+        }
+
+
+        /* =====================================================
+           선수 사진
+           핵심 수정:
+           - 원형 안 정중앙
+           - 원본 비율 유지
+           - 머리/몸이 한쪽으로 밀리지 않도록 center center
+           - contain으로 사진 자체가 잘리지 않게
+        ===================================================== */
+
+        .football-field .player-photo {
+            width: 68px !important;
+            height: 68px !important;
+
+            margin: 0 auto 3px !important;
+
+            padding: 0 !important;
+
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+
+            border: 3px solid white !important;
+            border-radius: 50% !important;
+
+            overflow: hidden !important;
+
+            background: white !important;
+
+            box-sizing: border-box !important;
+        }
+
+        .football-field .player-photo img {
+            width: 100% !important;
+            height: 100% !important;
+
+            display: block !important;
+
+            object-fit: contain !important;
+            object-position: center center !important;
+
+            margin: 0 auto !important;
+
+            transform: none !important;
+        }
+
+
+        /* =====================================================
+           선수 텍스트
+        ===================================================== */
+
+        .football-field .player-name {
+            margin: 0 0 2px !important;
+
+            font-size: 13px !important;
+            line-height: 1.15 !important;
+            font-weight: 800 !important;
+
+            white-space: nowrap !important;
+        }
+
+        .football-field .team-name {
+            min-height: 16px !important;
+
+            margin: 0 0 2px !important;
+
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 3px !important;
+
+            font-size: 9px !important;
+            line-height: 1.1 !important;
+
+            white-space: nowrap !important;
+        }
+
+        .football-field .team-mini-logo {
+            width: 15px !important;
+            height: 15px !important;
+
+            min-width: 15px !important;
+
+            padding: 1px !important;
+
+            object-fit: contain !important;
+            object-position: center center !important;
+        }
+
+        .football-field .player-score {
+            margin: 0 !important;
+            padding: 3px 6px !important;
+
+            display: inline-block !important;
+
+            font-size: 9px !important;
+            line-height: 1 !important;
+            font-weight: 700 !important;
+
+            white-space: nowrap !important;
+        }
+
+
+        /* =====================================================
+           인원이 많은 포메이션 추가 보정
+        ===================================================== */
+
+        /* MF 5명: 3-5-2 */
+        .formation-3-5-2 .mf-line .player-photo,
+        /* DF 5명: 5-3-2 */
+        .formation-5-3-2 .df-line .player-photo {
+            width: 62px !important;
+            height: 62px !important;
+        }
+
+        .formation-3-5-2 .mf-line .player-card,
+        .formation-5-3-2 .df-line .player-card {
+            width: 126px !important;
+            min-width: 126px !important;
+        }
+
+        .formation-3-5-2 .mf-line .player-name,
+        .formation-5-3-2 .df-line .player-name {
+            font-size: 12px !important;
+        }
+
+
+        /* =====================================================
+           작은 화면
+           화면보다 필드가 작아지면서 선수들이 겹치는 것을 막기 위해
+           일정 폭 이하에서는 가로 스크롤 사용
+        ===================================================== */
+
+        @media (max-width: 1220px) {
+
+            .football-field {
+                min-width: 1120px !important;
+                max-width: 1120px !important;
+            }
+
+        }
+
+
+/* =========================================================
+   좌측 세로 컨트롤 패널 + 우측 전술판
+========================================================= */
+
+.best11-workspace {
+    width: min(1460px, calc(100% - 36px));
+    margin: 28px auto 46px;
+
+    display: grid;
+    grid-template-columns: 245px minmax(0, 1fr);
+    gap: 24px;
+
+    align-items: start;
+}
+
+.best11-sidebar {
+    position: sticky;
+    top: 20px;
+
+    padding: 23px 19px;
+
+    background: #ffffff;
+    border-radius: 18px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+
+    box-sizing: border-box;
+}
+
+.sidebar-team {
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+.sidebar-team-logo,
+.sidebar-league-logo {
+    width: 68px;
+    height: 68px;
+
+    margin: 0 auto 10px;
+
+    border-radius: 50%;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.sidebar-team-logo {
+    display: block;
+    padding: 7px;
+
+    object-fit: contain;
+    object-position: center center;
+
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.sidebar-league-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #168447;
+    color: white;
+
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.sidebar-team-title {
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.sidebar-team-subtitle {
+    margin-top: 3px;
+
+    color: #777;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.sidebar-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.sidebar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.sidebar-field label {
+    color: #444;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.sidebar-field select {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d8d8d8;
+    border-radius: 9px;
+
+    background: white;
+
+    font-size: 13px;
+
+    box-sizing: border-box;
+}
+
+.sidebar-apply-btn {
+    width: 100%;
+    height: 44px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: #222;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.sidebar-apply-btn:hover {
+    background: #168447;
+}
+
+.sidebar-divider {
+    height: 1px;
+
+    margin: 23px 0;
+
+    background: #ededed;
+}
+
+.summary-title {
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.summary-note {
+    margin-top: 4px;
+
+    color: #888;
+
+    font-size: 11px;
+}
+
+.summary-total {
+    margin-top: 17px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 13px;
+}
+
+.summary-total strong {
+    font-size: 17px;
+}
+
+.summary-grid {
+    margin-top: 13px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.summary-grid > div {
+    padding: 9px 10px;
+
+    display: flex;
+    justify-content: space-between;
+
+    background: #f5f7f6;
+    border-radius: 8px;
+
+    font-size: 12px;
+}
+
+.summary-grid strong {
+    color: #168447;
+}
+
+.summary-selected {
+    margin-top: 14px;
+    padding: 10px;
+
+    background: #edf7f1;
+    border-radius: 8px;
+
+    color: #176d3c;
+
+    text-align: center;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.sidebar-warning {
+    margin-top: 14px;
+    padding: 11px;
+
+    background: #fff3e8;
+    border-radius: 8px;
+
+    color: #a45100;
+
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+/* 오른쪽 BEST11 */
+
+.best11-main {
+    min-width: 0;
+}
+
+.main-result-header {
+    min-height: 70px;
+    margin-bottom: 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+.main-result-title {
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.main-result-formation {
+    margin-top: 5px;
+
+    color: #168447;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* 경기장은 오른쪽 영역 전체 폭 사용 */
+.best11-workspace .football-field {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+}
+
+
+/* 기존 필터 변경 이벤트는 그대로 사용할 수 있도록
+   id(teamSelect, formationSelect)를 유지함 */
+
+@media (max-width: 1050px) {
+
+    .best11-workspace {
+        grid-template-columns: 1fr;
+    }
+
+    .best11-sidebar {
+        position: static;
+    }
+
+    .sidebar-filter {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        align-items: end;
+    }
+
+    .sidebar-apply-btn {
+        width: 90px;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   좌측 패널 / 우측 경기장 상단 정렬
+========================================================= */
+
+.best11-workspace {
+    align-items: start !important;
+}
+
+.best11-sidebar,
+.best11-main {
+    margin-top: 0 !important;
+}
+
+.best11-main {
+    padding-top: 0 !important;
+}
+
+.best11-workspace .football-field {
+    margin-top: 0 !important;
+}
+
+/* 경기장 내부 제목 */
+.field-result-title {
+    position: absolute;
+
+    top: 14px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 20;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 7px 13px;
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,0.94);
+
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+
+    white-space: nowrap;
+}
+
+.field-result-title span {
+    color: #111;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.field-result-title strong {
+    padding-left: 10px;
+
+    border-left: 1px solid #d8d8d8;
+
+    color: #168447;
+
+    font-size: 13px;
+    font-weight: 900;
+}
+
+/* 내부 제목과 GK/DF/MF/FW 라벨이 겹치지 않도록 약간 아래로 */
+.football-field .formation-line > .position-title {
+    top: 18px !important;
+}
+
+.football-field .formation-line {
+    padding-top: 48px !important;
+}
+
+
+/* =========================================================
+   와이드 화면 활용
+   - 좌우 빈 여백 축소
+   - 왼쪽 패널은 유지
+   - 오른쪽 경기장을 더 넓게
+========================================================= */
+
+.best11-workspace {
+    width: calc(100% - 48px) !important;
+    max-width: 1600px !important;
+
+    grid-template-columns: 245px minmax(0, 1fr) !important;
+    gap: 24px !important;
+}
+
+/* 오른쪽 영역을 남는 폭까지 사용 */
+.best11-main {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* 경기장 가로 폭 확대 */
+.best11-workspace .football-field {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    height: 720px !important;
+    min-height: 720px !important;
+}
+
+/* 큰 모니터에서는 조금 더 넓게 사용 */
+@media (min-width: 1500px) {
+
+    .best11-workspace {
+        width: calc(100% - 70px) !important;
+        max-width: 1720px !important;
+
+        grid-template-columns: 255px minmax(0, 1fr) !important;
+        gap: 28px !important;
+    }
+
+    .best11-workspace .football-field {
+        height: 720px !important;
+        min-height: 720px !important;
+    }
+
+}
+
+/* 아주 큰 화면에서는 최대 1800px까지 활용 */
+@media (min-width: 1800px) {
+
+    .best11-workspace {
+        max-width: 1800px !important;
+    }
+
+}
+
+
+/* =========================================================
+   FORMATION FINAL FIX
+   - 구성 불가능한 10명 전술판 표시 금지
+   - 6개 포메이션의 실제 라인 배치 고정
+   ========================================================= */
+
+/* 4-2-3-1 : MF 5명 = 수비형 2명 + 공격형 3명
+   HTML: row-3(상위 3명) = 공격형, row-2(뒤 2명) = 수비형 */
+.formation-4-2-3-1 .mf-split-area {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 0.9fr 1.1fr !important;
+    grid-template-areas: "dm am" !important;
+    gap: 8px !important;
+
+    align-items: stretch !important;
+}
+
+.formation-4-2-3-1 .mf-split-area > .row-2 {
+    grid-area: dm !important;
+}
+
+.formation-4-2-3-1 .mf-split-area > .row-3 {
+    grid-area: am !important;
+}
+
+.formation-4-2-3-1 .mf-split-area > .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 4px !important;
+}
+
+/* 3-5-2 : DF 3 / MF 5 / FW 2를 각 라인에서 균등 배치 */
+.formation-3-5-2 .df-line .position-row,
+.formation-3-5-2 .mf-line .position-row,
+.formation-3-5-2 .fw-line .position-row,
+
+/* 5-3-2 */
+.formation-5-3-2 .df-line .position-row,
+.formation-5-3-2 .mf-line .position-row,
+.formation-5-3-2 .fw-line .position-row,
+
+/* 4-3-3 */
+.formation-4-3-3 .df-line .position-row,
+.formation-4-3-3 .mf-line .position-row,
+.formation-4-3-3 .fw-line .position-row,
+
+/* 4-4-2 */
+.formation-4-4-2 .df-line .position-row,
+.formation-4-4-2 .mf-line .position-row,
+.formation-4-4-2 .fw-line .position-row,
+
+/* 3-4-3 */
+.formation-3-4-3 .df-line .position-row,
+.formation-3-4-3 .mf-line .position-row,
+.formation-3-4-3 .fw-line .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 구성 불가 화면 */
+.formation-unavailable {
+    position: relative !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    height: 720px !important;
+    min-height: 720px !important;
+
+    margin: 0 !important;
+}
+
+.formation-unavailable::before,
+.formation-unavailable::after {
+    content: none !important;
+}
+
+.formation-unavailable .unavailable-box {
+    position: relative;
+    z-index: 10;
+
+    width: min(520px, calc(100% - 80px));
+    padding: 38px 34px;
+
+    box-sizing: border-box;
+
+    border-radius: 20px;
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+
+    text-align: center;
+}
+
+.unavailable-icon {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #fff1e6;
+    color: #d96b18;
+
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.unavailable-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #222;
+}
+
+.unavailable-team {
+    margin-top: 6px;
+
+    font-size: 15px;
+    font-weight: 800;
+    color: #168447;
+}
+
+.unavailable-message {
+    margin-top: 20px;
+
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+}
+
+.unavailable-counts {
+    margin: 22px auto 0;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+
+    max-width: 390px;
+}
+
+.unavailable-counts span {
+    padding: 9px 5px;
+
+    border-radius: 8px;
+    background: #f3f6f4;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.unavailable-guide {
+    margin-top: 20px;
+
+    font-size: 13px;
+    font-weight: 800;
+    color: #d96b18;
+}
+
+/* 현재 레이아웃 유지: 좌측 패널은 절대 sticky 하지 않음 */
+.best11-sidebar {
+    position: static !important;
+    top: auto !important;
+}
+
+/* 좌측 패널과 경기장 높이 동일 */
+.best11-sidebar,
+.best11-workspace .football-field {
+    height: 720px !important;
+    min-height: 720px !important;
+    box-sizing: border-box !important;
+}
+
+
+
+/* =========================================================
+   4-2-3-1 전용 배치 수정
+   가로 경기장 기준:
+   GK | DF 4 | DM 2 | AM 3 | FW 1
+   ========================================================= */
+
+.football-field.formation-4-2-3-1 {
+    display: grid !important;
+
+    grid-template-columns:
+        0.72fr
+        1fr
+        0.92fr
+        1.08fr
+        0.82fr !important;
+
+    grid-template-rows: 1fr !important;
+    grid-template-areas: none !important;
+
+    column-gap: 8px !important;
+    align-items: stretch !important;
+}
+
+/* 각 라인을 정확한 세로 구역에 배치 */
+.football-field.formation-4-2-3-1 .gk-line {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 !important;
+}
+
+.football-field.formation-4-2-3-1 .df-line {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+}
+
+/* MF 전체는 DM + AM 두 구역을 차지 */
+.football-field.formation-4-2-3-1 .mf-line {
+    grid-column: 3 / 5 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.football-field.formation-4-2-3-1 .fw-line {
+    grid-column: 5 / 6 !important;
+    grid-row: 1 !important;
+}
+
+/* MF 안쪽을 다시 DM / AM 두 칸으로 나눔 */
+.football-field.formation-4-2-3-1 .mf-split-area {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 0.92fr 1.08fr !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "dm am" !important;
+
+    gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+}
+
+/* HTML의 row-2 = 수비형 미드필더 2명 */
+.football-field.formation-4-2-3-1 .mf-split-area > .row-2 {
+    grid-area: dm !important;
+}
+
+/* HTML의 row-3 = 공격형 미드필더 3명 */
+.football-field.formation-4-2-3-1 .mf-split-area > .row-3 {
+    grid-area: am !important;
+}
+
+/* 각 MF 세로 정렬 */
+.football-field.formation-4-2-3-1 .mf-split-area > .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+/* 4-2-3-1에서 카드가 이웃 라인으로 넘어가지 않도록 */
+.football-field.formation-4-2-3-1 .player-card {
+    width: 118px !important;
+    min-width: 118px !important;
+    max-width: 118px !important;
+}
+
+/* 4-2-3-1 사진 크기만 살짝 줄여 3명 세로 배치 안정화 */
+.football-field.formation-4-2-3-1 .player-photo {
+    width: 62px !important;
+    height: 62px !important;
+}
+
+/* MF 라벨은 MF 전체 영역 중앙 */
+.football-field.formation-4-2-3-1 .mf-line > .position-title {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+/* 기존에 남아있는 grid-area 규칙보다 우선 */
+.football-field.formation-4-2-3-1 .gk-line,
+.football-field.formation-4-2-3-1 .df-line,
+.football-field.formation-4-2-3-1 .mf-line,
+.football-field.formation-4-2-3-1 .fw-line {
+    grid-area: auto !important;
+}
+
+
+
+/* =========================================================
+   VERIFIED FINAL OVERRIDE
+   검증 기준
+   1. .container의 기존 width:1000px 제한 제거
+   2. 좌우 여백을 사용해 workspace 최대 1740px
+   3. 경기장: GK | DF | MF | FW 순서 강제
+   4. 4-2-3-1: MF 영역 내부에서 DM 2명 | AM 3명 분리
+   5. sticky 사용 안 함
+   ========================================================= */
+
+/* 문제 1의 실제 원인: 파일 상단 .container { width:1000px; } */
+.container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 40px 0 60px !important;
+    box-sizing: border-box !important;
+}
+
+/* 화면 좌우 공간 사용 */
+.best11-workspace {
+    width: calc(100vw - 56px) !important;
+    max-width: 1740px !important;
+    margin: 28px auto 46px !important;
+
+    display: grid !important;
+    grid-template-columns: 245px minmax(0, 1fr) !important;
+    gap: 28px !important;
+
+    align-items: start !important;
+    box-sizing: border-box !important;
+}
+
+/* 왼쪽 패널은 절대 따라오지 않음 */
+.best11-sidebar {
+    position: static !important;
+    top: auto !important;
+    align-self: start !important;
+
+    width: 245px !important;
+    height: 720px !important;
+    min-height: 720px !important;
+
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.best11-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   경기장 공통 구조
+   HTML 작성 순서와 관계없이 무조건
+   GK | DF | MF | FW
+--------------------------------------------------------- */
+.best11-workspace .football-field,
+.best11-workspace .football-field.formation-4-2-3-1 {
+    position: relative !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    height: 720px !important;
+    min-height: 720px !important;
+
+    margin: 0 !important;
+    padding: 42px 54px !important;
+
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns:
+        0.72fr
+        1.18fr
+        1.48fr
+        1.02fr !important;
+
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "gk df mf fw" !important;
+
+    column-gap: 22px !important;
+    align-items: stretch !important;
+
+    overflow: hidden !important;
+}
+
+/* 절대 순서 강제
+   이전 잘못된 grid-area:auto 규칙을 여기서 다시 덮어씀 */
+.best11-workspace .football-field .gk-line {
+    grid-area: gk !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+.best11-workspace .football-field .df-line {
+    grid-area: df !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+.best11-workspace .football-field .mf-line {
+    grid-area: mf !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+.best11-workspace .football-field .fw-line {
+    grid-area: fw !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+/* ---------------------------------------------------------
+   4-2-3-1
+   GK | DF4 | [DM2 | AM3] | FW1
+   MF 5명은 MF 영역 내부에서만 분리
+--------------------------------------------------------- */
+.best11-workspace .formation-4-2-3-1 .mf-split-area {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 0.92fr 1.08fr !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "dm am" !important;
+
+    gap: 16px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+}
+
+/* HTML 첫 3명 = 공격형 MF */
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .row-3 {
+    grid-area: am !important;
+}
+
+/* HTML 뒤 2명 = 수비형 MF */
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .row-2 {
+    grid-area: dm !important;
+}
+
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+/* 카드 폭을 MF 하위 칸 안에 안전하게 유지 */
+.best11-workspace .formation-4-2-3-1 .player-card {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+/* 사진은 원형 중앙 정렬 유지 */
+.best11-workspace .formation-4-2-3-1 .player-photo {
+    width: 62px !important;
+    height: 62px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.best11-workspace .formation-4-2-3-1 .player-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+}
+
+/* 1500px 이상에서는 거의 전체 폭 사용 */
+@media (min-width: 1500px) {
+    .best11-workspace {
+        width: calc(100vw - 72px) !important;
+        max-width: 1740px !important;
+    }
+}
+
+/* 작은 화면에서만 가로 스크롤 허용 */
+@media (max-width: 1100px) {
+    .best11-workspace {
+        width: calc(100vw - 24px) !important;
+        grid-template-columns: 220px minmax(900px, 1fr) !important;
+        gap: 18px !important;
+        overflow-x: auto !important;
+    }
+
+    .best11-sidebar {
+        width: 220px !important;
+    }
+
+    .best11-workspace .football-field {
+        min-width: 900px !important;
+    }
+}
+
+
+
+/* =========================================================
+   ALL FORMATIONS - VERIFIED POSITION LAYOUT
+   공격 방향: LEFT -> RIGHT
+   GK(왼쪽) -> DF -> MF -> FW(오른쪽)
+
+   Grid 충돌 방지를 위해 경기장 내부 라인은 absolute 배치.
+   ========================================================= */
+
+/* 화면 폭 최대 활용 */
+.container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 40px 0 60px !important;
+    box-sizing: border-box !important;
+}
+
+.best11-workspace {
+    width: calc(100vw - 56px) !important;
+    max-width: 1740px !important;
+    margin: 28px auto 46px !important;
+
+    display: grid !important;
+    grid-template-columns: 245px minmax(0, 1fr) !important;
+    gap: 28px !important;
+    align-items: start !important;
+}
+
+.best11-sidebar {
+    position: static !important;
+    top: auto !important;
+
+    width: 245px !important;
+    height: 720px !important;
+    min-height: 720px !important;
+
+    margin: 0 !important;
+    align-self: start !important;
+    box-sizing: border-box !important;
+}
+
+.best11-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 경기장은 Grid/Flex를 사용하지 않고 절대 좌표 기준으로 고정 */
+.best11-workspace .football-field,
+.best11-workspace .football-field.formation-4-2-3-1 {
+    position: relative !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    height: 720px !important;
+    min-height: 720px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* 공통 라인 */
+.best11-workspace .football-field .formation-line {
+    position: absolute !important;
+
+    top: 42px !important;
+    bottom: 24px !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 24px 4px 4px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+
+    grid-area: unset !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+}
+
+/* 반드시 왼쪽 -> 오른쪽 : GK / DF / MF / FW */
+.best11-workspace .football-field .gk-line {
+    left: 3% !important;
+    width: 13% !important;
+}
+
+.best11-workspace .football-field .df-line {
+    left: 20% !important;
+    width: 18% !important;
+}
+
+.best11-workspace .football-field .mf-line {
+    left: 43% !important;
+    width: 31% !important;
+}
+
+.best11-workspace .football-field .fw-line {
+    left: 80% !important;
+    width: 17% !important;
+}
+
+/* GK/DF/MF/FW 라벨 */
+.best11-workspace .football-field .formation-line > .position-title {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 50% !important;
+
+    transform: translateX(-50%) !important;
+
+    z-index: 15 !important;
+}
+
+/* 일반 포메이션 선수 세로 균등 배치 */
+.best11-workspace .football-field .formation-line > .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
+
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+/* =========================================================
+   4-2-3-1
+   GK 1 | DF 4 | DM 2 + AM 3 | FW 1
+   MF 영역 안에서만 DM/AM을 좌우로 나눔
+   ========================================================= */
+
+.best11-workspace .formation-4-2-3-1 .mf-line {
+    left: 40% !important;
+    width: 37% !important;
+}
+
+.best11-workspace .formation-4-2-3-1 .fw-line {
+    left: 83% !important;
+    width: 14% !important;
+}
+
+.best11-workspace .formation-4-2-3-1 .mf-split-area {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 0.9fr 1.1fr !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "dm am" !important;
+
+    gap: 18px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+/* 뒤쪽 2명 = 수비형 MF, DF에 가까운 왼쪽 */
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .row-2 {
+    grid-area: dm !important;
+}
+
+/* 앞쪽 3명 = 공격형 MF, FW에 가까운 오른쪽 */
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .row-3 {
+    grid-area: am !important;
+}
+
+.best11-workspace .formation-4-2-3-1 .mf-split-area > .position-row {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
+
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+/* 4-2-3-1은 MF가 2열이므로 카드만 약간 슬림하게 */
+.best11-workspace .formation-4-2-3-1 .mf-line .player-card {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+/* 선수 사진 중앙 */
+.best11-workspace .football-field .player-photo {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.best11-workspace .football-field .player-photo img {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center center !important;
+}
+
+/* 큰 모니터에서 좌우 여백 최소화 */
+@media (min-width: 1500px) {
+    .best11-workspace {
+        width: calc(100vw - 72px) !important;
+        max-width: 1740px !important;
+    }
+}
+
+/* 작은 화면 */
+@media (max-width: 1100px) {
+    .best11-workspace {
+        width: calc(100vw - 24px) !important;
+        grid-template-columns: 220px minmax(900px, 1fr) !important;
+        gap: 18px !important;
+        overflow-x: auto !important;
+    }
+
+    .best11-sidebar {
+        width: 220px !important;
+    }
+
+    .best11-workspace .football-field {
+        min-width: 900px !important;
+    }
+}
+
+
+
+/* =========================================================
+   Q1 - 포지션별 TOP10 탭
+   경기장/포메이션/사이드바/선수팝업과 독립
+   ========================================================= */
+
+.ranking-v2 {
+    width: calc(100vw - 56px) !important;
+    max-width: 1740px !important;
+    margin: 0 auto 80px !important;
+    padding: 30px 34px 36px !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06) !important;
+}
+
+.ranking-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.ranking-head h2 {
+    margin: 0 0 7px;
+    font-size: 24px;
+    color: #111;
+}
+
+.ranking-head p {
+    margin: 0;
+    font-size: 13px;
+    color: #8a8a8a;
+}
+
+.ranking-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.ranking-tab {
+    min-width: 62px;
+    padding: 10px 17px;
+    border: 1px solid #dfe4e1;
+    border-radius: 999px;
+    background: #fff;
+    color: #555;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ranking-tab.active {
+    background: #08783d;
+    border-color: #08783d;
+    color: #fff;
+}
+
+.ranking-panel {
+    display: none;
+    padding-top: 26px;
+}
+
+.ranking-panel.active {
+    display: block;
+}
+
+.ranking-panel-title {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ranking-panel-title strong {
+    font-size: 21px;
+}
+
+.ranking-panel-title span {
+    color: #8a8a8a;
+    font-size: 12px;
+}
+
+.ranking-podium {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.podium-card {
+    position: relative;
+    border: 1px solid #e7ebe8;
+    border-radius: 16px;
+    background: #fbfcfb;
+    min-height: 210px;
+    padding: 22px 16px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.podium-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 24px rgba(0,0,0,.08);
+}
+
+.podium-card.rank-1 {
+    border: 2px solid #159455;
+    background: #f3faf6;
+}
+
+.podium-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 27px;
+    margin-bottom: 10px;
+    border-radius: 999px;
+    background: #eef2ef;
+    font-weight: 900;
+    font-size: 13px;
+    color: #222;
+}
+
+.rank-1 .podium-rank {
+    background: #08783d;
+    color: #fff;
+}
+
+.podium-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e4e4e4;
+}
+
+.podium-photo img,
+.list-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.no-photo-small,
+.no-photo-tiny {
+    color: #999;
+    font-size: 10px;
+    line-height: 1.1;
+}
+
+.podium-name,
+.podium-team,
+.podium-score,
+.podium-minutes {
+    display: block;
+}
+
+.podium-name {
+    margin-bottom: 4px;
+    font-size: 17px;
+    font-weight: 900;
+    color: #111;
+}
+
+.podium-team {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #777;
+}
+
+.podium-score {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #e9f6ee;
+    color: #08783d;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.podium-minutes {
+    margin-top: 7px;
+    font-size: 11px;
+    color: #999;
+}
+
+.ranking-list {
+    border: 1px solid #ececec;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.ranking-list-head,
+.ranking-list-row {
+    display: grid;
+    grid-template-columns: 80px minmax(180px, 1.2fr) minmax(150px, 1fr) 120px 120px;
+    align-items: center;
+    column-gap: 16px;
+}
+
+.ranking-list-head {
+    padding: 11px 18px;
+    background: #f5f7f6;
+    color: #777;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.ranking-list-row {
+    width: 100%;
+    min-height: 66px;
+    padding: 8px 18px;
+    border: 0;
+    border-top: 1px solid #eeeeee;
+    background: #fff;
+    color: #222;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ranking-list-row:hover {
+    background: #f7fbf8;
+}
+
+.list-rank {
+    font-weight: 900;
+}
+
+.list-player {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.list-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #f4f4f4;
+    border: 1px solid #e5e5e5;
+}
+
+.list-score {
+    color: #08783d;
+    font-weight: 900;
+}
+
+@media (max-width: 900px) {
+    .ranking-v2 {
+        width: calc(100vw - 24px) !important;
+        padding: 24px 18px 28px !important;
+    }
+
+    .ranking-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ranking-podium {
+        grid-template-columns: 1fr;
+    }
+
+    .ranking-list {
+        overflow-x: auto;
+    }
+
+    .ranking-list-head,
+    .ranking-list-row {
+        min-width: 760px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =====================================================
+         제목
+    ====================================================== -->
+
+    <div class="title">
+
+        <h1>
+            2026 K리그 BEST11
+        </h1>
+
+        <p>
+            포메이션 선발: 450분 이상 · 공식 순위·TOP10: 600분 이상
+        </p>
+
+    </div>
+
+
+
+
+    <!-- =====================================================
+         구단 / 포메이션 선택
+    ====================================================== -->
+
+    <div class="best11-workspace">
+
+    <aside class="best11-sidebar">
+
+        <div class="sidebar-team">
+
+            {% if selected_team and selected_team.logo %}
+                <img
+                    src="{{ selected_team.logo.url }}"
+                    alt="{{ selected_team.team_name }}"
+                    class="sidebar-team-logo"
+                >
+            {% else %}
+                <div class="sidebar-league-logo">K</div>
+            {% endif %}
+
+            <div class="sidebar-team-title">
+                {% if selected_team %}
+                    {{ selected_team.team_name }}
+                {% else %}
+                    전체 K리그
+                {% endif %}
+            </div>
+
+            <div class="sidebar-team-subtitle">
+                BEST11
+            </div>
+
+        </div>
+
+
+        <form
+            method="get"
+            action="{% url 'player:best11' %}"
+            class="sidebar-filter"
+            id="best11FilterForm"
+        >
+
+            <div class="sidebar-field">
+
+                <label for="teamSelect">구단</label>
+
+                <select name="team" id="teamSelect">
+
+                    <option value="">전체 K리그</option>
+
+                    {% for team in teams %}
+                        <option
+                            value="{{ team.id }}"
+                            {% if team_id == team.id %}selected{% endif %}
+                        >
+                            {{ team.team_name }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="sidebar-field">
+
+                <label for="formationSelect">포메이션</label>
+
+                <select name="formation" id="formationSelect">
+
+                    {% for formation_name, formation_data in formations.items %}
+                        <option
+                            value="{{ formation_name }}"
+                            {% if formation == formation_name %}selected{% endif %}
+                        >
+                            {{ formation_name }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <button type="submit" class="sidebar-apply-btn">
+                적용
+            </button>
+
+        </form>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <div class="sidebar-summary">
+
+            <div class="summary-title">
+                2026 시즌
+            </div>
+
+            <div class="summary-note">
+                포메이션 후보: 출전시간 450분 이상
+            </div>
+
+            <div class="summary-total">
+                <span>전체 후보</span>
+                <strong>{{ candidate_count }}명</strong>
+            </div>
+
+            <div class="summary-grid">
+
+                <div>
+                    <span>GK</span>
+                    <strong>{{ position_count.GK }}</strong>
+                </div>
+
+                <div>
+                    <span>DF</span>
+                    <strong>{{ position_count.DF }}</strong>
+                </div>
+
+                <div>
+                    <span>MF</span>
+                    <strong>{{ position_count.MF }}</strong>
+                </div>
+
+                <div>
+                    <span>FW</span>
+                    <strong>{{ position_count.FW }}</strong>
+                </div>
+
+            </div>
+
+            <div class="summary-selected">
+                {% if formation_available %}
+                    {{ formation }} · 11명 선발
+                {% else %}
+                    {{ formation }} · 구성 불가
+                {% endif %}
+            </div>
+
+        </div>
+
+
+        {% if not formation_available %}
+            <div class="sidebar-warning">
+                현재 구단은 이 포메이션을 구성할 선수 수가 부족합니다.
+            </div>
+        {% endif %}
+
+    </aside>
+
+
+    <main class="best11-main">
+
+
+
+{% if formation_available %}
+
+<div class="football-field formation-{{ formation }}">
+        <div class="field-result-title">
+            <span>
+                {% if selected_team %}
+                    {{ selected_team.team_name }} BEST11
+                {% else %}
+                    K리그 BEST11
+                {% endif %}
+            </span>
+
+            <strong>
+                {{ formation }}
+            </strong>
+        </div>
+
+
+        <div class="field-lines"></div>
+
+
+        <div class="center-line"></div>
+
+        <div class="center-circle"></div>
+
+
+        <!-- =================================================
+             FW
+        ================================================== -->
+
+        <div class="formation-line fw-line">
+
+            <div class="position-title">
+                FW
+            </div>
+
+            <div class="position-row">
+
+                {% for row in best11.FW %}
+
+                    <div class="player-card">
+
+                        <a
+                            href="#"
+                            class="player-popup-link"
+                            onclick="openPlayerModal({{ row.player.id }}); return false;"
+                        >
+
+                            <div class="player-photo">
+
+                                {% if row.player.photo %}
+
+                                    <img
+                                        src="{{ row.player.photo.url }}"
+                                        alt="{{ row.player.name }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="no-photo">
+                                        NO PHOTO
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="player-name">
+                                {{ row.player.name }}
+                            </div>
+
+                            <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             MF
+
+             4-2-3-1만 MF 5명을
+             공격형 3명 + 수비형 2명으로 나눠서 표시
+        ================================================== -->
+
+        <div class="formation-line mf-line">
+
+            <div class="position-title">
+                MF
+            </div>
+
+
+            {% if formation == '4-2-3-1' %}
+
+                <!-- 공격형 MF 3명 -->
+                <div class="mf-split-area">
+
+                    <div class="position-row row-3">
+
+                        {% for row in best11.MF|slice:":3" %}
+
+                            <div class="player-card">
+
+                                <a
+                                    href="#"
+                                    class="player-popup-link"
+                                    onclick="openPlayerModal({{ row.player.id }}); return false;"
+                                >
+
+                                    <div class="player-photo">
+
+                                        {% if row.player.photo %}
+
+                                            <img
+                                                src="{{ row.player.photo.url }}"
+                                                alt="{{ row.player.name }}"
+                                            >
+
+                                        {% else %}
+
+                                            <div class="no-photo">
+                                                NO PHOTO
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="player-name">
+                                        {{ row.player.name }}
+                                    </div>
+
+                                    <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                                </a>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- 수비형 MF 2명 -->
+                    <div class="position-row row-2">
+
+                        {% for row in best11.MF|slice:"3:5" %}
+
+                            <div class="player-card">
+
+                                <a
+                                    href="#"
+                                    class="player-popup-link"
+                                    onclick="openPlayerModal({{ row.player.id }}); return false;"
+                                >
+
+                                    <div class="player-photo">
+
+                                        {% if row.player.photo %}
+
+                                            <img
+                                                src="{{ row.player.photo.url }}"
+                                                alt="{{ row.player.name }}"
+                                            >
+
+                                        {% else %}
+
+                                            <div class="no-photo">
+                                                NO PHOTO
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="player-name">
+                                        {{ row.player.name }}
+                                    </div>
+
+                                    <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                                </a>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <!-- 나머지 포메이션은 MF 한 줄 -->
+                <div class="position-row">
+
+                    {% for row in best11.MF %}
+
+                        <div class="player-card">
+
+                            <a
+                                href="#"
+                                class="player-popup-link"
+                                onclick="openPlayerModal({{ row.player.id }}); return false;"
+                            >
+
+                                <div class="player-photo">
+
+                                    {% if row.player.photo %}
+
+                                        <img
+                                            src="{{ row.player.photo.url }}"
+                                            alt="{{ row.player.name }}"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="no-photo">
+                                            NO PHOTO
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="player-name">
+                                    {{ row.player.name }}
+                                </div>
+
+                                <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                            </a>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             DF
+        ================================================== -->
+
+        <div class="formation-line df-line">
+
+            <div class="position-title">
+                DF
+            </div>
+
+            <div class="position-row">
+
+                {% for row in best11.DF %}
+
+                    <div class="player-card">
+
+                        <a
+                            href="#"
+                            class="player-popup-link"
+                            onclick="openPlayerModal({{ row.player.id }}); return false;"
+                        >
+
+                            <div class="player-photo">
+
+                                {% if row.player.photo %}
+
+                                    <img
+                                        src="{{ row.player.photo.url }}"
+                                        alt="{{ row.player.name }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="no-photo">
+                                        NO PHOTO
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="player-name">
+                                {{ row.player.name }}
+                            </div>
+
+                            <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GK
+        ================================================== -->
+
+        <div class="formation-line gk-line">
+
+            <div class="position-title">
+                GK
+            </div>
+
+            <div class="position-row">
+
+                {% for row in best11.GK %}
+
+                    <div class="player-card">
+
+                        <a
+                            href="#"
+                            class="player-popup-link"
+                            onclick="openPlayerModal({{ row.player.id }}); return false;"
+                        >
+
+                            <div class="player-photo">
+
+                                {% if row.player.photo %}
+
+                                    <img
+                                        src="{{ row.player.photo.url }}"
+                                        alt="{{ row.player.name }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="no-photo">
+                                        NO PHOTO
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="player-name">
+                                {{ row.player.name }}
+                            </div>
+
+                            <div class="team-name">
+
+                                {% if row.player.team.logo %}
+
+                                    <img
+                                        src="{{ row.player.team.logo.url }}"
+                                        alt="{{ row.player.team.team_name }}"
+                                        class="team-mini-logo"
+                                    >
+
+                                {% endif %}
+
+                                <span>
+                                    {{ row.player.team.team_name }}
+                                    ·
+                                    {{ row.player.position }}
+                                </span>
+
+                            </div>
+
+                            <div class="player-score">
+                                BEST11 {{ row.score }}점
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+{% else %}
+
+<div class="football-field formation-unavailable">
+
+    <div class="field-lines"></div>
+
+    <div class="unavailable-box">
+
+        <div class="unavailable-icon">!</div>
+
+        <div class="unavailable-title">
+            {{ formation }} 포메이션 구성 불가
+        </div>
+
+        <div class="unavailable-team">
+            {% if selected_team %}
+                {{ selected_team.team_name }}
+            {% else %}
+                전체 K리그
+            {% endif %}
+        </div>
+
+        <div class="unavailable-message">
+            최소 출전시간 450분 기준으로<br>
+            필요한 포지션의 선수가 부족합니다.
+        </div>
+
+        <div class="unavailable-counts">
+            <span>GK {{ position_count.GK }}</span>
+            <span>DF {{ position_count.DF }}</span>
+            <span>MF {{ position_count.MF }}</span>
+            <span>FW {{ position_count.FW }}</span>
+        </div>
+
+        <div class="unavailable-guide">
+            다른 포메이션을 선택해주세요.
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+    </main>
+
+</div>
+
+
+    <!-- 축구장 끝 -->
+
+
+    <!-- =====================================================
+         포지션별 BEST11 RANKING
+         경기장/포메이션/선수팝업은 수정하지 않음
+    ====================================================== -->
+
+    <section class="ranking-area ranking-v2">
+
+        <div class="ranking-head">
+            <div>
+                <h2>포지션별 BEST11 RANKING</h2>
+                <p>최소 출전시간 600분 · BEST11 점수 기준</p>
+            </div>
+
+            <div class="ranking-tabs" role="tablist" aria-label="포지션별 랭킹">
+                <button type="button" class="ranking-tab active" data-position="FW">FW</button>
+                <button type="button" class="ranking-tab" data-position="MF">MF</button>
+                <button type="button" class="ranking-tab" data-position="DF">DF</button>
+                <button type="button" class="ranking-tab" data-position="GK">GK</button>
+            </div>
+        </div>
+
+
+        <!-- FW -->
+        <div class="ranking-panel active" id="ranking-FW">
+            <div class="ranking-panel-title">
+                <strong>FW TOP 10</strong>
+                <span>공격수 BEST11 순위</span>
+            </div>
+
+            <div class="ranking-podium">
+                {% for row in rankings.FW|slice:":3" %}
+                <button type="button"
+                        class="podium-card rank-{{ forloop.counter }}"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="podium-rank">{{ forloop.counter }}위</span>
+
+                    <span class="podium-photo">
+                        {% if row.player.photo %}
+                            <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                        {% else %}
+                            <span class="no-photo-small">NO<br>PHOTO</span>
+                        {% endif %}
+                    </span>
+
+                    <span class="podium-name">{{ row.player.name }}</span>
+                    <span class="podium-team">{{ row.player.team.team_name }} · FW</span>
+                    <span class="podium-score">BEST11 {{ row.score }}점</span>
+                    <span class="podium-minutes">{{ row.stats.minutes }}분</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="ranking-list">
+                <div class="ranking-list-head">
+                    <span>순위</span><span>선수</span><span>구단</span><span>출전시간</span><span>BEST11</span>
+                </div>
+
+                {% for row in rankings.FW|slice:"3:10" %}
+                <button type="button"
+                        class="ranking-list-row"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="list-rank">{{ forloop.counter|add:"3" }}위</span>
+
+                    <span class="list-player">
+                        <span class="list-photo">
+                            {% if row.player.photo %}
+                                <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                            {% else %}
+                                <span class="no-photo-tiny">NO</span>
+                            {% endif %}
+                        </span>
+                        <strong>{{ row.player.name }}</strong>
+                    </span>
+
+                    <span>{{ row.player.team.team_name }}</span>
+                    <span>{{ row.stats.minutes }}분</span>
+                    <span class="list-score">{{ row.score }}점</span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- MF -->
+        <div class="ranking-panel" id="ranking-MF">
+            <div class="ranking-panel-title">
+                <strong>MF TOP 10</strong>
+                <span>미드필더 BEST11 순위</span>
+            </div>
+
+            <div class="ranking-podium">
+                {% for row in rankings.MF|slice:":3" %}
+                <button type="button"
+                        class="podium-card rank-{{ forloop.counter }}"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="podium-rank">{{ forloop.counter }}위</span>
+                    <span class="podium-photo">
+                        {% if row.player.photo %}
+                            <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                        {% else %}
+                            <span class="no-photo-small">NO<br>PHOTO</span>
+                        {% endif %}
+                    </span>
+                    <span class="podium-name">{{ row.player.name }}</span>
+                    <span class="podium-team">{{ row.player.team.team_name }} · MF</span>
+                    <span class="podium-score">BEST11 {{ row.score }}점</span>
+                    <span class="podium-minutes">{{ row.stats.minutes }}분</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="ranking-list">
+                <div class="ranking-list-head">
+                    <span>순위</span><span>선수</span><span>구단</span><span>출전시간</span><span>BEST11</span>
+                </div>
+
+                {% for row in rankings.MF|slice:"3:10" %}
+                <button type="button" class="ranking-list-row"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="list-rank">{{ forloop.counter|add:"3" }}위</span>
+                    <span class="list-player">
+                        <span class="list-photo">
+                            {% if row.player.photo %}
+                                <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                            {% else %}
+                                <span class="no-photo-tiny">NO</span>
+                            {% endif %}
+                        </span>
+                        <strong>{{ row.player.name }}</strong>
+                    </span>
+                    <span>{{ row.player.team.team_name }}</span>
+                    <span>{{ row.stats.minutes }}분</span>
+                    <span class="list-score">{{ row.score }}점</span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- DF -->
+        <div class="ranking-panel" id="ranking-DF">
+            <div class="ranking-panel-title">
+                <strong>DF TOP 10</strong>
+                <span>수비수 BEST11 순위</span>
+            </div>
+
+            <div class="ranking-podium">
+                {% for row in rankings.DF|slice:":3" %}
+                <button type="button"
+                        class="podium-card rank-{{ forloop.counter }}"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="podium-rank">{{ forloop.counter }}위</span>
+                    <span class="podium-photo">
+                        {% if row.player.photo %}
+                            <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                        {% else %}
+                            <span class="no-photo-small">NO<br>PHOTO</span>
+                        {% endif %}
+                    </span>
+                    <span class="podium-name">{{ row.player.name }}</span>
+                    <span class="podium-team">{{ row.player.team.team_name }} · DF</span>
+                    <span class="podium-score">BEST11 {{ row.score }}점</span>
+                    <span class="podium-minutes">{{ row.stats.minutes }}분</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="ranking-list">
+                <div class="ranking-list-head">
+                    <span>순위</span><span>선수</span><span>구단</span><span>출전시간</span><span>BEST11</span>
+                </div>
+
+                {% for row in rankings.DF|slice:"3:10" %}
+                <button type="button" class="ranking-list-row"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="list-rank">{{ forloop.counter|add:"3" }}위</span>
+                    <span class="list-player">
+                        <span class="list-photo">
+                            {% if row.player.photo %}
+                                <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                            {% else %}
+                                <span class="no-photo-tiny">NO</span>
+                            {% endif %}
+                        </span>
+                        <strong>{{ row.player.name }}</strong>
+                    </span>
+                    <span>{{ row.player.team.team_name }}</span>
+                    <span>{{ row.stats.minutes }}분</span>
+                    <span class="list-score">{{ row.score }}점</span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- GK -->
+        <div class="ranking-panel" id="ranking-GK">
+            <div class="ranking-panel-title">
+                <strong>GK TOP 10</strong>
+                <span>골키퍼 BEST11 순위</span>
+            </div>
+
+            <div class="ranking-podium">
+                {% for row in rankings.GK|slice:":3" %}
+                <button type="button"
+                        class="podium-card rank-{{ forloop.counter }}"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="podium-rank">{{ forloop.counter }}위</span>
+                    <span class="podium-photo">
+                        {% if row.player.photo %}
+                            <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                        {% else %}
+                            <span class="no-photo-small">NO<br>PHOTO</span>
+                        {% endif %}
+                    </span>
+                    <span class="podium-name">{{ row.player.name }}</span>
+                    <span class="podium-team">{{ row.player.team.team_name }} · GK</span>
+                    <span class="podium-score">BEST11 {{ row.score }}점</span>
+                    <span class="podium-minutes">{{ row.stats.minutes }}분</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="ranking-list">
+                <div class="ranking-list-head">
+                    <span>순위</span><span>선수</span><span>구단</span><span>출전시간</span><span>BEST11</span>
+                </div>
+
+                {% for row in rankings.GK|slice:"3:10" %}
+                <button type="button" class="ranking-list-row"
+                        onclick="openPlayerModal({{ row.player.id }})">
+                    <span class="list-rank">{{ forloop.counter|add:"3" }}위</span>
+                    <span class="list-player">
+                        <span class="list-photo">
+                            {% if row.player.photo %}
+                                <img src="{{ row.player.photo.url }}" alt="{{ row.player.name }}">
+                            {% else %}
+                                <span class="no-photo-tiny">NO</span>
+                            {% endif %}
+                        </span>
+                        <strong>{{ row.player.name }}</strong>
+                    </span>
+                    <span>{{ row.player.team.team_name }}</span>
+                    <span>{{ row.stats.minutes }}분</span>
+                    <span class="list-score">{{ row.score }}점</span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+    </section>
+    <!-- TOP10 끝 -->
+
+
+</div>
+<!-- container 끝 -->
+
+
+
+<!-- =========================================================
+     선수 상세 팝업
+========================================================== -->
+
+<div
+    id="playerModal"
+    class="player-modal"
+>
+
+
+    <div class="player-modal-content">
+
+
+        <!-- 닫기 -->
+
+        <button
+            type="button"
+            class="modal-close"
+            onclick="closePlayerModal()"
+        >
+            ×
+        </button>
+
+
+
+        <!-- =================================================
+             선수 기본정보
+        ================================================== -->
+
+        <div class="modal-player-header">
+
+
+            <div class="modal-player-photo">
+
+
+                <img
+                    id="modalPlayerPhoto"
+                    src=""
+                    alt="선수사진"
+                >
+
+
+                <div
+                    id="modalNoPhoto"
+                    class="modal-player-no-photo"
+                >
+                    NO PHOTO
+                </div>
+
+
+            </div>
+
+
+
+            <div>
+
+
+                <div
+                    id="modalPlayerName"
+                    class="modal-player-name"
+                >
+                    선수명
+                </div>
+
+
+                <div
+                    id="modalPlayerTeam"
+                    class="modal-player-team"
+                >
+                </div>
+
+
+                <div
+                    id="modalBest11Score"
+                    class="modal-best11-score"
+                >
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             기본 기록
+        ================================================== -->
+
+        <div class="modal-stats">
+
+
+            <div class="modal-stat-box">
+
+                <div class="modal-stat-title">
+                    경기
+                </div>
+
+                <div
+                    id="modalGames"
+                    class="modal-stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-stat-box">
+
+                <div class="modal-stat-title">
+                    출전시간
+                </div>
+
+                <div
+                    id="modalMinutes"
+                    class="modal-stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-stat-box">
+
+                <div class="modal-stat-title">
+                    득점
+                </div>
+
+                <div
+                    id="modalGoals"
+                    class="modal-stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-stat-box">
+
+                <div class="modal-stat-title">
+                    도움
+                </div>
+
+                <div
+                    id="modalAssists"
+                    class="modal-stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             육각형
+        ================================================== -->
+
+        <div class="radar-section">
+
+
+            <h3>
+                선수 능력 비교
+            </h3>
+
+
+            <div class="radar-description">
+                같은 포지션 선수 기준 · 백분위 점수
+            </div>
+
+
+            <div class="radar-area">
+
+                <canvas id="playerRadarChart"></canvas>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             90분당 기록
+        ================================================== -->
+
+        <div class="per90-area">
+
+
+            <h3>
+                90분당 주요 기록
+            </h3>
+
+
+            <div class="per90-grid">
+
+
+                <div class="per90-box">
+                    득점
+                    <br>
+                    <strong id="per90Goals">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    도움
+                    <br>
+                    <strong id="per90Assists">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    슈팅
+                    <br>
+                    <strong id="per90Shots">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    유효슈팅
+                    <br>
+                    <strong id="per90ShotsTarget">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    키패스
+                    <br>
+                    <strong id="per90KeyPasses">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    패스성공률
+                    <br>
+                    <strong id="per90PassRate">0</strong>%
+                </div>
+
+
+                <div class="per90-box">
+                    드리블
+                    <br>
+                    <strong id="per90Dribble">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    인터셉트
+                    <br>
+                    <strong id="per90Interceptions">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    클리어링
+                    <br>
+                    <strong id="per90Clearances">0</strong>
+                </div>
+
+
+                <div class="per90-box">
+                    획득
+                    <br>
+                    <strong id="per90Recoveries">0</strong>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     JavaScript
+========================================================== -->
+
+<script>
+
+    // =====================================================
+    // 현재 육각형 그래프
+    //
+    // 다른 선수를 클릭했을 때
+    // 기존 그래프를 삭제하기 위해 저장
+    // =====================================================
+
+
+    // =====================================================
+    // 구단 / 포메이션을 바꾸면 바로 적용
+    // =====================================================
+
+    const teamSelect =
+        document.getElementById(
+            'teamSelect'
+        );
+
+    const formationSelect =
+        document.getElementById(
+            'formationSelect'
+        );
+
+    const best11FilterForm =
+        document.getElementById(
+            'best11FilterForm'
+        );
+
+
+    if (
+        teamSelect
+        && formationSelect
+        && best11FilterForm
+    ) {
+
+        teamSelect.addEventListener(
+            'change',
+            function() {
+
+                best11FilterForm.submit();
+
+            }
+        );
+
+
+        formationSelect.addEventListener(
+            'change',
+            function() {
+
+                best11FilterForm.submit();
+
+            }
+        );
+
+    }
+
+
+    let playerRadarChart = null;
+
+
+
+    // =====================================================
+    // 선수 클릭
+    // =====================================================
+
+    function openPlayerModal(playerId) {
+
+
+        // -------------------------------------------------
+        // Django에 선수 정보 요청
+        //
+        // 예:
+        // /player/info/245/
+        // -------------------------------------------------
+
+        fetch('/player/info/' + playerId + '/')
+
+
+            // -------------------------------------------------
+            // Django 응답을 JSON으로 변환
+            // -------------------------------------------------
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'HTTP 오류 : '
+                        + response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+
+            // -------------------------------------------------
+            // JSON을 성공적으로 받은 경우
+            // -------------------------------------------------
+
+            .then(function(data) {
+
+
+                // 데이터가 없는 경우
+                if (data.success == false) {
+
+                    alert(data.message);
+
+                    return;
+
+                }
+
+
+
+                // =================================================
+                // 선수 이름
+                // =================================================
+
+                document.getElementById(
+                    'modalPlayerName'
+                ).innerText =
+                    data.player.name;
+
+
+
+                // =================================================
+                // 구단 / 포지션 / 등번호
+                // =================================================
+
+                document.getElementById(
+                    'modalPlayerTeam'
+                ).innerText =
+                    data.player.team
+                    + ' · '
+                    + data.player.position
+                    + ' · #'
+                    + data.player.number;
+
+
+
+                // =================================================
+                // 선수 사진
+                // =================================================
+
+                const photo =
+                    document.getElementById(
+                        'modalPlayerPhoto'
+                    );
+
+
+                const noPhoto =
+                    document.getElementById(
+                        'modalNoPhoto'
+                    );
+
+
+                if (data.player.photo) {
+
+                    photo.src =
+                        data.player.photo;
+
+                    photo.style.display =
+                        'block';
+
+                    noPhoto.style.display =
+                        'none';
+
+                } else {
+
+                    photo.removeAttribute(
+                        'src'
+                    );
+
+                    photo.style.display =
+                        'none';
+
+                    noPhoto.style.display =
+                        'flex';
+
+                }
+
+
+
+                // =================================================
+                // 기본 기록
+                // =================================================
+
+                document.getElementById(
+                    'modalGames'
+                ).innerText =
+                    data.stats.games
+                    + '경기';
+
+
+                document.getElementById(
+                    'modalMinutes'
+                ).innerText =
+                    data.stats.minutes
+                    + '분';
+
+
+                document.getElementById(
+                    'modalGoals'
+                ).innerText =
+                    data.stats.goals;
+
+
+                document.getElementById(
+                    'modalAssists'
+                ).innerText =
+                    data.stats.assists;
+
+
+
+                // =================================================
+                // BEST11 점수 / 순위
+                // =================================================
+
+                const scoreArea =
+                    document.getElementById(
+                        'modalBest11Score'
+                    );
+
+
+                if (
+                    data.best11.score
+                    != null
+                ) {
+
+                    scoreArea.innerText =
+                        'BEST11 '
+                        + data.best11.score
+                        + '점'
+                        + ' · '
+                        + data.player.position
+                        + ' '
+                        + data.best11.rank
+                        + '위 / '
+                        + data.best11.candidate_count
+                        + '명';
+
+                } else {
+
+                    scoreArea.innerText =
+                        '600분 미만 · '
+                        + 'BEST11 순위 미산정';
+
+                }
+
+
+
+                // =================================================
+                // 90분당 기록
+                // =================================================
+
+                document.getElementById(
+                    'per90Goals'
+                ).innerText =
+                    data.per90.goals;
+
+
+                document.getElementById(
+                    'per90Assists'
+                ).innerText =
+                    data.per90.assists;
+
+
+                document.getElementById(
+                    'per90Shots'
+                ).innerText =
+                    data.per90.shots;
+
+
+                document.getElementById(
+                    'per90ShotsTarget'
+                ).innerText =
+                    data.per90.shots_on_target;
+
+
+                document.getElementById(
+                    'per90KeyPasses'
+                ).innerText =
+                    data.per90.key_passes;
+
+
+                document.getElementById(
+                    'per90PassRate'
+                ).innerText =
+                    data.per90.pass_rate;
+
+
+                document.getElementById(
+                    'per90Dribble'
+                ).innerText =
+                    data.per90.dribble;
+
+
+                document.getElementById(
+                    'per90Interceptions'
+                ).innerText =
+                    data.per90.interceptions;
+
+
+                document.getElementById(
+                    'per90Clearances'
+                ).innerText =
+                    data.per90.clearances;
+
+
+                document.getElementById(
+                    'per90Recoveries'
+                ).innerText =
+                    data.per90.recoveries;
+
+
+
+                // =================================================
+                // 기존 육각형 그래프 삭제
+                //
+                // 이 부분이 없으면
+                // 선수 A 클릭 → 선수 B 클릭 시
+                // 그래프가 중복될 수 있음
+                // =================================================
+
+                if (
+                    playerRadarChart
+                    != null
+                ) {
+
+                    playerRadarChart.destroy();
+
+                    playerRadarChart = null;
+
+                }
+
+
+
+                // =================================================
+                // 육각형 그래프
+                // =================================================
+
+                const ctx =
+                    document.getElementById(
+                        'playerRadarChart'
+                    );
+
+
+                playerRadarChart =
+                    new Chart(
+
+                        ctx,
+
+                        {
+
+                            // 레이더 그래프
+                            type: 'radar',
+
+
+                            data: {
+
+
+                        // =================================================
+                        // 포지션별 육각형 6개 항목
+                        //
+                        // FW
+                        // 득점력 / 슈팅 / 찬스메이킹 / 드리블 / 패스 / 경합
+                        //
+                        // MF
+                        // 공격포인트 / 찬스메이킹 / 패스 / 드리블 / 볼회수 / 경합
+                        //
+                        // DF
+                        // 수비 / 태클 / 인터셉트 / 경합 / 빌드업 / 활동량
+                        //
+                        // GK
+                        // 패스 / 롱패스 / 볼회수 / 클리어링 / 출전시간 / 평점
+                        //
+                        // 항목 이름은 services.py에서 계산
+                        // → views.py JSON
+                        // → 여기에서 그대로 사용
+                        // =================================================
+                        labels:
+                            data.radar_labels,
+
+
+                        datasets: [
+
+                            {
+
+                                // 선수명
+                                label:
+                                    data.player.name,
+
+
+                                // 포지션별 백분위 점수 6개
+                                data:
+                                    data.radar_scores,
+
+
+                                borderWidth: 2,
+
+                                fill: true,
+
+
+                                // 점 크기
+                                pointRadius: 4,
+
+                                pointHoverRadius: 6
+
+                            }
+
+                        ]
+
+                        
+
+                            },
+
+
+                            options: {
+
+
+                                responsive: true,
+
+
+                                maintainAspectRatio: true,
+
+
+                                plugins: {
+
+
+                                    legend: {
+
+                                        display: true
+
+                                    }
+
+                                },
+
+
+                                scales: {
+
+
+                                    r: {
+
+
+                                        // 최소값
+                                        min: 0,
+
+
+                                        // 최대값
+                                        max: 100,
+
+
+                                        // 20점 간격
+                                        ticks: {
+
+                                            stepSize: 20
+
+                                        },
+
+
+                                        // 항목 글씨
+                                        pointLabels: {
+
+                                            font: {
+
+                                                size: 14
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    );
+
+
+
+                // =================================================
+                // 팝업 열기
+                // =================================================
+
+                document.getElementById(
+                    'playerModal'
+                ).style.display =
+                    'block';
+
+
+
+                // =================================================
+                // 뒤쪽 페이지 스크롤 막기
+                // =================================================
+
+                document.body.style.overflow =
+                    'hidden';
+
+
+            })
+
+
+            // -------------------------------------------------
+            // 오류
+            // -------------------------------------------------
+
+            .catch(function(error) {
+
+
+                console.log(
+                    '선수정보 오류 : ',
+                    error
+                );
+
+
+                alert(
+                    '선수 정보를 불러오지 못했습니다.'
+                );
+
+
+            });
+
+    }
+
+
+
+    // =====================================================
+    // 팝업 닫기
+    // =====================================================
+
+    function closePlayerModal() {
+
+
+        document.getElementById(
+            'playerModal'
+        ).style.display =
+            'none';
+
+
+        document.body.style.overflow =
+            'auto';
+
+    }
+
+
+
+    // =====================================================
+    // 검은 배경 클릭 → 팝업 닫기
+    // =====================================================
+
+    document.getElementById(
+        'playerModal'
+    ).addEventListener(
+
+        'click',
+
+        function(event) {
+
+
+            if (
+                event.target.id
+                == 'playerModal'
+            ) {
+
+                closePlayerModal();
+
+            }
+
+        }
+
+    );
+
+
+
+    // =====================================================
+    // ESC → 팝업 닫기
+    // =====================================================
+
+    document.addEventListener(
+
+        'keydown',
+
+        function(event) {
+
+
+            if (
+                event.key
+                == 'Escape'
+            ) {
+
+                closePlayerModal();
+
+            }
+
+        }
+
+    );
+
+</script>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.ranking-tab');
+    const panels = document.querySelectorAll('.ranking-panel');
+
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            const position = this.dataset.position;
+
+            tabs.forEach(function (item) {
+                item.classList.remove('active');
+            });
+
+            panels.forEach(function (panel) {
+                panel.classList.remove('active');
+            });
+
+            this.classList.add('active');
+
+            const target = document.getElementById('ranking-' + position);
+            if (target) {
+                target.classList.add('active');
+            }
+        });
+    });
+});
+</script>
+
+</body>
+
+</html>

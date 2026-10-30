@@ -1,0 +1,44 @@
+{% extends 'board/base.html' %}{% load board_tags %}
+{% block title %}글 목록{% endblock %}
+{% block content %}
+<div class="bd-title">
+  <div><h1>자유게시판</h1><p>전체 {{ total }}개의 글</p></div>
+  <a class="btn" href="{% url 'board:create' %}">✏️ 글쓰기</a>
+</div>
+<form class="search" method="get">
+  <select name="by">
+    <option value="all" {% if by == 'all' %}selected{% endif %}>제목+내용</option>
+    <option value="title" {% if by == 'title' %}selected{% endif %}>제목</option>
+    <option value="author" {% if by == 'author' %}selected{% endif %}>작성자</option>
+  </select>
+  <input type="text" name="q" value="{{ q }}" placeholder="검색어를 입력하세요">
+  <button class="btn sub" type="submit">검색</button>
+  {% if q %}<a class="btn sub" href="{% url 'board:list' %}">초기화</a>{% endif %}
+</form>
+<div class="card">
+<table class="list">
+  <tr><th class="hide-s" style="width:60px">번호</th><th>제목</th><th style="width:160px">작성자</th><th style="width:90px" class="hide-s">작성일</th><th style="width:60px" class="hide-s">조회</th></tr>
+  {% for p in page %}
+  <tr>
+    <td class="hide-s muted">{{ p.no }}</td>
+    <td class="t"><a href="{% url 'board:detail' p.pk %}">{{ p.title }}</a>{% if p.n_comments %}<span class="cmt">[{{ p.n_comments }}]</span>{% endif %}</td>
+    <td>{{ p.author|who }}</td>
+    <td class="hide-s muted">{{ p.created_at|date:"m.d H:i" }}</td>
+    <td class="hide-s muted">{{ p.views }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="5" class="empty">{% if q %}검색 결과가 없습니다.{% else %}아직 글이 없습니다. 첫 글을 남겨보세요!{% endif %}</td></tr>
+  {% endfor %}
+</table>
+</div>
+{% if page.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}{% if qs %}&{{ qs }}{% endif %}">‹</a>{% endif %}
+  {% for n in page.paginator.page_range %}
+    {% if n == page.number %}<span class="cur">{{ n }}</span>
+    {% elif n >= page.number|add:"-3" and n <= page.number|add:"3" %}<a href="?page={{ n }}{% if qs %}&{{ qs }}{% endif %}">{{ n }}</a>{% endif %}
+  {% endfor %}
+  {% if page.has_next %}<a href="?page={{ page.next_page_number }}{% if qs %}&{{ qs }}{% endif %}">›</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

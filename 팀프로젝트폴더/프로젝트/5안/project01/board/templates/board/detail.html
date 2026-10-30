@@ -1,0 +1,47 @@
+{% extends 'board/base.html' %}{% load board_tags %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="card post">
+  {% if post.status == 'deleted' %}<div class="notice">이 글은 숨김 처리되었습니다 (관리자에게만 보입니다). 사유: {{ post.deleted_reason }}</div>{% endif %}
+  <h2>{{ post.title }}</h2>
+  <div class="meta"><span>작성자 <b>{{ post.author|who }}</b></span><span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
+    {% if post.updated_at|date:"YmdHi" != post.created_at|date:"YmdHi" %}<span>(수정됨)</span>{% endif %}<span>조회 {{ post.views }}</span></div>
+  <div class="body">{{ post.content }}</div>
+  <div class="actions">
+    <a class="btn sub" href="{% url 'board:list' %}">목록</a>
+    <span>
+      {% if is_owner %}<a class="btn sub" href="{% url 'board:edit' post.pk %}">수정</a>{% endif %}
+      {% if is_owner or user.is_staff %}
+      <form method="post" action="{% url 'board:delete' post.pk %}" onsubmit="return confirm('정말 삭제할까요?')">{% csrf_token %}<button class="btn danger" type="submit">삭제</button></form>
+      {% endif %}
+      {% if not is_owner and post.status == 'ok' %}
+      <form method="post" action="{% url 'board:report' post.pk %}" onsubmit="return confirm('이 글을 신고할까요?')">{% csrf_token %}<button class="btn sub" type="submit">🚩 신고</button></form>
+      {% endif %}
+    </span>
+  </div>
+</article>
+
+<section class="card comments" id="comments">
+  <h3>댓글 {{ comments|length }}</h3>
+  {% for c in comments %}
+  <div class="c">
+    <div class="h"><b>{{ c.author|who }}</b><span>{{ c.created_at|date:"m.d H:i" }}</span>
+      {% if c.author_id == user.id or user.is_staff %}
+      <form method="post" action="{% url 'board:comment_delete' c.pk %}" onsubmit="return confirm('댓글을 삭제할까요?')">{% csrf_token %}<button type="submit">삭제</button></form>
+      {% elif post.status == 'ok' %}
+      <form method="post" action="{% url 'board:comment_report' c.pk %}" onsubmit="return confirm('이 댓글을 신고할까요?')">{% csrf_token %}<button type="submit">신고</button></form>
+      {% endif %}
+    </div>
+    <p>{{ c.content }}</p>
+  </div>
+  {% empty %}
+  <p class="muted">첫 댓글을 남겨보세요.</p>
+  {% endfor %}
+  {% if post.status == 'ok' %}
+  <form class="cform" method="post" action="{% url 'board:comment' post.pk %}">{% csrf_token %}
+    <textarea name="content" maxlength="500" placeholder="댓글을 입력하세요 (욕설·비하 표현은 등록되지 않습니다)" required></textarea>
+    <button class="btn" type="submit">등록</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

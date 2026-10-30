@@ -11,6 +11,7 @@
 <link rel="stylesheet" type="text/css" href="/static/css/reset.css?v=Y" />
 <link rel="stylesheet" type="text/css" href="/static/css/layout.css?v=Y" />
 <link rel="stylesheet" type="text/css" href="/static/css/content.css?v=Y" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script type="text/javascript" src="/static/js/top_navi.js"></script>
 <script type="text/javascript" src="/static/js/left_navi.js"></script>
 <script type="text/javascript" src="/static/js/main.js"></script>
@@ -380,7 +381,13 @@ $(function() {
 						<div class="viewHead">
 							<div class="subject">
 								<ul>
-									<li>제목 : {{event.etitle}}</li>
+									<li>제목 : {{event.etitle}}
+										<span>좋아요:
+											<span style ='margin-left:100ps;' class= 'likeBtn'>
+												<i class="fa-regular fa-heart"></i>
+											</span>
+										</span>
+									</li>
 								</ul>
 							</div>
 							<div class="day">

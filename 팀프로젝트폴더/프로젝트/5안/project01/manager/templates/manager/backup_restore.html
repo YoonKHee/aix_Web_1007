@@ -1,0 +1,20 @@
+{% extends 'manager/base.html' %}
+{% block title %}되돌리기 확인{% endblock %}
+{% block content %}
+<h1>{{ item.created }} 시점으로 되돌리기</h1>
+<div class="box">
+  <p>사유: {{ item.reason|default:"-" }}</p>
+  <p class="warn"><b>이 시점 이후의 모든 변경이 함께 사라집니다.</b> (선수 정보·기록·사진 연결·점수 기준·제외 선수 포함)</p>
+  {% if later_batches %}
+  <p>이 시점 이후 반영된 업로드 {{ later_batches|length }}건도 취소됩니다:
+    {% for x in later_batches %}<a href="{% url 'manager:import_report' x.pk %}">#{{ x.pk }}</a> {% endfor %}</p>
+  {% endif %}
+  {% if later %}<p>이 시점 이후 백업 {{ later|length }}개는 그대로 남아 있습니다.</p>{% endif %}
+  <p>복원 직전 상태는 자동으로 한 번 더 백업되므로, 잘못 눌러도 다시 되돌릴 수 있습니다.</p>
+  <p><small>업로드한 사진 파일(media)은 DB와 별개라 지워지지 않습니다. DB의 연결만 되돌아갑니다.</small></p>
+</div>
+<form method="post">{% csrf_token %}
+  <label><input type="checkbox" name="confirm" value="1"> 위 내용을 확인했고, 이 시점으로 되돌립니다.</label><br><br>
+  <button>되돌리기 실행</button> <a href="{% url 'manager:backups' %}">취소</a>
+</form>
+{% endblock %}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>K리그 승무패 예측</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f4f6f5;
+            color: #18382a;
+            font-family: sans-serif;
+        }
+
+        main {
+            max-width: 980px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        section,
+        form {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        p,
+        li {
+            line-height: 1.7;
+        }
+
+        a {
+            color: #08743e;
+        }
+
+        form .fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        select,
+        input,
+        button {
+            border-radius: 8px;
+            border: 1px solid #b8c9c0;
+            padding: 12px;
+            font: inherit;
+        }
+
+        button {
+            background: #08743e;
+            color: white;
+            cursor: pointer;
+        }
+
+        .errorlist {
+            color: #a52920;
+        }
+
+        .notice {
+            background: #fff5da;
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .muted {
+            color: #52645b;
+        }
+
+        .probability {
+            margin: 20px 0;
+        }
+
+        .probability strong {
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .track {
+            height: 18px;
+            background: #e9efeb;
+            border-radius: 9px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .bar {
+            height: 100%;
+            background: #078244;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dfe7e2;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #edf5ef;
+        }
+
+        h2 {
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+<main>
+    <a href="{% url 'player:best11' %}">
+        ← BEST11
+    </a>
+
+    ·
+
+    <a href="{% url 'team:simulate' %}">
+        선수 교체·컨디션 시뮬레이션
+    </a>
+
+    <h1>2026 K리그 승무패 예측</h1>
+
+    <p>
+        두 팀과 경기일을 선택해
+        홈승·무승부·원정승 가능성을 비교합니다.<br>
+        경기 기록 기반의 첫 실험 모델이며,
+        확률은 실제 결과를 보장하지 않습니다.
+    </p>
+
+    {% if unavailable %}
+        <section role="alert">
+            {{ unavailable }}
+        </section>
+    {% endif %}
+
+    {% if form %}
+        <form method="get">
+            {{ form.non_field_errors }}
+
+            <div class="fields">
+                {% for field in form %}
+                    <div>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+
+                <button type="submit">
+                    승무패 예측하기
+                </button>
+            </div>
+
+            <p class="muted">
+                선택한 조합의 가상 경기 예측입니다.
+                실제 예정된 대진인지 자동 확인하지 않습니다.<br>
+                보유 기록 기준일:
+                {{ last_day|date:"Y년 n월 j일" }}
+                · 최종 학습 {{ training_count }}경기
+            </p>
+        </form>
+    {% endif %}
+
+    {% if prediction %}
+        <section>
+            <h2>
+                {{ prediction.home_name }} (홈)
+                vs
+                {{ prediction.away_name }} (원정)
+            </h2>
+
+            <p>
+                {{ prediction.date }}
+                · 가장 높은 확률:
+                <strong>{{ prediction.best_label }}</strong>
+            </p>
+
+            {% for row in prediction.probabilities %}
+                <div class="probability">
+                    <strong>{{ row.label }}</strong>
+                    {{ row.percent|floatformat:1 }}%
+
+                    <div class="track">
+                        <div
+                            class="bar"
+                            style="width: {{ row.percent|floatformat:'1u' }}%"
+                        ></div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if prediction.long_gap %}
+                <p class="notice">
+                    보유 기록 기준일에서
+                    {{ prediction.stale_days }}일 뒤의 경기입니다.
+                    그 사이 경기·이적·부상 등은 반영되지 않습니다.
+                </p>
+            {% endif %}
+
+            <h3>예측에 사용한 경기 전 기록</h3>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>{{ prediction.home_name }}</th>
+                            <th>{{ prediction.away_name }}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>최근 5경기 결과 (과거 → 최근)</td>
+                            <td>
+                                {{ prediction.home.recent_results|join:" · " }}
+                            </td>
+                            <td>
+                                {{ prediction.away.recent_results|join:" · " }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>최근 평균 승점</td>
+                            <td>
+                                {{ prediction.home.recent.points|floatformat:2 }}
+                            </td>
+                            <td>
+                                {{ prediction.away.recent.points|floatformat:2 }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>최근 평균 득점</td>
+                            <td>
+                                {{ prediction.home.recent.gf|floatformat:2 }}
+                            </td>
+                            <td>
+                                {{ prediction.away.recent.gf|floatformat:2 }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>최근 평균 실점</td>
+                            <td>
+                                {{ prediction.home.recent.ga|floatformat:2 }}
+                            </td>
+                            <td>
+                                {{ prediction.away.recent.ga|floatformat:2 }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>최근 홈/원정 평균 승점</td>
+                            <td>
+                                {{ prediction.home.venue.points|floatformat:2 }}
+                                (홈 {{ prediction.home.venue_count }}경기)
+                            </td>
+                            <td>
+                                {{ prediction.away.venue.points|floatformat:2 }}
+                                (원정 {{ prediction.away.venue_count }}경기)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>직전 경기 날짜</td>
+                            <td>{{ prediction.home.last_match }}</td>
+                            <td>{{ prediction.away.last_match }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>직전 경기 이후 일수</td>
+                            <td>{{ prediction.home.rest_days }}일</td>
+                            <td>{{ prediction.away.rest_days }}일</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="muted">
+                승점: 승 3 · 무 1 · 패 0.
+                경기일과 같은 날의 결과는 사용하지 않습니다.<br>
+                홈/원정 기록은 각각 최근 최대 5경기입니다.
+                해당 기록이 없으면 전체 최근 5경기를 사용합니다.
+                부상·출전 명단·날씨는 미반영이며,
+                휴식일은 계산 시 최대 30일로 제한합니다.
+            </p>
+        </section>
+    {% endif %}
+
+    {% if evaluation %}
+        <section>
+            <h2>이 모델은 얼마나 맞혔나요?</h2>
+
+            <p>
+                시간순으로 앞선
+                {{ evaluation.train_count }}경기로 학습하고,
+                이후 {{ evaluation.test_count }}경기로 평가했습니다.<br>
+
+                학습:
+                {{ evaluation.train_start }}
+                ~
+                {{ evaluation.train_end }}<br>
+
+                평가:
+                {{ evaluation.test_start }}
+                ~
+                {{ evaluation.test_end }}
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>방법</th>
+                            <th>정확도</th>
+                            <th>정밀도</th>
+                            <th>재현율</th>
+                            <th>F1</th>
+                            <th>확률 오차</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for row in metrics %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                <td>{{ row.accuracy|floatformat:1 }}%</td>
+                                <td>{{ row.precision|floatformat:3 }}</td>
+                                <td>{{ row.recall|floatformat:3 }}</td>
+                                <td>{{ row.f1|floatformat:3 }}</td>
+                                <td>{{ row.log_loss|floatformat:3 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if not beats_baseline %}
+                <p class="notice">
+                    이번 평가에서는 정확도와 확률 오차 모두에서
+                    단순 기준을 개선하지 못했습니다.
+                    예측력을 입증한 모델로 볼 수 없으며
+                    추가 데이터가 필요합니다.
+                </p>
+            {% endif %}
+
+            <p>
+                세 결과에 각각 33.3%를 주는 기준의 확률 오차는
+                {{ evaluation.equal_probability_log_loss|floatformat:3 }}입니다.
+            </p>
+
+            <p class="muted">
+                단순 기준은 학습 경기의 승무패 비율을
+                모든 경기에 적용한 것입니다.<br>
+
+                정밀도·재현율·F1은 승·무·패를 각각 계산해
+                동일 비중으로 평균한 값입니다.
+                확률 오차는 로그 손실로, 낮을수록 좋습니다.<br>
+
+                평가 중에는 해당 날짜 전까지 끝난 경기만 사용했습니다.
+                평가는 한 번의 시간 구간 비교로 표본이 작습니다.<br>
+
+                실제 예측 모델은 평가를 마친 뒤
+                사용 가능한 전체 경기로 다시 학습했습니다.
+                확률의 신뢰성은 별도 검증되지 않았습니다.
+            </p>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

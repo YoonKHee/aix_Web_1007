@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% load static %}
+<!---------------------------------------------------->
+{% block script-block %}
+	$(function() {
+		// 전역변수 초기화
+		let cno;
+		let id;
+		let cdate;
+		let ccontent;
+		let temp = 0;
+
+		// 06. 댓글 수정 저장
+		$(document).on('click','.saveBtn',function(){
+			alert('댓글 수정')
+			cno = $(this).closest('ul').attr('id');
+			id = '{{request.session.session_id}}'
+			ccontent = $(this).closest('ul').children('.txt').children('.commText').val();
+			console.log(ccontent);
+
+			$.ajax({
+				url:'/comment/commUpdate/',  //링크주소
+				type:'post',               //get,post
+				headers:{'X-CSRFToken':'{{csrf_token}}'}, //csrf_token
+				data:{
+					'cno':cno,
+					'ccontent':ccontent },     //보내는 데이터
+				dataType:'json',                          //리턴타입:json,xml,text
+				success:function(data){                   // 리턴받는데이터 data
+					alert('댓글수정완료');
+					console.log(data);
+					//prepend추가
+					//댓글추가 - append:아래추가,prepend:위에 추가,html:모두삭제후 추가,remove
+					$('#'+cno).html(`
+						<li class="name">${data.comment[0].member_id}
+							<span>[${data.comment[0].cdate}]</span>
+						</li>
+							<li class="txt ccontent">${ccontent}</li>
+							<li class="btn">
+							<a style='cursor: pointer;' class="updateBtn rebtn">수정</a>
+							<a style='cursor: pointer;' class="deleteBtn rebtn">삭제</a>
+						</li>
+					`);
+					temp = 0;
+				},
+				error:function(){
+					alert('실패');
+				}
+			})//ajax
+		})//saveBtn
+
+
+
+		// 05. 댓글 수정 취소
+		$(document).on('click','.cancelBtn',function(){
+			ccontent,cdate,id,cno; //전역변수 초기화 불러오기
+			let hdata = `
+				<li class="name">${id} <span>${cdate}</span></li>
+					<li class="txt ccontent">${ccontent}</li>
+					<li class="btn">
+						<a style = 'cursor:pointer;' class="updateBtn rebtn">수정</a>
+						<a style = 'cursor:pointer;' class="deleteBtn rebtn">삭제</a>
+				</li>`;
+			$('#'+cno).html(hdata);
+			temp = 0
+
+		})//cancelBtn
+
+
+
+
+		// 04. 댓글수정버튼
+		$(document).on('click','.updateBtn',function(){
+			if(temp != 0){
+				alert('다른 댓글 수정중입니다.')
+				return;
+			}else{
+				temp=1
+			}
+			cno = $(this).closest('ul').attr('id');
+			id = '{{request.session.session_id}}';
+			cdate = $(this).closest('ul').children('.name').children('span').text();
+			ccontent = $(this).closest('ul').children('.ccontent').text();
+			alert(cno+'댓글을 수정합니다.');
+
+			let hdata = `
+				<li class="name">${id} <span>${cdate}</span></li>
+				<li class="txt"><textarea class="commText replyType">${ccontent}</textarea></li>
+				<li class="btn">
+					<a style = 'cursor:pointer;' class=" saveBtn rebtn">저장</a>
+					<a style = 'cursor:pointer;' class=" cancelBtn rebtn">취소</a>
+				</li>
+			`;
+			$('#'+cno).html(hdata)
+		})//updateBtn
+
+
+		// 03. 댓글삭제
+		$(document).on('click','.deleteBtn',function(){
+			//alert('확인')
+			const cno = $(this).closest('ul').attr('id');
+			let count = Number($('.commCount').text())
+			if(confirm(cno+'댓글을 삭제합니까?')){
+				$.ajax({
+					url:'/comment/commDelete/',  //링크주소
+					type:'post',               //get,post
+					headers:{'X-CSRFToken':'{{csrf_token}}'}, //csrf_token
+					data:{'cno':cno},     //보내는 데이터
+					dataType:'json',                          //리턴타입:json,xml,text
+					success:function(data){                   // 리턴받는데이터 data
+						alert(cno+'댓글을 삭제했습니다');
+						$('#'+cno).remove();
+						$('.commCount').text(count-1);
+						console.log(data);
+					},//success
+					error:function(){
+						alert('실패');
+					}//error
+				})//ajax
+			}//if
+		})//deleteBtn
+
+		// 02. 댓글 리스트
+
+		// 01. 댓글등록
+		$(document).on('click','.replyBtn',function(){
+			if('{{request.session.session_id}}'==''){
+				alert('로그인시 이용가능합니다.');
+				location.href = '/member/login/';
+				return
+			}
+			const cpw = $('.replynum').val(); //비밀번호
+			const ccontent = $('.replyType').val(); //내용
+			let count = Number($('.commCount').text());
+			if(ccontent==''||ccontent==null){
+				alert('댓글을 입력하세요');
+				return;
+			}
+			alert(`댓글을 저장합니다.`);
+
+			//ajax사용 - django저장
+			$.ajax({
+				url:'/comment/commWrite/',  //링크주소
+				type:'post',               //get,post
+				headers:{'X-CSRFToken':'{{csrf_token}}'}, //csrf_token
+				data:{
+					'eno':'{{event.eno}}',
+					'cpw':cpw,
+					'ccontent':ccontent },     //보내는 데이터
+				dataType:'json',                          //리턴타입:json,xml,text
+				success:function(data){                   // 리턴받는데이터 data
+					alert('성공');
+					$('.commCount').text(count+1)
+					console.log(data);
+
+					//prepend추가
+					//댓글추가 - append:아래추가,prepend:위에 추가,html:모두삭제후 추가,remove
+					$('.replyBox').prepend(`
+						<ul id='${data.comment[0].cno}'>
+						<li class="name">${data.comment[0].member_id}
+							<span>[${data.comment[0].cdate}]</span>
+						</li>
+							<li class="txt ccontent">${ccontent}</li>
+							<li class="btn">
+							<a style='cursor: pointer;' class="updateBtn rebtn">수정</a>
+							<a style='cursor: pointer;' class="deleteBtn rebtn">삭제</a>
+						</li>
+						</ul>
+					`);
+					//리셋
+					$('.replynum').val('');
+					$('.replyType').val('');
+				},
+				error:function(){
+					alert('실패');
+				}
+			})
+		});
+	});
+{% endblock script-block %}
+<!---------------------------------------------------->
+{% block container-block %} 
+	<!-- container -->
+		<div id="container">
+
+			<div id="location">
+				<ol>
+					<li><a href="#">HOME</a></li>
+					<li><a href="#">EVENT</a></li>
+					<li class="last">진행중 이벤트</li>
+				</ol>
+			</div>
+			
+			<div id="outbox">		
+				<div id="left">
+					<div id="title2">EVENT<span>이벤트</span></div>
+					<ul>	
+						<li><a href="#" id="leftNavi1">진행중 이벤트</a></li>
+						<li><a href="#" id="leftNavi2">종료된 이벤트</a></li>
+						<li class="last"><a href="#" id="leftNavi3">당첨자 발표</span></a></li>
+					</ul>			
+				</div><script type="text/javascript">initSubmenu(1,0);</script>
+
+
+				<!-- contents -->
+				<div id="contents">
+					<div id="mypage">
+						<h2><strong>진행중 이벤트</strong><span>쟈뎅샵의 특별한 혜택이 가득한 이벤트에 참여해 보세요.</span></h2>
+						
+						<div class="viewDivMt">
+							<div class="viewHead">
+								<script>
+									$(function(){
+										$('.likesBtn').click(function(){
+											$.ajax({
+												url:'/event/likes/',
+												type:'post',
+												headers:{'X-CSRFToken':'{{csrf_token}}'},
+												data:{'eno':'{{event.eno}}'},  
+												dataType:'json', 
+												success:function(data){                   // 리턴받는데이터 data
+													alert('성공');
+													console.log(data);
+													let hdata = '';
+													if(data.result==1){
+														alert('좋아요 추가')
+														hdata = `<i class="fa-solid fa-heart"></i> ${data.count}`;
+													}else{
+														alert('좋아요 취소')
+														hdata = `<i class="fa-regular fa-heart"></i>${data.count}`;
+														
+													}
+													//prepend추가
+													//댓글추가 - append:아래추가,prepend:위에 추가,html:모두삭제후 추가,remove
+													$('.likesBtn').html(hdata);
+												},//success
+												error:function(){
+													alert('실패');
+												}//error
+											})//ajax
+										})//likesBtn
+									});//jquery
+								</script>
+								<div class="subject">
+									<ul>
+										<li>제목 : {{event.etitle}}
+											<span style ='margin-left:100px;'>좋아요:
+												<span style ='cursor:pointer;' class= 'likesBtn'>
+													{% if event.likes.count %}
+													<i class="fa-solid fa-heart"></i>{{event.likes.count}}
+													{% else %}
+													<i class="fa-regular fa-heart"></i>{{event.likes.count}}
+													{% endif %}
+												</span>
+											</span>
+										</li>
+									</ul>
+								</div>
+								<div class="day">
+									<p class="txt">이벤트 기간
+										<span>{{event.first_date|date:'Y-m-d'}} ~ {{event.end_date|date:'Y-m-d'}}</span>
+									</p>
+								</div>
+							</div>
+
+							<div class="viewContents">
+								<img src="/media/{{event.efile2}}" alt="" />
+							</div>
+						</div>
+
+
+						<!-- 이전다음글 -->
+						<div class="pnDiv web">
+							<table summary="이전다음글을 선택하여 보실 수 있습니다." class="preNext" border="1" cellspacing="0">
+								<caption>이전다음글</caption>
+								<colgroup>
+								<col width="100px" />
+								<col width="*" />
+								<col width="100px" />
+								</colgroup>
+								<tbody>
+									<tr>
+										<th class="pre">PREV</th>
+										<td><a href="#">상품 재입고는 언제 되나요?</a></td>
+										<td>&nbsp;</td>
+									</tr>
+
+									<tr>
+										<th class="next">NEXT</th>
+										<td>다음 글이 없습니다.</td>
+										<td>&nbsp;</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- //이전다음글 -->
+
+						<!-- Btn Area -->
+						<div class="btnArea">
+							<div class="bRight">
+								<ul>
+									<li><a href="/event/event/" class="sbtnMini mw">목록</a></li>
+								</ul>
+							</div>
+						</div>
+						<!-- //Btn Area -->
+
+
+						<!-- 댓글등록 -->
+						<div class="replyWrite">
+							<ul>
+								<li class="in">
+									<p class="txt">총 <span class="orange commCount">{{count}}</span> 개의 댓글이 달려있습니다.</p>
+									<p class="password">비밀번호&nbsp;&nbsp;
+										<input name='cpw' type="password" class="replynum" />
+									</p>
+									<textarea name='ccontent' class="replyType"></textarea>
+								</li>
+								<li class="btn"><a style='cursor:pointer;' class="replyBtn">등록</a></li>
+							</ul>
+							<p class="ntic">※ 비밀번호를 입력하시면 댓글이 비밀글로 등록 됩니다.</p>
+						</div>
+
+						<div class="replyBox">
+							<!-- 댓글리스트 반복 -->
+							{% if commlist %}
+								{% for comm in commlist  %}
+								<ul id='{{comm.cno}}' >
+									<li class="name">{{comm.member.id}} 
+										<span>[{{comm.cdate|date:'Y-m-d'}}&nbsp;&nbsp;{{comm.cdate|date:'H:i:s'}}]</span>
+									</li>
+									<li class="txt ccontent">{{comm.ccontent}}</li>
+									<li class="btn">
+										<a style='cursor: pointer;' class="updateBtn rebtn">수정</a>
+										<a style='cursor: pointer;' class="deleteBtn rebtn">삭제</a>
+									</li>
+								</ul>
+								{% endfor %}
+							{% else %}
+							<ul>
+								<li class="txt">댓글이 없습니다!! </li>
+							</ul>
+							{% endif %} 
+
+							<!-- ---------------------------- -->
+							<!-- 수정입력화면
+								<ul>
+									<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+									<li class="txt"><textarea class="replyType"></textarea></li>
+									<li class="btn">
+										<a href="#" class="rebtn">저장</a>
+										<a href="#" class="rebtn">취소</a>
+									</li>
+								</ul>
+							-->
+							<!-- 비밀글화면 
+							<ul>
+								<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+								<li class="txt">
+									<a href="password.html" class="passwordBtn"><span class="orange">※ 비밀글입니다.</span></a>
+								</li>
+							</ul>
+							-->
+						</div>
+						<!-- //댓글 -->
+
+
+						
+						
+					</div>
+				</div>
+				<!-- //contents -->
+
+
+		<script type="text/javascript" src="/static/js/jquery.fancybox-1.3.4.pack.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/css/jquery.fancybox-1.3.4.css" />
+		<script type="text/javascript">
+		$(function(){
+			
+		var winWidth = $(window).width();
+		if(winWidth > 767){
+			var layerCheck = 540;
+		}else{
+			var layerCheck = 320;
+		}
+
+		$(".passwordBtn").fancybox({
+			'autoDimensions'    : false,
+			'showCloseButton'	: false,
+			'width' : layerCheck,
+			'padding' : 0,
+			'type'			: 'iframe',
+			'onComplete' : function() {
+				$('#fancybox-frame').load(function() { // wait for frame to load and then gets it's height
+				$('#fancybox-content').height($(this).contents().find('body').height());
+				});
+			}
+		});
+
+
+		});
+		</script>
+
+				</div>
+			</div>
+	<!-- //container -->
+{% endblock container-block %} 
+
+
+

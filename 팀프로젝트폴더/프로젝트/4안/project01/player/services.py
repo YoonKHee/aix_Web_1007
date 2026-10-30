@@ -288,37 +288,6 @@ GK_WEIGHTS = {
     'minutes': 10,
 }
 
-# [manager-patch] 관리자 페이지(manager)에서 설정한 값을 읽는다. 오류가 나면 위의 기존 상수를 그대로 쓴다.
-def get_min_minutes():
-    try:
-        from manager.config import min_minutes
-        return min_minutes(BEST11_MIN_MINUTES, FORMATION_MIN_MINUTES)
-    except Exception:
-        return {'best11': BEST11_MIN_MINUTES, 'formation': FORMATION_MIN_MINUTES}
-
-
-def get_weights(position):
-    defaults = {
-        'FW': FW_WEIGHTS,
-        'MF': MF_WEIGHTS,
-        'DF': DF_WEIGHTS,
-        'GK': GK_WEIGHTS,
-    }
-    try:
-        from manager.config import weights_for
-        return weights_for(position, defaults[position])
-    except Exception:
-        return defaults[position]
-
-
-def get_excluded_ids():
-    try:
-        from manager.config import excluded_ids
-        return excluded_ids(EXCLUDED_PLAYER_IDS)
-    except Exception:
-        return list(EXCLUDED_PLAYER_IDS)
-
-
 
 # =========================================================
 # 한 포지션의 BEST11 점수 계산
@@ -478,11 +447,11 @@ def get_best11_candidates():
 
         .filter(
             season=2026,
-            minutes__gte=get_min_minutes()['best11']
+            minutes__gte=BEST11_MIN_MINUTES
         )
 
         .exclude(
-            player_id__in=get_excluded_ids()
+            player_id__in=EXCLUDED_PLAYER_IDS
         )
 
         .select_related(
@@ -510,11 +479,11 @@ def get_formation_candidates():
 
         .filter(
             season=2026,
-            minutes__gte=get_min_minutes()['formation']
+            minutes__gte=FORMATION_MIN_MINUTES
         )
 
         .exclude(
-            player_id__in=get_excluded_ids()
+            player_id__in=EXCLUDED_PLAYER_IDS
         )
 
         .select_related(
@@ -579,25 +548,25 @@ def get_best11():
     fw_score_ranking = calculate_position_scores(
         fw_list,
         get_fw_metrics,
-        get_weights('FW')
+        FW_WEIGHTS
     )
 
     mf_score_ranking = calculate_position_scores(
         mf_list,
         get_mf_metrics,
-        get_weights('MF')
+        MF_WEIGHTS
     )
 
     df_score_ranking = calculate_position_scores(
         df_list,
         get_df_metrics,
-        get_weights('DF')
+        DF_WEIGHTS
     )
 
     gk_score_ranking = calculate_position_scores(
         gk_list,
         get_gk_metrics,
-        get_weights('GK')
+        GK_WEIGHTS
     )
 
 
@@ -617,7 +586,7 @@ def get_best11():
         return [
             row
             for row in ranking
-            if row['stats'].minutes >= get_min_minutes()['best11']
+            if row['stats'].minutes >= BEST11_MIN_MINUTES
         ]
 
 
@@ -1982,25 +1951,25 @@ def get_filtered_best11(
     fw_ranking_all = calculate_position_scores(
         fw_all,
         get_fw_metrics,
-        get_weights('FW')
+        FW_WEIGHTS
     )
 
     mf_ranking_all = calculate_position_scores(
         mf_all,
         get_mf_metrics,
-        get_weights('MF')
+        MF_WEIGHTS
     )
 
     df_ranking_all = calculate_position_scores(
         df_all,
         get_df_metrics,
-        get_weights('DF')
+        DF_WEIGHTS
     )
 
     gk_ranking_all = calculate_position_scores(
         gk_all,
         get_gk_metrics,
-        get_weights('GK')
+        GK_WEIGHTS
     )
 
 

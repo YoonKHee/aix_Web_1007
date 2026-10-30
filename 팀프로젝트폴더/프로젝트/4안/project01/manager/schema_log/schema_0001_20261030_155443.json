@@ -1,0 +1,209 @@
+{
+  "업로드": 1,
+  "시각": "2026-10-30T15:54:43",
+  "파일": "data/player/2026_강원.xls, data/player/2026_광주.xls, data/player/2026_김천.xls, data/player/2026_대전.xls, data/player/2026_부천.xls, data/player/2026_서울.xls, data/player/2026_안양.xls, data/player/2026_울산.xls, data/player/2026_인천.xls, data/player/2026_전북.xls, data/player/2026_제주.xls, data/player/2026_포항.xls, data/prediction/model_2026.json, data/강원/강성윤.png, data/강원/강윤구.png, data/강원/강준혁.png, data/강원/강투지.png, data/강원/고영준.png, data/강원/고은석.png, data/강원/김건희.png, data/강원/김대원.png, data/강원/김도현.png, data/강원/김동현.png, data/강원/김유성.png, data/강원/김이석.png, data/강원/김정훈.png, data/강원/김태환.png, data/강원/모재현.png, data/강원/박상혁.png, data/강원/박청효.png, data/강원/박호영.png, data/강원/서민우.png, data/강원/신민하.png, data/강원/아부달라.png, data/강원/이기혁.png, data/강원/이승원.png, data/강원/이용재.png, data/강원/이유현.png, data/강원/이은호.png, data/강원/이지호.png, data/강원/이효빈.png, data/강원/정승빈.png, data/강원/제시.png, data/강원/조민규.png, data/강원/조원우.png, data/강원/조현태.png, data/강원/최병찬.png, data/강원/최재혁.png, data/강원/최지남.png, data/강원/카림.png, data/강원/홍진혁.png, data/강원/홍철.png, data/강원/황문기.png, data/광주/강희수.png, data/광주/공배현.png, data/광주/곽성훈.png, data/광주/권성윤.png, data/광주/김경민.png, data/광주/김동화.png, data/광주/김용혁.png, data/광주/김우진.png, data/광주/김윤호.png, data/광주/김종석.png, data/광주/노희동.png, data/광주/리영직.png, data/광주/문민서.png, data/광주/민상기.png, data/광주/바 루아.png, data/광주/박성현.png, data/광주/박원재.png, data/광주/반 흐룬스벤.png, data/광주/배진우.png, data/광주/사이토스키.png, data/광주/신창무.png, data/광주/아이데일.png, data/광주/안영규.png, data/광주/안혁주.png, data/광주/오하종.png, data/광주/유제호.png, data/광주/이민기.png, data/광주/임승겸.png, data/광주/장석환.png, data/광주/정규민.png, data/광주/정지훈.png, data/광주/주세종.png, data/광주/주앙 페드로.png, data/광주/최경록.png, data/광주/프리드욘슨.png, data/광주/하승운.png, data/광주/홍용준.png, data/구단마크/강원.png, data/구단마크/광주.png, data/구단마크/김천.png, data/구단마크/대전.png, data/구단마크/부천.png, data/구단마크/서울.png, data/구단마크/안양.png, data/구단마크/울산.png, data/구단마크/인천.png, data/구단마크/전북.png, data/구단마크/제주.png, data/구단마크/포항.png, data/김천/강민규.png, data/김천/강영훈.png, data/김천/강주혁.png, data/김천/고재현.png, data/김천/김민규.png, data/김천/김인균.png, data/김천/김주찬.png, data/김천/김준하.p",
+  "변경 전 추가 컬럼": [],
+  "변경 후 추가 컬럼": [
+    "드리블 성공%",
+    "패스 성공%",
+    "후방 패스 성공%",
+    "횡패스 성공%",
+    "공격지역패스 성공%",
+    "수비지역패스 성공%",
+    "중앙지역패스 성공%",
+    "롱패스 성공%",
+    "중거리패스 성공%",
+    "숏패스 성공%",
+    "크로스 성공%",
+    "경합 지상 성공%",
+    "태클 성공%"
+  ],
+  "추가한 컬럼": [
+    {
+      "name": "드리블 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 0"
+      ],
+      "problems": []
+    },
+    {
+      "name": "패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 53.8"
+      ],
+      "problems": []
+    },
+    {
+      "name": "후방 패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 100"
+      ],
+      "problems": []
+    },
+    {
+      "name": "횡패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 100"
+      ],
+      "problems": []
+    },
+    {
+      "name": "공격지역패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 100"
+      ],
+      "problems": []
+    },
+    {
+      "name": "수비지역패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 53.7"
+      ],
+      "problems": []
+    },
+    {
+      "name": "중앙지역패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 55.3"
+      ],
+      "problems": []
+    },
+    {
+      "name": "롱패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 36.4"
+      ],
+      "problems": []
+    },
+    {
+      "name": "중거리패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 97.8"
+      ],
+      "problems": []
+    },
+    {
+      "name": "숏패스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 98.9"
+      ],
+      "problems": []
+    },
+    {
+      "name": "크로스 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 0"
+      ],
+      "problems": []
+    },
+    {
+      "name": "경합 지상 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 0"
+      ],
+      "problems": []
+    },
+    {
+      "name": "태클 성공%",
+      "kind": "float",
+      "filled": 428,
+      "total": 510,
+      "min": 0,
+      "max": 100,
+      "sample": [
+        "강원FC 김유성: 0",
+        "강원FC 김정훈: 0",
+        "강원FC 박청효: 0"
+      ],
+      "problems": []
+    }
+  ],
+  "승인하지 않은 컬럼": [
+    "전방 패스 성공%",
+    "경합 공중 성공%"
+  ]
+}

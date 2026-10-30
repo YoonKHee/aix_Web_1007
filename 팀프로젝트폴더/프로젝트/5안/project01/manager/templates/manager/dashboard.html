@@ -1,0 +1,22 @@
+{% extends 'manager/base.html' %}
+{% block title %}데이터 현황{% endblock %}
+{% block content %}
+<h1>데이터 현황</h1>
+<table>
+  <tr><th>구단</th><th class="num">선수</th><th class="num">2026 기록 있음</th><th class="num">기록 없음</th><th class="num">사진 없음</th><th class="num">생년월일 없음</th></tr>
+  {% for t in rows %}
+  <tr>
+    <td>{{ t.team_name }}</td>
+    <td class="num">{{ t.total }}</td>
+    <td class="num">{{ t.with_stats }}</td>
+    <td class="num {% if t.no_stats %}warn{% endif %}">{{ t.no_stats }}</td>
+    <td class="num {% if t.no_photo %}warn{% endif %}">{{ t.no_photo }}</td>
+    <td class="num {% if t.no_birth %}warn{% endif %}">{{ t.no_birth }}</td>
+  </tr>
+  {% endfor %}
+  <tr><th>합계</th><th class="num">{{ sums.total }}</th><th class="num">{{ sums.with_stats }}</th><th class="num">{{ sums.no_stats }}</th><th class="num">{{ sums.no_photo }}</th><th class="num">{{ sums.no_birth }}</th></tr>
+</table>
+<h3>등록된 추가 컬럼 ({{ columns|length }}개)</h3>
+<p>{% for c in columns %}<code>{{ c.name }}</code> {% empty %}아직 없습니다.{% endfor %}</p>
+<p><a class="btn" href="{% url 'manager:import_upload' %}">데이터 추가하기</a></p>
+{% endblock %}
