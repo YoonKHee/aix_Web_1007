@@ -14,19 +14,16 @@
         rel="stylesheet"
         href="{% static 'team/lineup_simulation.css' %}"
     >
+{% include 'shared/site_assets.html' %}
 </head>
 
-<body>
+<body class="site-shell">
+{% include 'shared/site_header.html' with active='predict' %}
 <main>
     <h1 class="sr-only">K리그 선수 구성 시뮬레이션</h1>
 
     <header class="page-header">
-        <a
-            href="{% url 'player:best11' %}"
-            class="brand"
-        >
-            K<span>LEAGUE</span> / 매치 스튜디오
-        </a>
+        <span class="studio-title">선수 구성 시뮬레이션</span>
 
         <div class="header-tools">
             <a

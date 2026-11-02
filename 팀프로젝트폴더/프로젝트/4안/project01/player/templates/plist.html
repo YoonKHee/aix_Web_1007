@@ -12,10 +12,13 @@
 
     <title>K리그 선수목록</title>
 
+{% include 'shared/site_assets.html' %}
 </head>
 
 
-<body>
+<body class="site-shell">
+{% include 'shared/site_header.html' with active='players' %}
+<main class="site-player-content">
 
 
     <!-- ============================================= -->
@@ -155,7 +158,7 @@
     <!-- 선수 목록 -->
     <!-- ============================================= -->
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
 
@@ -237,9 +240,10 @@
         {% endfor %}
 
 
-    </table>
+    </table></div>
 
 
+</main>
 </body>
 
 </html>

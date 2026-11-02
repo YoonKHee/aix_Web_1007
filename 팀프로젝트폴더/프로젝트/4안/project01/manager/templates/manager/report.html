@@ -106,7 +106,7 @@
   {% if batch.result.backup %}<p>반영 직전 백업: <code>{{ batch.result.backup }}</code> — <a href="{% url 'manager:backup_restore' batch.result.backup %}">이 반영 전으로 되돌리기</a></p>{% endif %}
   {% if batch.schema_file %}<p>구조 변경 기록 파일: <code>{{ batch.schema_file }}</code></p>{% endif %}
 {% else %}
-<form method="post" action="{% url 'manager:import_apply' batch.pk %}">
+<form method="post" action="{% url 'manager:import_apply' batch.pk %}" onsubmit="var b=this.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='반영 중… 잠시만 기다려주세요';}">
   {% csrf_token %}
 
   {% if plan.proposals %}

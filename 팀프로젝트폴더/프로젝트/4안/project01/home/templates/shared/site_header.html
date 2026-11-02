@@ -1,0 +1,120 @@
+{% url 'soccer_game:game' as soccer_game_url %}
+
+<a class="site-skip" href="#site-page-content">
+  본문으로 건너뛰기
+</a>
+
+<header class="site-header" data-site-header>
+  <div class="site-inner">
+    <a
+      class="site-brand"
+      href="/"
+      aria-label="감독? 내가한다! 메인페이지"
+    >
+      <span class="site-brand-icon" aria-hidden="true">⚽</span>
+      <span>
+        감독? 내가한다!
+        <small>K LEAGUE MATCH STUDIO</small>
+      </span>
+    </a>
+
+    <button
+      class="site-nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-navigation"
+      hidden
+    >
+      메뉴 열기 ☰
+    </button>
+
+    <div class="site-navigation" id="site-navigation">
+      <nav class="site-links" aria-label="주요 메뉴">
+        <a
+          class="site-link"
+          href="/"
+          {% if active == 'home' %}aria-current="page"{% endif %}
+        >
+          메인
+        </a>
+
+        <a
+          class="site-link"
+          href="{% url 'player:plist' %}"
+          {% if active == 'players' %}aria-current="page"{% endif %}
+        >
+          선수 기록
+        </a>
+
+        <a
+          class="site-link"
+          href="{% url 'board:list' %}"
+          {% if active == 'board' %}aria-current="page"{% endif %}
+        >
+          자유게시판
+        </a>
+
+        <a
+          class="site-link site-predict"
+          href="{% url 'team:simulate' %}"
+          {% if active == 'predict' %}aria-current="page"{% endif %}
+        >
+          ⚽ 승부예측
+        </a>
+
+        <a
+          class="site-link site-best11"
+          href="{% url 'player:best11' %}"
+          {% if active == 'best11' %}aria-current="page"{% endif %}
+        >
+          🏆 BEST11
+        </a>
+
+        {% if soccer_game_url %}
+          <a
+            class="site-link site-best11"
+            href="{{ soccer_game_url }}"
+            {% if active == 'game' %}aria-current="page"{% endif %}
+          >
+            🎮 축구게임
+          </a>
+        {% endif %}
+      </nav>
+
+      <div class="site-account" aria-label="회원 메뉴">
+        {% if user.is_authenticated %}
+          <span
+            class="site-user-name"
+            title="{{ user.profile.nickname|default:user.get_username }}"
+          >
+            {{ user.profile.nickname|default:user.get_username }}님
+          </span>
+
+          {% if user.is_superuser %}
+            <a href="{% url 'manager:dashboard' %}">
+              데이터 관리
+            </a>
+          {% elif user.is_staff %}
+            <a href="/admin/board/">
+              게시판 관리
+            </a>
+          {% endif %}
+
+          <form
+            class="site-logout"
+            method="post"
+            action="{% url 'board:logout' %}"
+          >
+            {% csrf_token %}
+            <button type="submit">로그아웃</button>
+          </form>
+        {% else %}
+          <a href="{% url 'board:login' %}">로그인</a>
+          <a href="{% url 'board:signup' %}">회원가입</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="site-page-content" tabindex="-1"></div>

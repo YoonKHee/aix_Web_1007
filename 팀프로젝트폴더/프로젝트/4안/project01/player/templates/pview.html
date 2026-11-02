@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>선수 상세정보</title>
+{% include 'shared/site_assets.html' %}
 </head>
 
-<body>
+<body class="site-shell">
+{% include 'shared/site_header.html' with active='players' %}
+<main class="site-player-content">
 
     <!-- ============================================= -->
     <!-- 선수 기본정보 -->
@@ -15,7 +18,7 @@
 
     <h1>선수 상세정보</h1>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>번호</th>
@@ -42,7 +45,7 @@
             <td>{{ player.position }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -69,7 +72,7 @@
 
     <h3>1. 기본 기록</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>시즌</th>
@@ -91,7 +94,7 @@
             <td>{{ s.assists }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -102,7 +105,7 @@
 
     <h3>1-1. 90분당 주요 기록</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>90분당 득점</th>
@@ -120,7 +123,7 @@
             <td>{{ s.key_passes_per90 }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -131,7 +134,7 @@
 
     <h3>2. 슈팅 기록</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>슈팅</th>
@@ -151,7 +154,7 @@
             <td>{{ s.shots_outside_box }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -162,7 +165,7 @@
 
     <h3>3. 공격 기타</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>오프사이드</th>
@@ -180,7 +183,7 @@
             <td>{{ s.escape_pressure }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -191,7 +194,7 @@
 
     <h3>4. 드리블</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>시도</th>
@@ -205,7 +208,7 @@
             <td>{{ s.dribble_success_rate }}%</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -216,7 +219,7 @@
 
     <h3>5. 전체 패스</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>패스 시도</th>
@@ -232,7 +235,7 @@
             <td>{{ s.key_passes }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -243,7 +246,7 @@
 
     <h3>6. 패스 방향</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>구분</th>
@@ -269,7 +272,7 @@
             <td>{{ s.lateral_pass_success }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -280,7 +283,7 @@
 
     <h3>7. 지역별 패스</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>구분</th>
@@ -306,7 +309,7 @@
             <td>{{ s.middle_third_pass_success }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -317,7 +320,7 @@
 
     <h3>8. 거리별 패스</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>구분</th>
@@ -343,7 +346,7 @@
             <td>{{ s.short_pass_success }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -354,7 +357,7 @@
 
     <h3>9. 크로스</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>시도</th>
@@ -368,7 +371,7 @@
             <td>{{ s.cross_success_rate }}%</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -379,7 +382,7 @@
 
     <h3>10. 경합</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>구분</th>
@@ -402,7 +405,7 @@
             <td>{{ s.aerial_duel_success_rate }}%</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -413,7 +416,7 @@
 
     <h3>11. 태클</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>태클 시도</th>
@@ -427,7 +430,7 @@
             <td>{{ s.tackle_success_rate }}%</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -438,7 +441,7 @@
 
     <h3>12. 수비 기록</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>클리어링</th>
@@ -456,7 +459,7 @@
             <td>{{ s.blocks }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
 
@@ -467,7 +470,7 @@
 
     <h3>13. 볼미스 / 파울 / 카드</h3>
 
-    <table border="1">
+    <div class="site-table-scroll"><table border="1">
 
         <tr>
             <th>볼미스</th>
@@ -485,7 +488,7 @@
             <td>{{ s.red_cards }}</td>
         </tr>
 
-    </table>
+    </table></div>
 
     <br>
     <hr>
@@ -498,6 +501,7 @@
     {% endfor %}
 
 
+</main>
 </body>
 
 </html>

@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'home',
     'player',
     'team',
-    'manager',
     'board',
+    'manager',
     'soccer_game',
 ]
 
@@ -122,14 +122,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = '/media/'
-
-
-MEDIA_ROOT = BASE_DIR
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-DATA_UPLOAD_MAX_NUMBER_FILES = None

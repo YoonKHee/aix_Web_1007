@@ -125,20 +125,12 @@
             font-size: 22px;
         }
     </style>
+{% include 'shared/site_assets.html' %}
 </head>
 
-<body>
+<body class="site-shell">
+{% include 'shared/site_header.html' with active='predict' %}
 <main>
-    <a href="{% url 'player:best11' %}">
-        ← BEST11
-    </a>
-
-    ·
-
-    <a href="{% url 'team:simulate' %}">
-        선수 교체·컨디션 시뮬레이션
-    </a>
-
     <h1>2026 K리그 승무패 예측</h1>
 
     <p>

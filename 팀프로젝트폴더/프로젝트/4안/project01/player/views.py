@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 
 from player.models import Player, PlayerStats
@@ -112,9 +112,7 @@ def pview(request, id):
     # -----------------------------------------------------
     # 선수 1명
     # -----------------------------------------------------
-    qs = Player.objects.get(
-        id=id
-    )
+    qs = get_object_or_404(Player, id=id)
 
 
     # -----------------------------------------------------
