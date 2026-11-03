@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 
@@ -33,6 +33,12 @@ urlpatterns = [
         'info/<int:id>/',
         views.player_info,
         name='player_info'
+    ),
+
+    # 감독 연구실 (가중치 · 케미 · 교체 · 진단 · 데이터 점검)
+    path(
+        'lab/',
+        include('player.lab.urls')
     ),
 
 ]

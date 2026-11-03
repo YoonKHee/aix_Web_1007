@@ -1,9 +1,0 @@
-{
-  "formations": ["4-4-2", "4-3-3", "3-5-2", "4-2-3-1"],
-  "tactics": [
-    { "code": "TIKI_TAKA", "label": "티키타카" },
-    { "code": "GEGENPRESSING", "label": "게겐프레싱" },
-    { "code": "COUNTER", "label": "역습" },
-    { "code": "WING_PLAY", "label": "측면돌파" }
-  ]
-}
