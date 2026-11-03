@@ -114,3 +114,39 @@
 
 .b11-cr{display:block;font-size:10px;font-weight:400;line-height:1.25;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .b11-cr-pop{font-size:11px;color:#6b7280;margin:0 6px 0 4px}
+
+/* 스카우터 양식 보고서 */
+.b11-sc-head{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:#0f172a;color:#f8fafc}
+.b11-sc-head small{display:block;font-size:11px;letter-spacing:.08em;opacity:.7}
+.b11-sc-id{flex:1;min-width:200px}.b11-sc-id h3{margin:2px 0 4px;font-size:22px;color:#fff}.b11-sc-id .lab-muted{color:#cbd5e1}
+.b11-sc-ovr,.b11-sc-rec{text-align:center;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08);min-width:96px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.b11-sc-ovr b{font-size:34px;line-height:1}.b11-sc-ovr b.hi{color:#4ade80}.b11-sc-ovr b.mid{color:#fde68a}.b11-sc-ovr b.lo{color:#fca5a5}
+.b11-sc-rec span,.b11-sc-ovr span{font-size:12px}
+.b11-sc-sum{font-weight:700;font-size:15px;line-height:1.5;margin:10px 0}
+.b11-sc-row{align-items:center}.b11-sc-g{width:30px;text-align:right;flex:none}.b11-sc-g.hi{color:#15803d}.b11-sc-g.mid{color:#a16207}.b11-sc-g.lo{color:#b91c1c}
+.b11-hb-f.g-hi{background:#16a34a}.b11-hb-f.g-mid{background:#eab308}.b11-hb-f.g-lo{background:#ef4444}
+.b11-sc-row .b11-hb-v{width:230px}
+.b11-sc-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.b11-sc-box{padding:8px 12px;border-radius:8px;border-left:4px solid #cbd5e1}.b11-sc-box.hire{border-color:#16a34a;background:#f0fdf4}.b11-sc-box.warn{border-color:#f59e0b;background:#fffbeb}
+.b11-sc-box h4{margin:0 0 4px;font-size:15px}.b11-sc-box ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55}
+.b11-sc-final{border-color:#1d4ed8;background:#eff6ff}
+@media(max-width:700px){.b11-sc-cols{grid-template-columns:1fr}.b11-sc-row{flex-wrap:wrap}.b11-sc-row .b11-hb-v{width:100%;text-align:left}}
+
+/* 스카우터 보고서 가독성 */
+.b11-scout{font-size:15px;line-height:1.6;color:#111827}
+.b11-scout .b11-rpt-sec{border:1px solid #e5e7eb;border-left-width:4px;border-radius:10px;padding:12px 14px;margin:12px 0}
+.b11-scout h4{font-size:16px;margin:0 0 2px}
+.b11-sc-sub{margin:0 0 8px;font-size:13px;color:#6b7280}
+.b11-sc-sum{margin:12px 0;padding:10px 14px;border-radius:10px;background:#f1f5f9}
+.b11-sc-sum small{font-size:12px;color:#64748b;letter-spacing:.04em}.b11-sc-sum p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.5}
+.b11-sc-item{padding:7px 0;border-bottom:1px solid #f1f5f9}.b11-sc-item:last-child{border-bottom:0}
+.b11-sc-item .b11-hb{margin:0}
+.b11-scout .b11-hb-l{width:92px;font-size:15px}.b11-scout .b11-hb-t{height:16px}
+.b11-sc-g{width:34px;font-size:18px}
+.b11-sc-w{width:64px;flex:none;font-size:13px;font-weight:700}.b11-sc-w.hi{color:#15803d}.b11-sc-w.mid{color:#a16207}.b11-sc-w.lo{color:#b91c1c}
+.b11-sc-d{margin:2px 0 0 100px;font-size:13px;color:#6b7280}
+.b11-sc-box{padding:12px 14px}.b11-sc-box ul{padding-left:16px;font-size:14.5px}.b11-sc-box li{margin:4px 0}
+.b11-lead{color:#111827;background:rgba(0,0,0,.05);border-radius:4px;padding:0 5px;margin-right:2px}
+.b11-sc-more summary{cursor:pointer;font-weight:700;font-size:15px}.b11-sc-more ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+.b11-sc-final p{margin:4px 0;font-size:15px}
+@media(max-width:700px){.b11-sc-d{margin-left:0}.b11-scout .b11-hb-l{width:70px}.b11-sc-row{flex-wrap:nowrap!important}}

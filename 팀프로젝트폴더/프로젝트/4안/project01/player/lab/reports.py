@@ -128,6 +128,27 @@ def build_one(c, pid, peers_by_pos, teammates_by_key):
             'rows': bd['rows'], 'why': why, 'hire': hire, 'cautions': cautions, 'partners': partners, 'similar': similar}
 
 
+PER90_KEYS = {'goals': 'goals', 'assists': 'assists', 'shots': 'shots', 'shots_on_target': 'shots_on_target', 'key_passes': 'key_passes',
+              'dribble': 'dribble_success', 'interceptions': 'interceptions', 'clearances': 'clearances', 'recoveries': 'recoveries'}
+
+
+def per90_scale(c):
+    """선수 팝업 '90분당 주요 기록' 가로바용 기준. 포지션별 주전급(450분 이상) 평균·최대. pass_rate 는 성공률(%)."""
+    out = {}
+    for pos in ('FW', 'MF', 'DF', 'GK'):
+        rows = [st for pid, st in c.data['stats'].items() if st.player.position.strip().upper() == pos and st.minutes >= CH.REFERENCE_MIN_MINUTES]
+        d = {}
+        for key, field in PER90_KEYS.items():
+            vals = [(getattr(st, field, 0) or 0) * 90.0 / st.minutes for st in rows]
+            if vals:
+                d[key] = {'mean': round(sum(vals) / len(vals), 3), 'max': round(max(vals), 3)}
+        rates = [(st.pass_success or 0) / st.pass_attempt * 100 for st in rows if (st.pass_attempt or 0) > 0]
+        if rates:
+            d['pass_rate'] = {'mean': round(sum(rates) / len(rates), 2), 'max': round(max(rates), 2)}
+        out[pos] = d
+    return out
+
+
 def build_all():
     """리그 전체 선수의 보고서. 기본 설정(가중치 기본, 케미 1×, 경험 보정 기본값)."""
     c = SVC.Ctx({})
@@ -141,6 +162,6 @@ def build_all():
     for pid in c.profiles:
         if pid in c.data['stats'] and pid in c.info:
             players[str(pid)] = build_one(c, pid, peers_by_pos, tm)
-    return {'meta': {'generated': date.today().isoformat(), 'season': SVC.SEASON, 'count': len(players),
+    return {'meta': {'per90_scale': per90_scale(c), 'generated': date.today().isoformat(), 'season': SVC.SEASON, 'count': len(players),
                      'settings': '기본 가중치 · 케미 1× · 경험 보정 기본값', 'note': '올 시즌 기록 기반 추정이며 실제 경기 결과를 보장하지 않습니다. "주전급"은 같은 포지션에서 450분 이상 뛴 선수입니다.'},
             'players': players}

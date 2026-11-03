@@ -17,7 +17,20 @@
   var field = document.querySelector('.football-field');
   if (!field || !URLS.evaluate || !URLS.candidates) return;
   var cards = Array.prototype.slice.call(field.querySelectorAll('.player-card'));
-  if (cards.length !== 11) return;                      // 포메이션을 만들 수 없는 화면이면 사용하지 않음
+  if (cards.length !== 11) return;
+  /* 화면(DOM)은 FW → MF → DF → GK 줄 순서인데 서버 라인업은 GK → DF → MF → FW 순서다.
+     카드를 서버 순서(GK, DF, MF, FW)로 다시 늘어놓아야 공격수 칸에 골키퍼가 들어가지 않는다. */
+  (function () {
+    var LINE = { 'fw-line': 'FW', 'mf-line': 'MF', 'df-line': 'DF', 'gk-line': 'GK' }, RANK = { GK: 0, DF: 1, MF: 2, FW: 3 };
+    var tagged = cards.map(function (c, i) {
+      var ln = c.closest('.formation-line'), pos = null;
+      if (ln) Object.keys(LINE).forEach(function (k) { if (ln.classList.contains(k)) pos = LINE[k]; });
+      return { c: c, i: i, pos: pos };
+    });
+    if (tagged.some(function (t) { return !t.pos; })) return;       // 줄 정보가 없으면 건드리지 않는다
+    tagged.sort(function (a, b) { return RANK[a.pos] - RANK[b.pos] || a.i - b.i; });
+    cards = tagged.map(function (t) { return t.c; });
+  })();                      // 포메이션을 만들 수 없는 화면이면 사용하지 않음
 
   var KEY = 'kleague-my-best11-v1', SKEY = 'kleague-b11-settings-v1';
   var POS_ORDER = ['FW', 'MF', 'DF', 'GK'], POS_LABEL = { FW: '공격수', MF: '미드필더', DF: '수비수', GK: '골키퍼' };
@@ -339,6 +352,42 @@
   }
 
   /* ---------- 선수 팝업: 이름 옆 케미 표시 + VS 비교 ---------- */
+  /* ---------- 팝업 "90분당 주요 기록": 박스 → 가로바 (막대=선수, 세로선=같은 포지션 주전급 평균, 끝=리그 최고) ---------- */
+  var P90 = [['per90Goals', 'goals', '득점'], ['per90Assists', 'assists', '도움'], ['per90Shots', 'shots', '슈팅'], ['per90ShotsTarget', 'shots_on_target', '유효슈팅'],
+    ['per90KeyPasses', 'key_passes', '키패스'], ['per90PassRate', 'pass_rate', '패스 성공률(%)'], ['per90Dribble', 'dribble', '드리블'],
+    ['per90Interceptions', 'interceptions', '인터셉트'], ['per90Clearances', 'clearances', '클리어링'], ['per90Recoveries', 'recoveries', '볼 회수']];
+  function initPer90Bars() {
+    var grid = document.querySelector('.per90-grid');
+    if (!grid || !URLS.reportsFile) return;
+    var wrap = el('div', { class: 'b11-p90' });
+    grid.parentNode.insertBefore(wrap, grid.nextSibling);
+    var pending = false;
+    function draw() {
+      pending = false;
+      loadReports().then(function (j) {
+        var rp = j.players[String(curId)];
+        var sc = j.meta.per90_scale && rp && j.meta.per90_scale[rp.position];
+        if (!sc) { grid.style.display = ''; wrap.hidden = true; return; }     // 기준이 없으면 원래 박스를 그대로 둔다
+        grid.style.display = 'none'; wrap.hidden = false; clear(wrap);
+        wrap.appendChild(el('p', { class: 'lab-muted', text: '막대=이 선수 · 세로선=같은 포지션(' + rp.position + ') 주전급 평균 · 끝=리그 최고 · 평균 이상은 초록' }));
+        P90.forEach(function (m) {
+          var node = document.getElementById(m[0]); if (!node) return;
+          var v = parseFloat(String(node.textContent).replace(/[^0-9.\-]/g, '')) || 0;
+          var s = sc[m[1]]; if (!s) return;
+          var mx = Math.max(s.max, v, 0.0001), w = Math.max(1, Math.min(100, v / mx * 100)), mp = Math.max(0, Math.min(100, s.mean / mx * 100));
+          wrap.appendChild(el('div', { class: 'b11-hb' }, [
+            el('span', { class: 'b11-hb-l', text: m[2] }),
+            el('span', { class: 'b11-hb-t' }, [el('span', { class: 'b11-hb-f ' + (v >= s.mean ? 'above' : 'below'), style: 'width:' + w + '%' }), el('span', { class: 'b11-hb-m', style: 'left:' + mp + '%', title: '주전급 평균 ' + s.mean })]),
+            el('span', { class: 'b11-hb-v', text: v + ' (평균 ' + s.mean + ')' })]));
+        });
+      }).catch(function () { grid.style.display = ''; wrap.hidden = true; });
+    }
+    function sched() { if (!pending) { pending = true; setTimeout(draw, 30); } }
+    new MutationObserver(sched).observe(grid, { childList: true, characterData: true, subtree: true });
+    sched();
+  }
+  initPer90Bars();
+
   /* ---------- 케미 파트너: 이 선수가 누구와 어떤 케미를 보이는가 ---------- */
   var TIERK = { strong: '강한 케미', normal: '케미 있음', none: '케미 약함' };
   function partnerRow(x, extra) {
@@ -452,33 +501,76 @@
     });
     out.appendChild(row); out.appendChild(body); return out;
   }
-  function renderLeagueReport(r, meta) {
-    var box = el('div', { class: 'b11-rpt' });
-    box.appendChild(el('div', { class: 'b11-rpt-head' }, [
-      el('span', { class: 'b11-verdict ' + (VCLS[r.verdict] || 'mid'), text: r.verdict }),
-      el('span', { text: r.team + ' · ' + r.position + (r.ranked ? ' — ' + r.rank_total + '명 중 ' + r.rank + '위 (상위 ' + r.top_pct + '%)' : ' — 출전 적음(순위 참고용)') +
-        (r.club_style ? ' · 구단 스타일 ' + r.club_style : '') })]));
-    box.appendChild(el('div', { class: 'b11-rpt-score' }, [el('div', {}, [el('small', { text: '능력 점수' }), el('b', { text: String(r.ability) })])]));
-    box.appendChild(el('p', { class: 'b11-rpt-concl', text: r.conclusion }));
-    box.appendChild(el('p', { class: 'lab-muted', text: '근거 자료: ' + r.basis + ' · 기록 신뢰도 ' + r.confidence }));
-    box.appendChild(section('✅ 이 선수를 쓰는 이유', r.hire, 'hire'));
-    box.appendChild(section('📊 왜 이 점수인가', r.why));
-    if (r.cautions.length) box.appendChild(section('⚠ 주의할 점', r.cautions, 'warn'));
-    box.appendChild(statBars(r));
-    var max = Math.max.apply(null, r.rows.map(function (x) { return x.points; }).concat([1]));
-    var tb = el('table', { class: 'b11-cmp-table b11-rpt-table' }, [el('tr', {}, ['지표', '기록(90분당)', '주전급 평균', '순위', '비중', '기여 점수'].map(function (h) { return el('th', { text: h }); }))]);
-    r.rows.forEach(function (x) {
-      tb.appendChild(el('tr', {}, [el('td', { text: x.label }), el('td', { text: String(x.value) }), el('td', { text: String(x.mean) }),
-        el('td', { text: x.rank + '위 (상위 ' + Math.max(1, 100 - x.pct) + '%)' }), el('td', { text: x.weight + '%' }),
-        el('td', {}, [el('span', { class: 'lab-bar', style: 'width:' + Math.max(2, Math.round(x.points / max * 90)) + 'px' }), ' ' + x.points])]));
+  /* ---------- 스카우터 양식 보고서 (20-80 스케일: 50 = 같은 포지션 주전급 평균, 10점 = 표준편차 1) ---------- */
+  function probit(p) {                       // 표준정규 역함수 (Abramowitz-Stegun 26.2.23)
+    p = Math.min(0.995, Math.max(0.005, p));
+    var q = p < 0.5 ? p : 1 - p, tt = Math.sqrt(-2 * Math.log(q));
+    var z = tt - (2.515517 + 0.802853 * tt + 0.010328 * tt * tt) / (1 + 1.432788 * tt + 0.189269 * tt * tt + 0.001308 * tt * tt * tt);
+    return p < 0.5 ? -z : z;
+  }
+  function grade(pct) { var g = 50 + 10 * probit(pct / 100); return Math.max(20, Math.min(80, Math.round(g / 5) * 5)); }
+  function gradeWord(g) { return g >= 70 ? '최상급' : g >= 60 ? '상급' : g >= 55 ? '평균 이상' : g >= 45 ? '평균' : g >= 40 ? '평균 이하' : '취약'; }
+  function gradeCls(g) { return g >= 60 ? 'hi' : g >= 45 ? 'mid' : 'lo'; }
+  var RECS = { '강력 추천': ['영입 권장', 'A'], '추천': ['영입 고려', 'B'], '무난': ['관찰', 'C'], '대안 검토': ['보류', 'D'], '표본 부족': ['추가 관찰 필요', '-'] };
+  function boldLead(x) {                     // "강점: …" → 앞의 짧은 라벨만 굵게
+    var m = /^(\[?[^:\[\]]{1,8}\]?):\s*(.*)$/.exec(x);
+    return m ? el('li', {}, [el('b', { class: 'b11-lead', text: m[1] }), ' ' + m[2]]) : el('li', { text: x });
+  }
+  function bulletBox(title, arr, cls) {
+    var ul = el('ul', {}); arr.forEach(function (x) { ul.appendChild(boldLead(x)); });
+    if (!arr.length) ul.appendChild(el('li', { text: '해당 없음' }));
+    return el('div', { class: 'b11-sc-box ' + cls }, [el('h4', { text: title }), ul]);
+  }
+  function renderScout(o) {
+    var box = el('div', { class: 'b11-rpt b11-scout' });
+    if (o.banner) box.appendChild(o.banner);
+    var rec = RECS[o.verdict] || ['관찰', 'C'];
+    var ovr = grade(Math.max(1, Math.min(99, 100 - o.top_pct)));
+    box.appendChild(el('div', { class: 'b11-sc-head' }, [
+      el('div', { class: 'b11-sc-id' }, [el('small', { text: 'SCOUTING REPORT' }), el('h3', { text: o.name }),
+        el('div', { text: o.team + ' · ' + (POSK[o.pos] || o.pos) + (o.club_style ? ' · 구단 스타일 ' + o.club_style : '') }),
+        el('div', { class: 'lab-muted', text: o.basis + ' · 기록 신뢰도 ' + o.confidence })]),
+      el('div', { class: 'b11-sc-ovr' }, [el('small', { text: 'OVR (20–80)' }), el('b', { class: gradeCls(ovr), text: String(ovr) }), el('span', { text: gradeWord(ovr) })]),
+      el('div', { class: 'b11-sc-rec' }, [el('small', { text: '스카우트 의견' }), el('b', { class: 'b11-verdict ' + (VCLS[o.verdict] || 'mid'), text: rec[0] }),
+        el('span', { text: o.rank_total ? o.rank_total + '명 중 ' + o.rank + '위 · 상위 ' + o.top_pct + '%' : '순위 참고용' })])]));
+    var sc = [el('div', {}, [el('small', { text: '능력 점수' }), el('b', { text: String(o.ability) })])];
+    if (o.final != null) {
+      sc.push(el('span', { text: '+' }), el('div', {}, [el('small', { text: '케미' }), el('b', { class: 'b11-cn ' + (o.chem > 0 ? 'pos' : o.chem < 0 ? 'neg' : 'zero'), text: sign(o.chem) })]),
+        el('span', { text: '=' }), el('div', {}, [el('small', { text: '최종 점수' }), el('b', { text: String(o.final) })]));
+    }
+    box.appendChild(el('div', { class: 'b11-rpt-score' }, sc));
+    box.appendChild(el('div', { class: 'b11-sc-sum' }, [el('small', { text: '한 줄 평가' }), el('p', { text: o.conclusion })]));
+
+    // 능력치 평가
+    var at = el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '능력치 평가' }), el('p', { class: 'b11-sc-sub', text: '20–80 등급 · 가운데 선(50) = 같은 포지션 주전급 평균' })]);
+    o.rows.forEach(function (x) {
+      var g = grade(x.pct), w = (g - 20) / 60 * 100;
+      at.appendChild(el('div', { class: 'b11-sc-item' }, [
+        el('div', { class: 'b11-hb b11-sc-row' }, [
+          el('span', { class: 'b11-hb-l', text: x.label }),
+          el('span', { class: 'b11-hb-t' }, [el('span', { class: 'b11-hb-f g-' + gradeCls(g), style: 'width:' + w + '%' }), el('span', { class: 'b11-hb-m', style: 'left:50%' })]),
+          el('b', { class: 'b11-sc-g ' + gradeCls(g), text: String(g) }),
+          el('span', { class: 'b11-sc-w ' + gradeCls(g), text: gradeWord(g) })]),
+        el('div', { class: 'b11-sc-d', text: x.value + (x.unit === 'rate' ? '' : ' /90분') + ' · 평균 ' + x.mean + ' · ' + x.rank + '위 · 비중 ' + x.weight + '%' })]));
     });
-    var det = el('details', { class: 'b11-rpt-sec' }, [el('summary', { text: '지표별 기여 표 (능력 점수 = 기여 점수의 합 × 경험 배율, 소표본 보정 반영)' }), tb]);
-    box.appendChild(det);
-    if (r.similar.length) box.appendChild(section('같은 포지션에서 능력이 더 높은 선수 (바로 위부터)', r.similar.map(function (s) { return s.team + ' ' + s.name + ' — 능력 ' + s.ability + '점 (출전 ' + s.minutes + '분)'; })));
+    box.appendChild(at);
+
+    box.appendChild(el('div', { class: 'b11-sc-cols' }, [bulletBox('✅ 강점 · 영입 이유', o.hire, 'hire'), bulletBox('⚠ 약점 · 리스크', o.cautions, 'warn')]));
+    box.appendChild(el('details', { class: 'b11-rpt-sec b11-sc-more' }, [el('summary', { text: '📊 점수 구성 근거 (펼쳐 보기)' }), el('ul', {}, o.why.map(boldLead))]));
+    if (o.h2h) box.appendChild(o.h2h);
+    if (o.alt) box.appendChild(o.alt);
+    box.appendChild(el('div', { class: 'b11-rpt-sec b11-sc-final' }, [el('h4', { text: '최종 의견: ' + rec[0] + (rec[1] !== '-' ? ' (등급 ' + rec[1] + ')' : '') }),
+      el('p', { text: o.conclusion }), el('p', { class: 'lab-muted', text: o.rule })]));
     box.appendChild(helpChips());
-    box.appendChild(el('p', { class: 'lab-muted', text: r.rule }));
-    box.appendChild(el('p', { class: 'lab-muted', text: meta.note + ' 기준: ' + meta.settings + ' · 작성일 ' + meta.generated }));
+    box.appendChild(el('p', { class: 'lab-muted', text: '등급 읽는 법: 20–80 스케일은 스카우팅에서 쓰는 표기로, 같은 포지션 주전급(450분 이상) 선수들 사이의 위치를 정규분포로 환산해 5점 단위로 반올림했습니다. 50 평균, 60 상위 약 16%, 70 상위 약 2%, 40 하위 약 16%입니다. ' + (o.notes || '') }));
     return box;
+  }
+  function renderLeagueReport(r, meta) {
+    var alt = null;
+    if (r.similar && r.similar.length) alt = section('비교 대상 — 같은 포지션에서 능력이 더 높은 선수 (바로 위부터)', r.similar.map(function (s) { return s.team + ' ' + s.name + ' — 능력 ' + s.ability + '점 (출전 ' + s.minutes + '분)'; }));
+    return renderScout({ name: r.name, team: r.team, pos: r.position, club_style: r.club_style, basis: r.basis, confidence: r.confidence, verdict: r.verdict,
+      rank: r.ranked ? r.rank : null, rank_total: r.ranked ? r.rank_total : null, top_pct: r.top_pct, ability: r.ability, conclusion: r.conclusion, rows: r.rows,
+      hire: r.hire, cautions: r.cautions, why: r.why, alt: alt, rule: r.rule, notes: meta.note + ' 기준: ' + meta.settings + ' · 작성일 ' + meta.generated });
   }
   function openReport(pid) {
     if (pid == null) return;
@@ -527,52 +619,26 @@
     post(URLS.report, b).then(function (r) {
       clear(box);
       var banner = el('div', { class: 'b11-rpt-sec warn b11-set' });
-      box.appendChild(banner); settingsBanner(banner, pid, r);
-      var VC = { '강력 추천': 'good', '추천': 'good', '무난': 'mid', '대안 검토': 'bad', '표본 부족': 'bad' };
-      box.appendChild(el('div', { class: 'b11-rpt-head' }, [
-        el('span', { class: 'b11-verdict ' + (VC[r.verdict] || 'mid'), text: r.verdict }),
-        el('span', { text: r.player.team + ' · ' + r.player.position + ' — ' + r.rank_total + '명 중 ' + r.rank + '위 (상위 ' + r.top_pct + '%)' })]));
-      box.appendChild(el('div', { class: 'b11-rpt-score' }, [
-        el('div', {}, [el('small', { text: '능력 점수' }), el('b', { text: String(r.ability) })]), el('span', { text: '+' }),
-        el('div', {}, [el('small', { text: '케미' }), el('b', { class: 'b11-cn ' + (r.chem_bonus > 0 ? 'pos' : r.chem_bonus < 0 ? 'neg' : 'zero'), text: sign(r.chem_bonus) })]), el('span', { text: '=' }),
-        el('div', {}, [el('small', { text: '최종 점수' }), el('b', { text: String(r.final) })])]));
-      box.appendChild(el('p', { class: 'b11-rpt-concl', text: r.conclusion }));
-      box.appendChild(el('p', { class: 'lab-muted', text: '근거 자료: ' + r.basis + ' · 기록 신뢰도 ' + r.confidence }));
-      function list(title, arr, cls) {
-        var ul = el('ul', {}); arr.forEach(function (x) { ul.appendChild(el('li', { text: x })); });
-        return el('div', { class: 'b11-rpt-sec ' + (cls || '') }, [el('h4', { text: title }), ul]);
-      }
-      box.appendChild(list('✅ 이 선수를 쓰는 이유', r.hire, 'hire'));
-      box.appendChild(list('📊 왜 이 점수인가', r.why));
-      if (r.cautions.length) box.appendChild(list('⚠ 주의할 점', r.cautions, 'warn'));
+      settingsBanner(banner, pid, r);
+      var h2h = null, alt = null;
       if (r.h2h && r.h2h.rows.length) {
         var h = r.h2h, ht = el('table', { class: 'b11-cmp-table b11-rpt-table' }, [el('tr', {}, [el('th', { text: '지표' }), el('th', { text: r.player.name, style: 'color:' + COL.a }), el('th', { text: h.name + ' (대체 1순위)', style: 'color:' + COL.b })])]);
         h.rows.forEach(function (x) {
           ht.appendChild(el('tr', {}, [el('td', { text: x.label + (x.unit === 'rate' ? '' : ' (90분당)') }), el('td', { text: String(x.me), class: x.lead === 'me' ? 'win' : '' }), el('td', { text: String(x.other), class: x.lead === 'other' ? 'win' : '' })]));
         });
-        box.appendChild(el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '대체 1순위와 직접 비교 — ' + h.name + '(' + h.team + ', 출전 ' + h.minutes + '분) · 능력 ' + r.ability + ' vs ' + h.ability + '점, 앞선 지표 ' + h.me_wins + ' : ' + h.other_wins }), ht]));
+        h2h = el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '비교 대상 — ' + h.name + '(' + h.team + ', 출전 ' + h.minutes + '분) · 능력 ' + r.ability + ' vs ' + h.ability + '점, 앞선 지표 ' + h.me_wins + ' : ' + h.other_wins }), ht]);
       }
-      box.appendChild(statBars(r));
-      var max = Math.max.apply(null, r.rows.map(function (x) { return x.points; }).concat([1]));
-      var tb = el('table', { class: 'b11-cmp-table b11-rpt-table' }, [el('tr', {}, ['지표', '기록(90분당)', '주전급 평균', '순위', '비중', '기여 점수'].map(function (h) { return el('th', { text: h }); }))]);
-      r.rows.forEach(function (x) {
-        tb.appendChild(el('tr', {}, [el('td', { text: x.label }), el('td', { text: String(x.value) }), el('td', { text: String(x.mean) }),
-          el('td', { text: x.rank + '위 (상위 ' + Math.max(1, 100 - x.pct) + '%)' }), el('td', { text: x.weight + '%' }),
-          el('td', {}, [el('span', { class: 'lab-bar', style: 'width:' + Math.max(2, Math.round(x.points / max * 90)) + 'px' }), ' ' + x.points])]));
-      });
-      box.appendChild(el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '지표별 기여 (능력 점수 = 기여 점수의 합 × 경험 배율, 소표본 보정 반영)' }), tb]));
       if (r.alternatives.length) {
-        var alt = el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '이 자리의 대안 (라인업 총점이 오르는 선수)' })]);
+        alt = el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '이 자리의 대안 (라인업 총점이 오르는 선수)' })]);
         r.alternatives.forEach(function (a) {
           alt.appendChild(el('div', { class: 'lab-cand' }, [el('div', {}, [el('b', { text: a.name }), ' ', el('span', { class: 'lab-muted', text: a.team + ' · BEST11 ' + a.ability + '점 ' + sign(a.chem_bonus) })]),
             el('div', {}, [el('span', { class: 'lab-delta pos', text: sign(a.delta) + ' ' }),
               el('button', { type: 'button', text: '교체', onclick: function () { var slot = ids.indexOf(pid); closeModal(); var pm = document.getElementById('playerModal'); if (pm) pm.style.display = 'none'; choose(slot, a.id); } })])]));
         });
-        box.appendChild(alt);
       }
-      box.appendChild(helpChips());
-      box.appendChild(el('p', { class: 'lab-muted', text: r.rule }));
-      box.appendChild(el('p', { class: 'lab-muted', text: r.notes }));
+      box.appendChild(renderScout({ name: r.player.name, team: r.player.team, pos: r.player.position, club_style: r.player.club_style, basis: r.basis, confidence: r.confidence,
+        verdict: r.verdict, rank: r.rank, rank_total: r.rank_total, top_pct: r.top_pct, ability: r.ability, chem: r.chem_bonus, final: r.final, conclusion: r.conclusion, rows: r.rows,
+        hire: r.hire, cautions: r.cautions, why: r.why, h2h: h2h, alt: alt, banner: banner, rule: r.rule, notes: r.notes }));
     }).catch(function (e) { clear(box).appendChild(el('p', { class: 'lab-msg err', text: e.message })); });
   }
 
