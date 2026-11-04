@@ -144,7 +144,7 @@
       oppRptBtn,
       el('button', { type: 'button', text: '포메이션 추천', title: '이 구단·가중치에서 점수가 가장 높은 포메이션', onclick: openFormations }),
       el('span', { class: 'lab-muted', text: '카드 숫자 = 능력 점수, 옆의 색 숫자 = 케미 가산점' })]));
-    var det = el('details', { class: 'lab-detail' }, [el('summary', { text: '지표별 가중치 자세히 (점수 0~100, 포지션 합계 100 기준)' }), metricsBox]);
+    var det = el('details', { class: 'lab-detail' }, [el('summary', { text: '범주별 가중치 자세히 (포지션별 범주 4~6개, 합계 100 기준 · 승부예측과 같은 점수)' }), metricsBox]);
     tools.appendChild(det);
   }
   function fmtMult(v) { return v.toFixed(2).replace(/0$/, '') + '×'; }

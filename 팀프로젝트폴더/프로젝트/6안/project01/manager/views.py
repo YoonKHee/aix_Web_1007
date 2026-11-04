@@ -268,26 +268,27 @@ def _svc():
 
 def _defaults():
     s = _svc()
+    from player import scoring as SC
     return {
         'min': {'best11': s.BEST11_MIN_MINUTES, 'formation': s.FORMATION_MIN_MINUTES},
-        'weights': {'FW': dict(s.FW_WEIGHTS), 'MF': dict(s.MF_WEIGHTS), 'DF': dict(s.DF_WEIGHTS), 'GK': dict(s.GK_WEIGHTS)},
+        'groups': {p: SC.default_group_weights(p) for p in SC.POSITIONS},
+        'player_weight': 30.0,
     }
 
 
 def _current():
+    from player import scoring as SC
     d, saved = _defaults(), config.load_saved()
-    cur = {'min': dict(d['min']), 'weights': {p: dict(w) for p, w in d['weights'].items()}}
+    cur = {'min': dict(d['min']), 'groups': {p: SC.group_weights(p) for p in SC.POSITIONS}}
     cur['min'].update({k: int(v) for k, v in saved.get('min', {}).items()})
-    for p, w in saved.get('weights', {}).items():
-        if p in cur['weights']:
-            cur['weights'][p].update({k: float(v) for k, v in w.items() if k in cur['weights'][p]})
-    cur['extra_weight'] = config.extra_weight(30)
+    cur['player_weight'] = config.player_weight(30)
     return cur
 
 
 def _parse_form(post, base):
     """폼 → 설정. (설정, 오류목록)"""
-    errors, out = [], {'min': {}, 'weights': {}}
+    from player import scoring as SC
+    errors, out = [], {'min': {}, 'groups': {}}
     for key, label in (('best11', 'BEST11 최소 출전시간'), ('formation', '포메이션 최소 출전시간')):
         try:
             v = int(post.get(f'min_{key}', ''))
@@ -298,32 +299,33 @@ def _parse_form(post, base):
             errors.append(f'{label}은 0~5000 사이 정수여야 합니다.')
     if not errors and out['min']['best11'] < out['min']['formation']:
         errors.append('BEST11 최소 출전시간이 포메이션 최소 출전시간보다 작을 수 없습니다.')
-    for p in config.POSITIONS:
-        out['weights'][p] = {}
-        for k in base['weights'][p]:
-            raw = post.get(f'w_{p}_{k}', '').strip()
+    labels = {p: {g: lbl for g, lbl, _w, _k in SC.GROUPS[p]} for p in SC.POSITIONS}
+    for p in SC.POSITIONS:
+        out['groups'][p] = {}
+        for g in base['groups'][p]:
+            raw = post.get(f'g_{p}_{g}', '').strip()
             try:
                 v = float(raw)
                 if v < 0:
                     raise ValueError
             except ValueError:
-                errors.append(f'{p} · {config.METRIC_LABELS[p].get(k, k)}: 0 이상의 숫자를 넣어주세요. (입력값: "{raw}")')
+                errors.append(f'{p} · {labels[p][g]}: 0 이상의 숫자를 넣어주세요. (입력값: "{raw}")')
                 continue
-            out['weights'][p][k] = v
-        if not errors and sum(out['weights'][p].values()) <= 0:
-            errors.append(f'{p}: 가중치 합이 0입니다. 하나 이상은 0보다 커야 합니다.')
-    raw = str(post.get('extra_weight', '')).strip()
+            out['groups'][p][g] = v
+        if not errors and sum(out['groups'][p].values()) <= 0:
+            errors.append(f'{p}: 범주 비율 합이 0입니다. 하나 이상은 0보다 커야 합니다.')
+    raw = str(post.get('player_weight', '')).strip()
     try:
-        ew = float(raw)
-        if not 0 <= ew <= 50:
+        pw = float(raw)
+        if not 0 <= pw <= 60:
             raise ValueError
-        out['extra_weight'] = ew
+        out['player_weight'] = pw
     except ValueError:
-        errors.append(f'승부예측 추가 요소 비중은 0~50 사이 숫자여야 합니다. (입력값: "{raw}")')
+        errors.append(f'승부예측 선수 능력치 비중은 0~60 사이 숫자여야 합니다. (입력값: "{raw}")')
     if not errors and post.get('normalize'):
-        for p in config.POSITIONS:
-            t = sum(out['weights'][p].values())
-            out['weights'][p] = {k: round(v * 100 / t, 2) for k, v in out['weights'][p].items()}
+        for p in SC.POSITIONS:
+            t = sum(out['groups'][p].values())
+            out['groups'][p] = {k: round(v * 100 / t, 2) for k, v in out['groups'][p].items()}
     return out, errors
 
 
@@ -335,21 +337,6 @@ def _best11_names(cfg, formation):
         r = svc.get_filtered_best11(team_id='', formation=formation)
     return {pos: [(row['player'].id, row['player'].name, row['player'].team.team_name, row['score'])
                   for row in rows] for pos, rows in r['best11'].items()}
-
-
-def _sim_top(cfg, n=5):
-    """모의 경기(승부예측) 기준 포지션별 능력 점수 상위 n명. 미리보기에서 저장 전/후를 비교한다."""
-    from team.lineup_simulation import simulation_methods
-    svc = _svc()
-    with config.override(cfg):
-        methods = simulation_methods()
-    cands = svc.get_formation_candidates()
-    out = {}
-    for pos, (fn, w) in methods.items():
-        group = [s for s in cands if (s.player.position or '').strip().upper() == pos]
-        rows = svc.calculate_position_scores(group, fn, w)[:n]
-        out[pos] = [(r['stats'].player.id, r['stats'].player.name, r['stats'].player.team.team_name, r['score']) for r in rows]
-    return out
 
 
 def _diff_best11(before, after):
@@ -365,9 +352,9 @@ def _diff_best11(before, after):
 @admin_only
 def scoring(request):
     d, cur = _defaults(), _current()
-    patched = True      # 점수 기준은 모의 경기(승부예측)에 바로 적용된다 (BEST11에는 적용하지 않으므로 patch_services 는 쓰지 않는다)
+    patched = True      # 범주 비율은 BEST11 · 감독 연구실 · 승부예측에 바로 적용된다
     formation = request.POST.get('formation') or request.GET.get('formation') or '4-3-3'
-    ctx = dict(defaults=d, labels=config.METRIC_LABELS, patched=patched, formation=formation,
+    ctx = dict(defaults=d, patched=patched, formation=formation,
                formations=list(_svc().FORMATIONS.keys()), logs=ScoreConfigLog.objects.all()[:15])
     form = cur
     if request.method == 'POST':
@@ -376,7 +363,7 @@ def scoring(request):
             before = config.load_saved()
             obj = ScoreConfig.objects.first()
             if obj:
-                obj.data = {k: v for k, v in obj.data.items() if k not in ('min', 'weights', 'extra_weight')}
+                obj.data = {k: v for k, v in obj.data.items() if k not in ('min', 'weights', 'extra_weight', 'groups', 'player_weight')}
                 obj.save()
             ScoreConfigLog.objects.create(created_by=request.user.get_username(), summary='점수 기준을 기본값으로 되돌림',
                                           before=before, after=config.load_saved())
@@ -387,27 +374,29 @@ def scoring(request):
             ctx['errors'] = errors
             c = _current()
             form = {'min': {**c['min'], **form['min']},
-                    'weights': {p: {**c['weights'][p], **form['weights'].get(p, {})} for p in c['weights']},
-                    'extra_weight': form.get('extra_weight', c['extra_weight'])}
+                    'groups': {p: {**c['groups'][p], **form['groups'].get(p, {})} for p in c['groups']},
+                    'player_weight': form.get('player_weight', c['player_weight'])}
         else:
-            before_names = _sim_top({k: v for k, v in config.load_saved().items() if k in ('min', 'weights')} or {})
-            after_names = _sim_top(form)
+            before_names = _best11_names({k: v for k, v in config.load_saved().items() if k in ('min', 'groups')} or {}, formation)
+            after_names = _best11_names(form, formation)
             if action == 'save':
                 obj = ScoreConfig.objects.first() or ScoreConfig(data={})
                 before = dict(obj.data)
-                obj.data = {**obj.data, 'min': form['min'], 'weights': form['weights'], 'extra_weight': form['extra_weight']}
+                obj.data = {k: v for k, v in obj.data.items() if k not in ('weights', 'extra_weight')}   # 예전 형식 정리
+                obj.data = {**obj.data, 'min': form['min'], 'groups': form['groups'], 'player_weight': form['player_weight']}
                 obj.save()
-                changed = sum(1 for p in config.POSITIONS for k, v in form['weights'][p].items() if v != d['weights'][p][k])
+                changed = sum(1 for p in form['groups'] for k, v in form['groups'][p].items() if v != d['groups'][p][k])
                 ScoreConfigLog.objects.create(created_by=request.user.get_username(),
-                                              summary=f'최소시간 {form["min"]["best11"]}/{form["min"]["formation"]}분, 기본값과 다른 가중치 {changed}개, 추가 요소 비중 {form["extra_weight"]:g}%',
+                                              summary=f'최소시간 {form["min"]["best11"]}/{form["min"]["formation"]}분, 기본값과 다른 범주 비율 {changed}개, 승부예측 선수 능력치 {form["player_weight"]:g}%',
                                               before=before, after=obj.data)
-                messages.success(request, '저장했습니다. 지금부터 승부예측(모의 경기)의 선수 능력 계산에 적용됩니다. (BEST11에는 적용되지 않습니다)')
+                messages.success(request, '저장했습니다. 지금부터 BEST11 · 감독 연구실 · 승부예측의 선수 점수에 적용됩니다. (BEST11 화면의 선수 보고서 파일은 python manage.py build_player_reports 로 다시 만드세요)')
                 return redirect('manager:scoring')
             ctx['preview'] = _diff_best11(before_names, after_names)      # 미리보기
     ctx['form'] = form
-    ctx['rows'] = [dict(pos=p, items=[dict(key=k, label=config.METRIC_LABELS[p].get(k, k), default=d['weights'][p][k],
-                                           value=form['weights'][p][k]) for k in d['weights'][p]],
-                        total=sum(form['weights'][p].values())) for p in config.POSITIONS]
+    from player import scoring as SC
+    ctx['rows'] = [dict(pos=p, items=[dict(key=g, label=lbl, metrics=', '.join(SC.label(k) for k in ks), default=d['groups'][p][g],
+                                           value=form['groups'][p][g]) for g, lbl, _w, ks in SC.GROUPS[p]],
+                        total=sum(form['groups'][p].values())) for p in SC.POSITIONS]
     return render(request, 'manager/scoring.html', ctx)
 
 

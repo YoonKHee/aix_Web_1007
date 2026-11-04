@@ -457,7 +457,7 @@
     }
 
     function scoreText(p, role) {
-        if (!p.total_scores || !p.detail) return `역할 지수 ${p.scores[role].toFixed(1)}`;
+        if (!p.total_scores || !p.detail) return `선수 점수 ${p.scores[role].toFixed(1)}`;
         return `종합 ${shownScore(p, role).toFixed(1)} (기존 ${p.scores[role].toFixed(1)} · 추가 지표 ${p.detail.score.toFixed(1)})`;
     }
 
@@ -746,44 +746,42 @@
         return wrap;
     }
 
-    /* 추가 컬럼(체력·개인기·패스 정확도·선방 등) 반영 내역 — 최종 확률의 10% */
-    function extraBlock(data) {
-        const x = data.extra;
+    /* 승부예측 비율: 팀 기록 (100-w)% + 선수 능력치 w% */
+    function playerBlock(data) {
+        const x = data.player_part;
         const box = el('section', undefined, 'extra-box');
-        box.append(el('h3', `추가 요소 반영 (최종 확률의 ${x.weight}%)`));
+        box.append(el('h3', `승부예측 구성: 팀 기록 ${100 - x.weight}% + 선수 능력치 ${x.weight}%`));
         box.append(el(
             'p',
-            `포지션별 추가 지표(체력·개인기·패스 정확도·경합·선방 등)로 예상 득점을 조정해 따로 계산한 확률을 ${x.weight}% 비중으로 섞었습니다. 나머지 ${100 - x.weight}%는 기존 팀 기록 예측 + 선수 구성 보정입니다.`,
+            `팀 기록(최근 5경기·홈/원정·시즌 성적)으로 낸 확률 ${100 - x.weight}%와, 양 팀 라인업의 선수 점수(BEST11과 같은 통합 점수)만으로 낸 확률 ${x.weight}%를 합쳤습니다. 선수 능력치 확률은 리그 평균 득점에서 출발해 공격 지수 ÷ 상대 수비 지수(12개 구단 기본 선발 평균 = 기준)로 예상 득점을 정합니다.`,
             'muted'
         ));
         box.append(table(
-            ['', '공격 지수', '수비 지수', '예상 득점 (기본 → 조정)'],
+            ['', '공격 지수', '수비 지수', '예상 득점 (리그 평균 → 선수 능력치)'],
             [
                 [data.home_name, x.home.attack.toFixed(1), x.home.defense.toFixed(1), `${x.base_goals.home.toFixed(2)} → ${x.goals.home_goals.toFixed(2)}`],
                 [data.away_name, x.away.attack.toFixed(1), x.away.defense.toFixed(1), `${x.base_goals.away.toFixed(2)} → ${x.goals.away_goals.toFixed(2)}`],
+                ['기준 (기본 선발 평균)', x.reference.attack.toFixed(1), x.reference.defense.toFixed(1), ''],
             ]
         ));
-        box.append(el(
-            'p',
-            `추가 요소만으로 본 확률: ${data.home_name} 승 ${x.probabilities.H}% · 무승부 ${x.probabilities.D}% · ${data.away_name} 승 ${x.probabilities.A}%  (지수 50 = 리그 같은 포지션 주전급 평균)`
-        ));
+        const t = x.team_probabilities, q = x.probabilities;
+        box.append(el('p', `팀 기록만: ${data.home_name} 승 ${t.H}% · 무 ${t.D}% · ${data.away_name} 승 ${t.A}%   |   선수 능력치만: ${data.home_name} 승 ${q.H}% · 무 ${q.D}% · ${data.away_name} 승 ${q.A}%`));
         if (data.best11_recent) {
             const r = data.best11_recent;
             const recent = el('div', undefined, 'best11-recent');
             recent.append(el('b', `🏆 내 BEST11 (${r.team}) 최근 5경기 `), el('span', '가상', 'virtual-badge'));
             const chips = el('div', undefined, 'recent-chips');
             r.games.forEach(g => {
-                const c = el('span', `${g.result} ${g.score} vs ${g.opponent}`, `recent-chip r-${g.result}`);
-                chips.append(c);
+                chips.append(el('span', `${g.result} ${g.score} vs ${g.opponent}`, `recent-chip r-${g.result}`));
             });
             recent.append(chips, el(
                 'p',
-                `경기당 ${r.points_per_game}점 → 예상 득점 ×${r.form_factor} (추가 요소 ${x.weight}% 안에서만 반영). ${r.note}`,
+                `경기당 ${r.points_per_game}점 → 예상 득점 ×${r.form_factor} (선수 능력치 ${x.weight}% 안에서만 반영). ${r.note}`,
                 'muted'
             ));
             box.append(recent);
         }
-        box.append(el('p', `⚠ ${x.virtual_note} (골키퍼 선방·실점·무실점·공중볼 처리, 활동량·스프린트)`, 'virtual-note'));
+        box.append(el('p', `⚠ 선수 점수의 일부 컬럼은 가상 데이터입니다 (골키퍼 선방·실점·무실점·공중볼 처리, 활동량·스프린트). ${x.virtual_note}`, 'virtual-note'));
         return box;
     }
 
@@ -799,40 +797,17 @@
             const v = m.probabilities[k];
             const d = Math.round((v - main[k]) * 10) / 10;
             const card = el('div', undefined, 'weighted-card');
-            card.append(el('span', label), el('strong', `${v.toFixed(1)}%`), el('small', `위 기본 결과 대비 ${signed(d)}%p`));
+            card.append(el('span', label), el('strong', `${v.toFixed(1)}%`), el('small', `위 결과 대비 ${signed(d)}%p`));
             row.append(card);
         });
         box.append(row);
         const summary = config.best11 && config.best11.settings_summary ? config.best11.settings_summary : '';
         box.append(el(
             'p',
-            `BEST11 화면에서 정한 내 가중치(${summary || '기본'})로 ${data.home_name} 선수 점수(능력 + 케미)를 다시 계산했습니다. 기본 추천 라인업 대비 전력 변화 ${signed(m.change)}점. 원정팀과 추가 요소(${data.extra ? data.extra.weight : 0}%)는 같습니다.`,
+            `BEST11 화면에서 정한 내 가중치(${summary || '기본'})로 ${data.home_name} 선수 점수를 다시 계산해 선수 능력치(${data.player_part.weight}%) 부분에 넣었습니다. ${data.home_name} 공격 지수 ${m.home.attack.toFixed(1)} · 수비 지수 ${m.home.defense.toFixed(1)} (기본 점수 대비 공격 ${signed(m.change)}). 팀 기록 부분과 원정팀은 같습니다.`,
             'muted'
         ));
         return box;
-    }
-
-    function extraPlayers(data) {
-        const wrap = el('details', undefined, 'extra-players');
-        wrap.append(el('summary', '선수별 추가 지표 점수 보기'));
-        for (const side of ['home', 'away']) {
-            const name = side === 'home' ? data.home_name : data.away_name;
-            wrap.append(el('h4', name));
-            wrap.append(table(
-                ['선수', '역할', '추가 지표 점수', '지표별 백분위 (가상 = ※)'],
-                data.extra.players[side].map(p => [
-                    p.name,
-                    p.role,
-                    p.score.toFixed(1) + (p.note ? ' *' : ''),
-                    p.metrics
-                        .filter(m => m.percentile !== null)
-                        .map(m => `${m.label}${m.source === 'virtual' ? '※' : ''} ${m.percentile}`)
-                        .join(' · ') || '-',
-                ])
-            ));
-        }
-        wrap.append(el('p', '* 600분 미만은 중립(50) 쪽으로 보정 · ※ 가상 데이터', 'muted'));
-        return wrap;
     }
 
     function showResult(data) {
@@ -934,9 +909,8 @@
             root.append(weightedBlock(data));
         }
 
-        if (data.extra) {
-            root.append(extraBlock(data));
-            details.append(extraPlayers(data));
+        if (data.player_part) {
+            root.append(playerBlock(data));
         }
 
         details.append(el(

@@ -43,8 +43,8 @@ def build_one(c, pid, peers_by_pos, teammates_by_key):
     avg = sum(peers) / len(peers) if peers else 0.0
     ranked = i['minutes'] >= CH.REFERENCE_MIN_MINUTES            # 450분 미만이면 순위는 참고용
 
-    strengths = sorted([r for r in bd['rows'] if r['pct'] >= 70 and r['weight'] >= 5], key=lambda r: -r['points'])[:3]
-    weak = sorted([r for r in bd['rows'] if r['pct'] <= 30 and r['weight'] >= 8], key=lambda r: -r['weight'])[:2]
+    strengths = sorted([r for r in bd['rows'] if r['pct'] >= 70 and r['weight'] >= 3], key=lambda r: -r['points'])[:3]
+    weak = sorted([r for r in bd['rows'] if r['pct'] <= 30 and r['weight'] >= 4], key=lambda r: -r['weight'])[:2]
 
     # 같은 구단 같은 포지션 안에서의 위치
     mates = [q for q in teammates_by_key.get((i['team_id'], pos), []) if q['minutes'] >= CH.REFERENCE_MIN_MINUTES]

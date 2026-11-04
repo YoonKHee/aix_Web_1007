@@ -52,13 +52,27 @@ def min_minutes(default_best11, default_formation):
             'formation': int(d.get('formation', default_formation))}
 
 
-def extra_weight(default=30):
-    """승부예측(모의 경기)에서 추가 컬럼 점수를 최종 확률에 섞는 비중(%). 0~50."""
+def player_weight(default=30):
+    """승부예측에서 '선수 능력치' 부분의 비중(%). 나머지는 팀 기록(최근 5경기·홈/원정·시즌). 0~60."""
     try:
-        v = float(_data().get('extra_weight', default))
+        v = float(_data().get('player_weight', default))
     except (TypeError, ValueError):
         return float(default)
-    return max(0.0, min(50.0, v))
+    return max(0.0, min(60.0, v))
+
+
+def group_weights_for(position, default):
+    """통합 선수 점수의 범주 비율 (BEST11 · 감독 연구실 · 승부예측 공통). 저장값이 없으면 기본값."""
+    g = _data().get('groups', {}).get(position)
+    if not g:
+        return dict(default)
+    out = {}
+    for k in default:
+        try:
+            out[k] = max(0.0, float(g.get(k, default[k])))
+        except (TypeError, ValueError):
+            out[k] = default[k]
+    return out if sum(out.values()) > 0 else dict(default)
 
 
 def weights_for(position, default):

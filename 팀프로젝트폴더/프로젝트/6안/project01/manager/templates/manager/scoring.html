@@ -1,35 +1,36 @@
 {% extends 'manager/base.html' %}
 {% block title %}점수 기준{% endblock %}
 {% block content %}
-<h1>점수 기준 (가중치 · 최소 출전시간)</h1>
-<div class="box warn"><b>안내:</b> 여기서 저장한 <b>가중치는 승부예측(모의 경기)의 선수 능력 계산에만 적용</b>됩니다. <b>BEST11 · 감독 연구실에는 적용되지 않습니다</b>(BEST11은 관리자와 선수·선수 기록만 공유). 최소 출전시간은 지금 어디에도 적용되지 않습니다. <code>python manage.py patch_services</code> 는 BEST11에 연결하는 명령이므로 실행하지 마세요.</div>
+<h1>점수 기준 (범주 비율 · 최소 출전시간)</h1>
+<div class="box warn"><b>안내:</b> 여기서 저장한 <b>범주 비율은 통합 선수 점수의 기본값</b>으로, <b>BEST11 · 감독 연구실 · 승부예측에 모두 적용</b>됩니다. BEST11 화면의 감독 연구실 슬라이더는 이 기본값 위에서 '내 설정'만 바꿉니다. 범주 안의 컬럼은 같은 비중입니다. ※ 표시 컬럼은 가상 데이터입니다. 최소 출전시간은 지금 어디에도 적용되지 않습니다. <code>python manage.py patch_services</code> 는 쓰지 않습니다.</div>
 {% if errors %}<div class="box error"><b>저장하지 않았습니다. 고쳐주세요:</b><ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
 <form method="post">{% csrf_token %}
 <h3>최소 출전시간 (분)</h3>
 <p>BEST11 / TOP10: <input type="number" name="min_best11" value="{{ form.min.best11 }}" style="width:90px"> <small>기본 {{ defaults.min.best11 }}</small>
  &nbsp; 포메이션 후보: <input type="number" name="min_formation" value="{{ form.min.formation }}" style="width:90px"> <small>기본 {{ defaults.min.formation }}</small></p>
-<h3>포지션별 가중치</h3>
+<h3>포지션별 범주 비율</h3>
 <div class="cols">
 {% for r in rows %}
  <div><table><tr><th colspan="3">{{ r.pos }} <small>(합 {{ r.total|floatformat:0 }})</small></th></tr>
- {% for i in r.items %}<tr><td>{{ i.label }}</td>
-   <td><input type="number" step="any" min="0" name="w_{{ r.pos }}_{{ i.key }}" value="{{ i.value|floatformat:"-2" }}" style="width:70px"></td>
+ {% for i in r.items %}<tr><td>{{ i.label }}<br><small style="color:#6e7781">{{ i.metrics }}</small></td>
+   <td><input type="number" step="any" min="0" name="g_{{ r.pos }}_{{ i.key }}" value="{{ i.value|floatformat:"-2" }}" style="width:70px"></td>
    <td><small>기본 {{ i.default|floatformat:"-2" }}</small></td></tr>{% endfor %}</table></div>
 {% endfor %}
 </div>
 <p><label><input type="checkbox" name="normalize"> 포지션별 합을 100으로 맞추기</label></p>
-<h3>승부예측 추가 요소 비중</h3>
-<p>추가 컬럼(체력·개인기·패스 정확도·경합·선방 등) 점수로 계산한 확률을 최종 확률에
- <input type="number" name="extra_weight" min="0" max="50" step="1" value="{{ form.extra_weight|floatformat:"-1" }}" style="width:70px"> % 섞습니다.
- <small>기본 30 · 0~50 · 나머지는 팀 기록 예측 + 선수 구성 보정 · 추가 컬럼 일부는 가상 데이터</small></p>
+<h3>승부예측 비율</h3>
+<p>팀 기록(최근 5경기·홈/원정·시즌 성적) <b>{{ form.player_weight|floatformat:"-1" }}% 를 뺀 나머지</b> + 선수 능력치
+ <input type="number" name="player_weight" min="0" max="60" step="1" value="{{ form.player_weight|floatformat:"-1" }}" style="width:70px"> %
+ <small>기본 30 (팀 기록 70 : 선수 능력치 30) · 0~60</small></p>
+<p>미리보기 포메이션: <select name="formation">{% for f in formations %}<option {% if f == formation %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></p>
 <button name="action" value="preview">미리보기 (저장 안 함)</button>
 <button name="action" value="save">저장</button>
 <button name="action" value="reset" onclick="return confirm('기본값으로 되돌릴까요?')" style="background:#6e7781">기본값으로</button>
 </form>
 
 {% if preview %}
-<h2>미리보기: 승부예측(모의 경기) 포지션별 능력 점수 상위 5명</h2>
-<p>초록 = 새로 들어오는 선수, 빨강 취소선 = 빠지는 선수. 아직 저장되지 않았습니다. (BEST11 화면은 바뀌지 않습니다)</p>
+<h2>미리보기: 전체 K리그 {{ formation }} BEST11</h2>
+<p>초록 = 새로 들어오는 선수, 빨강 취소선 = 빠지는 선수. 아직 저장되지 않았습니다.</p>
 <table><tr><th>포지션</th><th>선발</th><th>빠지는 선수</th></tr>
 {% for g in preview %}<tr><td>{{ g.pos }}</td>
  <td>{% for x in g.rows %}<span {% if x.new %}class="new"{% endif %}>{{ x.name }}({{ x.team }}) {{ x.score }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</td>

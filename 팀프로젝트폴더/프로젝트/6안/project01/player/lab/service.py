@@ -32,7 +32,7 @@ CACHE_SECONDS = 300
 SHRINK_ENABLED = True
 SHRINK_FULL_MINUTES = 450
 SHRINK_TARGET = 0.85          # 정보가 부족하면 평균보다 조금 낮게 본다
-NO_SHRINK_METRICS = {'minutes'}
+NO_SHRINK_METRICS = None      # 아래에서 player/scoring.py 의 NO_SHRINK 로 채운다
 # 경험(출전시간) 보정: 출전시간이 EXPERIENCE_FULL 분에 못 미치면 능력 점수에 1 미만의 배율을 곱한다.
 #   배율 = 1 - 감점폭 × (1 - 출전시간/EXPERIENCE_FULL),  감점폭 = (1 - EXPERIENCE_FLOOR) × 화면의 '경험 중시' 배율(0~2, 기본 1)
 #   (경기 수는 출전시간과 거의 같이 움직이고, 교체로 잠깐 뛴 경기는 시간으로 걸러지므로 출전시간 하나로 본다)
@@ -42,16 +42,26 @@ EXPERIENCE_FLOOR = 0.70       # 출전시간 0분일 때의 배율(기본 설정
 CANDIDATE_LIMIT = 40
 CONDITION_BAD_FATIGUE = 71            # 이 이상이면 모의 경기 컨디션을 '안 좋음' 으로 제안한다 (management 의 '기용 비권장' 구간)
 
-METRIC_FUNCS = {'FW': SV.get_fw_metrics, 'MF': SV.get_mf_metrics, 'DF': SV.get_df_metrics, 'GK': SV.get_gk_metrics}
-BASE_WEIGHTS = {'FW': SV.FW_WEIGHTS, 'MF': SV.MF_WEIGHTS, 'DF': SV.DF_WEIGHTS, 'GK': SV.GK_WEIGHTS}
+from player import scoring as SC
 
-METRIC_LABELS = {
-    'goals': '득점', 'assists': '도움', 'shots_on_target': '유효슈팅', 'shots': '슈팅', 'key_passes': '키패스',
-    'dribble': '드리블', 'pass_rate': '패스 성공률', 'recoveries': '볼 회수', 'interceptions': '인터셉트',
-    'clearances': '클리어링', 'tackle': '태클', 'aerial_duel': '공중볼 경합', 'ground_duel': '지상 경합',
-    'defensive_blocks': '수비 차단', 'blocks': '블록', 'rating': '평점', 'mom': 'MOM', 'best11': '베스트11 선정',
-    'minutes': '출전시간',
-}
+METRIC_FUNCS = {'FW': SV.get_fw_metrics, 'MF': SV.get_mf_metrics, 'DF': SV.get_df_metrics, 'GK': SV.get_gk_metrics}
+NO_SHRINK_METRICS = SC.NO_SHRINK
+
+
+def base_weights():
+    """컬럼별 기본 가중치 = 관리자 > 점수 기준의 범주 비율 ÷ 범주 안 컬럼 수 (BEST11 과 같은 값)."""
+    return {pos: SV.position_weights(pos) for pos in SC.POSITIONS}
+
+
+def _expand_old(mult):
+    """예전 지표 이름(goals, clearances …)으로 된 배율을 새 컬럼 이름으로 바꾼다 (프리셋·상대 맞춤용)."""
+    out = {}
+    for k, v in (mult or {}).items():
+        for new in SC.OLD_KEYS.get(k, [k]):
+            out[new] = out.get(new, 1.0) * v if new in out else v
+    return out
+
+METRIC_LABELS = {k: d[0] for k, d in SC.METRIC_DEFS.items()}   # 통합 점수 컬럼 이름 (player/scoring.py)
 
 # 프리셋 = 지표별 배율(없으면 1). 포지션 안에서 합계 100 으로 다시 맞춘다.
 PRESETS = {
@@ -128,7 +138,7 @@ def build_weights(preset='default', mult=None, extra=None):
     사용자 배율 키는 'FW:goals' 처럼 포지션별로 받는다(공격수 득점을 바꿔도 미드필더 득점은 그대로).
     예전 형식('goals')도 읽는다 — 그 경우 그 지표가 있는 모든 포지션에 적용된다.
     """
-    pm = dict(PRESETS.get(preset, PRESETS['default'])['mult'])
+    pm = _expand_old(PRESETS.get(preset, PRESETS['default'])['mult'])
     per_pos = {}
     for k, v in (mult or {}).items():
         try:
@@ -139,12 +149,27 @@ def build_weights(preset='default', mult=None, extra=None):
             per_pos[str(k)] = val
         else:
             pm[k] = val
-    extra = extra or {}                           # 상대 맞춤 배율은 프리셋·사용자 조정 위에 곱한다
+    extra = _expand_old(extra)                    # 상대 맞춤 배율은 프리셋·사용자 조정 위에 곱한다
     out = {}
-    for pos, base in BASE_WEIGHTS.items():
-        raw = {m: w * per_pos.get(f'{pos}:{m}', pm.get(m, 1.0)) * extra.get(m, 1.0) for m, w in base.items()}
+    for pos, base in base_weights().items():
+        grp = SC.group_of(pos)                    # 화면의 범주 슬라이더: 'FW:g:finishing' → 그 범주의 모든 컬럼
+        raw = {m: w * per_pos.get(f'{pos}:{m}', per_pos.get(f'{pos}:g:{grp[m]}', pm.get(m, 1.0))) * extra.get(m, 1.0)
+               for m, w in base.items()}
         total = sum(raw.values()) or 1.0
         out[pos] = {m: v / total * 100 for m, v in raw.items()}
+    return out
+
+
+def _shrunk(vals, norm, f):
+    """소표본 보정: 평균 쪽으로 당긴다 (많을수록 좋은 컬럼은 평균의 85%, 적을수록 좋은 컬럼은 115% 쪽)."""
+    out = {}
+    for m, x in vals.items():
+        mean = norm.mean.get(m)
+        if m in NO_SHRINK_METRICS or x is None or mean is None:
+            out[m] = x
+        else:
+            target = mean * (2 - SHRINK_TARGET) if m in SC.LOWER_BETTER else mean * SHRINK_TARGET
+            out[m] = f * x + (1 - f) * target
     return out
 
 
@@ -161,14 +186,12 @@ def ability_scores(weights, shrink=None, exp_scale=None):
         fn, w = METRIC_FUNCS[pos], weights[pos]
         mets = {pid: fn(st) for pid, st in items}
         ref = [pid for pid, st in items if st.minutes >= SV.FORMATION_MIN_MINUTES] or [pid for pid, _ in items]
-        maxes = {m: max((mets[pid][m] for pid in ref), default=0) for m in w}
-        means = {m: sum(mets[pid][m] for pid in ref) / len(ref) for m in w}
+        norm = SC.Normalizer([mets[pid] for pid in ref], w.keys())
         for pid, st in items:
-            vals = mets[pid]
+            vals = {m: norm.fill(m, x) for m, x in mets[pid].items()}
             if shrink and st.minutes < SHRINK_FULL_MINUTES:
-                f = max(0.0, st.minutes) / SHRINK_FULL_MINUTES
-                vals = {m: (vals[m] if m in NO_SHRINK_METRICS else f * vals[m] + (1 - f) * SHRINK_TARGET * means[m]) for m in vals}
-            score = sum(SV.normalize_score(vals[m], maxes[m]) * w[m] / 100 for m in w)
+                vals = _shrunk(vals, norm, max(0.0, st.minutes) / SHRINK_FULL_MINUTES)
+            score = sum(norm.unit(m, vals[m]) * w[m] for m in w)
             if exp_scale > 0 and st.minutes < EXPERIENCE_FULL:
                 score *= max(0.0, 1 - (1 - EXPERIENCE_FLOOR) * exp_scale * (1 - max(0, st.minutes) / EXPERIENCE_FULL))
             ability[pid] = round(min(100.0, score), 2)
@@ -396,8 +419,10 @@ def api_init(body):
                         for t, n in teams if t in club],
         'formations': SV.FORMATIONS,
         'presets': {k: v['label'] for k, v in PRESETS.items()},
-        'metrics': {pos: [{'key': m, 'label': METRIC_LABELS.get(m, m), 'weight': round(w, 1)} for m, w in BASE_WEIGHTS[pos].items()]
-                    for pos in BASE_WEIGHTS},
+        # 화면의 가중치 슬라이더 = 포지션별 범주(4~6개). 기본값은 관리자 > 점수 기준의 범주 비율
+        'metrics': {pos: [{'key': 'g:' + g, 'label': lbl, 'weight': round(SC.group_weights(pos).get(g, w), 1),
+                           'items': [SC.label(k) for k in ks]} for g, lbl, w, ks in SC.GROUPS[pos]]
+                    for pos in SC.POSITIONS},
         'today': c.today.isoformat(),
         'prediction': {'available': pred is not None, 'trained_through': pred[2]['trained_through'] if pred else None, 'error': err},
         'schedule_note': '일정 파일 기준일은 파일을 받은 시점입니다. 오늘 날짜 이후 경기만 남은 라운드로 봅니다.',
@@ -824,26 +849,32 @@ def _breakdown(c, pid):
     items = [(q, s2) for q, s2 in data['stats'].items() if s2.player.position.strip().upper() == pos]
     mets = {q: fn(s2) for q, s2 in items}
     ref = [q for q, s2 in items if s2.minutes >= SV.FORMATION_MIN_MINUTES] or [q for q, _ in items]
-    maxes = {m: max((mets[q][m] for q in ref), default=0) for m in w}
-    means = {m: sum(mets[q][m] for q in ref) / len(ref) for m in w}
-    raw = mets[pid]
+    norm = SC.Normalizer([mets[q] for q in ref], w.keys())
+    raw = {m: norm.fill(m, x) for m, x in mets[pid].items()}
     vals = raw
     f = 1.0
     if SHRINK_ENABLED and st.minutes < SHRINK_FULL_MINUTES:
         f = max(0.0, st.minutes) / SHRINK_FULL_MINUTES
-        vals = {m: (raw[m] if m in NO_SHRINK_METRICS else f * raw[m] + (1 - f) * SHRINK_TARGET * means[m]) for m in raw}
+        vals = _shrunk(raw, norm, f)
     rows = []
     for m in w:
-        lower = sum(1 for q in ref if mets[q][m] < raw[m])
-        same = sum(1 for q in ref if mets[q][m] == raw[m] and q != pid)
-        pct = round((lower + 0.5 * same) / len(ref) * 100)          # 같은 값(동률)은 절반만 아래로 본다
-        got = SV.normalize_score(vals[m], maxes[m]) * w[m] / 100
-        rank_m = sum(1 for q in ref if mets[q][m] > raw[m]) + 1
-        total_field = TOTAL_FIELD.get(m)
-        total_v = getattr(st, total_field, None) if total_field else None
-        rows.append({'key': m, 'label': METRIC_LABELS.get(m, m), 'value': round(raw[m], 2), 'mean': round(means[m], 2), 'max': round(maxes[m], 2),
-                     'pct': pct, 'rank': rank_m, 'ratio': round(raw[m] / means[m], 1) if means[m] > 0 else None,
-                     'unit': 'rate' if m in NON_PER90 else 'per90', 'total': total_v, 'weight': round(w[m], 1), 'points': round(got, 1)})
+        if raw.get(m) is None:
+            continue
+        ref_vals = [norm.fill(m, mets[q][m]) for q in ref]
+        better = (lambda a, b: a < b) if m in SC.LOWER_BETTER else (lambda a, b: a > b)
+        worse_cnt = sum(1 for x in ref_vals if better(raw[m], x))
+        same = sum(1 for x in ref_vals if x == raw[m]) - (1 if pid in ref else 0)
+        pct = round((worse_cnt + 0.5 * max(0, same)) / len(ref) * 100)      # 이 선수보다 못한 비율 (적을수록 좋은 컬럼은 뒤집음)
+        got = norm.unit(m, vals[m]) * w[m]
+        rank_m = sum(1 for x in ref_vals if better(x, raw[m])) + 1
+        d = SC.METRIC_DEFS[m]
+        total_v = getattr(st, d[4], None) if d[4] else None
+        mean = norm.mean.get(m) or 0
+        rows.append({'key': m, 'label': METRIC_LABELS.get(m, m), 'value': round(raw[m], 2), 'mean': round(mean, 2),
+                     'max': round(norm.hi.get(m, 0), 2),
+                     'pct': pct, 'rank': rank_m, 'ratio': round(raw[m] / mean, 1) if mean > 0 else None,
+                     'unit': 'per90' if d[3] == SC.PER90 else 'rate', 'total': total_v, 'weight': round(w[m], 1),
+                     'points': round(got, 1), 'virtual': d[5], 'lower_better': m in SC.LOWER_BETTER})
     rows.sort(key=lambda r: -r['points'])
     exp = 1.0
     if c.exp_scale > 0 and st.minutes < EXPERIENCE_FULL:
@@ -883,8 +914,8 @@ def api_player_report(body):
     avg = sum(peers) / len(peers) if peers else 0.0
     top = max(1, 100 - pct)
 
-    strengths = sorted([r for r in bd['rows'] if r['pct'] >= 70 and r['weight'] >= 5], key=lambda r: -r['points'])[:3]
-    weak = sorted([r for r in bd['rows'] if r['pct'] <= 30 and r['weight'] >= 8], key=lambda r: -r['weight'])[:2]
+    strengths = sorted([r for r in bd['rows'] if r['pct'] >= 70 and r['weight'] >= 3], key=lambda r: -r['points'])[:3]
+    weak = sorted([r for r in bd['rows'] if r['pct'] <= 30 and r['weight'] >= 4], key=lambda r: -r['weight'])[:2]
 
     ability_adj = {q: c.adj(q) for q in c.profiles}
     irr = AN.irreplaceability(lineup, c.pool(), ability_adj, {}, c.chem_scale)

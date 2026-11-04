@@ -76,217 +76,50 @@ def normalize_score(value, max_value):
 
 
 # =========================================================
-# FW BEST11 평가 지표
+# BEST11 평가 지표 (통합 선수 점수)
+#
+# 컬럼·범주·기본 비율은 player/scoring.py 에 있다.
+# BEST11 · 감독 연구실 · 승부예측이 같은 점수를 쓴다.
+# 범주 비율은 관리자 > 점수 기준에서 바꿀 수 있다.
 # =========================================================
+
+from player import scoring as SC
+
 
 def get_fw_metrics(stats):
+    return SC.metric_values(stats, 'FW')
 
-    return {
-
-        'goals': per90(
-            stats.goals,
-            stats.minutes
-        ),
-
-        'assists': per90(
-            stats.assists,
-            stats.minutes
-        ),
-
-        'shots_on_target': per90(
-            stats.shots_on_target,
-            stats.minutes
-        ),
-
-        'shots': per90(
-            stats.shots,
-            stats.minutes
-        ),
-
-        'key_passes': per90(
-            stats.key_passes,
-            stats.minutes
-        ),
-
-        'dribble': per90(
-            stats.dribble_success,
-            stats.minutes
-        ),
-    }
-
-
-# =========================================================
-# MF BEST11 평가 지표
-# =========================================================
 
 def get_mf_metrics(stats):
+    return SC.metric_values(stats, 'MF')
 
-    return {
-
-        'assists': per90(
-            stats.assists,
-            stats.minutes
-        ),
-
-        'key_passes': per90(
-            stats.key_passes,
-            stats.minutes
-        ),
-
-        'pass_rate': success_rate(
-            stats.pass_success,
-            stats.pass_attempt
-        ),
-
-        'goals': per90(
-            stats.goals,
-            stats.minutes
-        ),
-
-        'recoveries': per90(
-            stats.recoveries,
-            stats.minutes
-        ),
-
-        'interceptions': per90(
-            stats.interceptions,
-            stats.minutes
-        ),
-
-        'dribble': per90(
-            stats.dribble_success,
-            stats.minutes
-        ),
-    }
-
-
-# =========================================================
-# DF BEST11 평가 지표
-# =========================================================
 
 def get_df_metrics(stats):
-
-    return {
-
-        'clearances': per90(
-            stats.clearances,
-            stats.minutes
-        ),
-
-        'interceptions': per90(
-            stats.interceptions,
-            stats.minutes
-        ),
-
-        'recoveries': per90(
-            stats.recoveries,
-            stats.minutes
-        ),
-
-        'tackle': per90(
-            stats.tackle_success,
-            stats.minutes
-        ),
-
-        'aerial_duel': per90(
-            stats.aerial_duel_success,
-            stats.minutes
-        ),
-
-        'ground_duel': per90(
-            stats.ground_duel_success,
-            stats.minutes
-        ),
-
-        'defensive_blocks': per90(
-            stats.defensive_blocks,
-            stats.minutes
-        ),
-
-        'blocks': per90(
-            stats.blocks,
-            stats.minutes
-        ),
-    }
+    return SC.metric_values(stats, 'DF')
 
 
-# =========================================================
-# GK BEST11 평가 지표
-#
-# 아직 GK 전용 핵심 데이터가 부족하므로 임시 평가
-# =========================================================
-
+# GK 는 MOM·베스트11을 90분당이 아니라 시즌 누적 횟수로 본다
+# (90분당으로 바꾸면 5경기 뛴 선수가 1~2번만 뽑혀도 주전보다 높아짐)
 def get_gk_metrics(stats):
-
-    return {
-
-        'rating': number(
-            stats.average_rating
-        ),
-
-        # GK는 MOM·베스트11을 90분당이 아니라 시즌 누적 횟수로 본다.
-        # (90분당으로 바꾸면 5경기 뛴 선수가 1~2번만 뽑혀도 주전보다 높아짐)
-        'mom': number(
-            stats.mom
-        ),
-
-        'best11': number(
-            stats.best11_count
-        ),
-
-        'minutes': number(
-            stats.minutes
-        ),
-    }
+    return SC.metric_values(stats, 'GK')
 
 
 # =========================================================
-# BEST11 포지션별 가중치
+# BEST11 포지션별 가중치 (컬럼별 = 범주 비율 ÷ 범주 안 컬럼 수)
+#
+# 아래 상수는 '기본' 범주 비율로 만든 값이다.
+# 실제 계산은 position_weights() 로 관리자 설정까지 반영한다.
 # =========================================================
 
-FW_WEIGHTS = {
-
-    'goals': 35,
-    'assists': 20,
-    'shots_on_target': 15,
-    'shots': 10,
-    'key_passes': 10,
-    'dribble': 10,
-}
+FW_WEIGHTS = SC.metric_weights('FW', SC.default_group_weights('FW'))
+MF_WEIGHTS = SC.metric_weights('MF', SC.default_group_weights('MF'))
+DF_WEIGHTS = SC.metric_weights('DF', SC.default_group_weights('DF'))
+GK_WEIGHTS = SC.metric_weights('GK', SC.default_group_weights('GK'))
 
 
-MF_WEIGHTS = {
-
-    'assists': 20,
-    'key_passes': 20,
-    'pass_rate': 20,
-    'goals': 15,
-    'recoveries': 10,
-    'interceptions': 10,
-    'dribble': 5,
-}
-
-
-DF_WEIGHTS = {
-
-    'clearances': 20,
-    'interceptions': 20,
-    'recoveries': 15,
-    'tackle': 15,
-    'aerial_duel': 10,
-    'ground_duel': 10,
-    'defensive_blocks': 5,
-    'blocks': 5,
-}
-
-
-GK_WEIGHTS = {
-
-    'rating': 50,
-    'mom': 15,
-    'best11': 25,
-    'minutes': 10,
-}
+def position_weights(position):
+    """관리자 > 점수 기준의 범주 비율을 반영한 컬럼별 가중치."""
+    return SC.metric_weights(position)
 
 
 # =========================================================
@@ -323,35 +156,17 @@ def calculate_position_scores(
 
 
     # -----------------------------------------------------
-    # 2. 평가항목별 최고값 계산
+    # 2. 컬럼별 분포 (최저·최고·평균) — 적을수록 좋은 컬럼은 뒤집는다
     # -----------------------------------------------------
 
-    max_values = {}
-
-
-    for metric_name in weights.keys():
-
-        values = [
-
-            row['metrics'][metric_name]
-
-            for row in rows
-        ]
-
-
-        if values:
-
-            max_values[metric_name] = max(
-                values
-            )
-
-        else:
-
-            max_values[metric_name] = 0
+    normalizer = SC.Normalizer(
+        [row['metrics'] for row in rows],
+        weights.keys()
+    )
 
 
     # -----------------------------------------------------
-    # 3. 가중치 점수 계산
+    # 3. 가중치 점수 계산 (0~100)
     # -----------------------------------------------------
 
     for row in rows:
@@ -365,19 +180,10 @@ def calculate_position_scores(
 
         for metric_name, weight in weights.items():
 
-            raw_value = (
-                row['metrics'][metric_name]
-            )
-
-            max_value = (
-                max_values[metric_name]
-            )
-
-
-            score = normalize_score(
-                raw_value,
-                max_value
-            )
+            score = normalizer.unit(
+                metric_name,
+                row['metrics'].get(metric_name)
+            ) * 100
 
 
             contribution = (
@@ -548,25 +354,25 @@ def get_best11():
     fw_score_ranking = calculate_position_scores(
         fw_list,
         get_fw_metrics,
-        FW_WEIGHTS
+        position_weights('FW')
     )
 
     mf_score_ranking = calculate_position_scores(
         mf_list,
         get_mf_metrics,
-        MF_WEIGHTS
+        position_weights('MF')
     )
 
     df_score_ranking = calculate_position_scores(
         df_list,
         get_df_metrics,
-        DF_WEIGHTS
+        position_weights('DF')
     )
 
     gk_score_ranking = calculate_position_scores(
         gk_list,
         get_gk_metrics,
-        GK_WEIGHTS
+        position_weights('GK')
     )
 
 
@@ -1951,25 +1757,25 @@ def get_filtered_best11(
     fw_ranking_all = calculate_position_scores(
         fw_all,
         get_fw_metrics,
-        FW_WEIGHTS
+        position_weights('FW')
     )
 
     mf_ranking_all = calculate_position_scores(
         mf_all,
         get_mf_metrics,
-        MF_WEIGHTS
+        position_weights('MF')
     )
 
     df_ranking_all = calculate_position_scores(
         df_all,
         get_df_metrics,
-        DF_WEIGHTS
+        position_weights('DF')
     )
 
     gk_ranking_all = calculate_position_scores(
         gk_all,
         get_gk_metrics,
-        GK_WEIGHTS
+        position_weights('GK')
     )
 
 
