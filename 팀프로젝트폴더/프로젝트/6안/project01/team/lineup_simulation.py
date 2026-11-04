@@ -151,6 +151,34 @@ class SimulationContext:
             self._reference = ref
         return ref
 
+    def chem_scores(self, lineup):
+        """라인업 안에서의 케미 가산점(BEST11 화면과 같은 엔진).
+        반환: ({선수 ID: 능력 + 가산점}, {선수 ID: 가산점})"""
+        from player.lab import chemistry as CH
+        profiles = self.lab.lineup_profiles([p['id'] for p in lineup])
+        chem = self.lab.score_lineup(profiles)[1] if profiles else {'players': {}}
+        totals, bonus = {}, {}
+        for p in lineup:
+            pid = p['id']
+            b = chem['players'].get(pid, {}).get('bonus', 0.0)
+            bonus[pid] = round(b, 2)
+            totals[pid] = CH.final_score(self.lab.ability.get(pid, p['base_score']), b)
+        return totals, bonus
+
+    def bonus_reference(self):
+        """가산점 포함 기준: 12개 구단 기본 선발(4-3-3)을 '능력 + 케미 가산점'으로 평가한 평균."""
+        if getattr(self, '_bonus_reference', None):
+            return self._bonus_reference
+        rows = []
+        for official_id in self.db_teams:
+            try:
+                lineup = self.validate_lineup(official_id, self.recommended(official_id, '4-3-3'))
+            except PredictionUnavailable:
+                continue
+            rows.append(team_strength(lineup, self.chem_scores(lineup)[0]))
+        self._bonus_reference = {'attack': _mean(r['attack'] for r in rows), 'defense': _mean(r['defense'] for r in rows)}
+        return self._bonus_reference
+
     def ability(self, stats, role):
         """선수 점수 = BEST11 화면과 같은 통합 점수. 원래 포지션이 아닌 자리는 ×0.9."""
         if stats is None or stats.minutes <= 0:
@@ -825,6 +853,26 @@ def simulate(context, payload):
     final_before = {k: (1 - w) * prior[k] + w * player_before[k] for k in prior}
     final_after = {k: (1 - w) * prior[k] + w * player_after[k] for k in prior}
 
+    # 가산점(케미) 포함 결과 — 기존 결과와 따로 계산
+    bonus_ref = context.bonus_reference()
+    home_total, home_bonus = context.chem_scores(teams[0]['lineup'])
+    away_total, away_bonus = context.chem_scores(teams[1]['lineup'])
+    bonus_h, bonus_a = team_strength(teams[0]['lineup'], home_total), team_strength(teams[1]['lineup'], away_total)
+    bonus_player, bonus_goals = player_probabilities(base_home, base_away, bonus_h, bonus_a, bonus_ref, form)
+    bonus_final = {k: (1 - w) * prior[k] + w * bonus_player[k] for k in prior}
+
+    def bonus_rows(lineup, bonus):
+        return [{'name': p['name'], 'role': p['role'], 'bonus': bonus.get(p['id'], 0.0)} for p in lineup]
+
+    bonus_result = {
+        'probabilities': percent_rows(bonus_final),
+        'player_probabilities': {k: round(v * 100, 1) for k, v in bonus_player.items()},
+        'home': bonus_h, 'away': bonus_a, 'goals': bonus_goals,
+        'reference': {k: round(v, 1) for k, v in bonus_ref.items()},
+        'team_chem': {'home': round(_mean(home_bonus.values(), 0.0), 2), 'away': round(_mean(away_bonus.values(), 0.0), 2)},
+        'players': {'home': bonus_rows(teams[0]['lineup'], home_bonus), 'away': bonus_rows(teams[1]['lineup'], away_bonus)},
+    }
+
     # 내 BEST11 가중치 반영 확률 (BEST11 화면에서 넘어온 내 라인업일 때만)
     mine = None
     settings = payload.get('home_best11_settings')
@@ -886,6 +934,16 @@ def simulate(context, payload):
         },
         'best11_recent': recent,
         'best11_weighted': mine,
+        'bonus_result': bonus_result,
+        # 화면에서 골라 보는 두 결과: 기록만(팀 기록 100%) / 가중치 포함(팀 기록 + 선수 능력치)
+        'views': {
+            'record': {'probabilities': percent_rows(prior),
+                       'label': '기록만', 'detail': '팀 기록 100% (최근 5경기·홈/원정·시즌 성적)'},
+            'weighted': {'probabilities': mine['probabilities'] if mine else after_percent,
+                         'label': '가중치 포함', 'mine': bool(mine),
+                         'detail': f'팀 기록 {round((1 - w) * 100)}% + 선수 능력치 {round(w * 100)}% ('
+                                   + ('내 BEST11 가중치' if mine else '기본 가중치') + ')'},
+        },
         'baseline_accuracy': round(
             evaluation['model']['accuracy'] * 100,
             1,

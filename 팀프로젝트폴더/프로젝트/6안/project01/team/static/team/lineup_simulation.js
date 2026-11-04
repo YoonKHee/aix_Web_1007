@@ -785,6 +785,40 @@
         return box;
     }
 
+    /* 가산점(케미) 포함 결과 — 위의 기존 결과(능력치만)와 따로 보여 준다 */
+    function bonusBlock(data) {
+        const r = data.bonus_result;
+        let main = {};
+        if (data.views) main = {...data.views.weighted.probabilities};
+        else data.probabilities.forEach(p => { main[p.code] = p.after; });
+        const box = el('section', undefined, 'weighted-box bonus-box');
+        box.append(el('h3', '➕ 가산점(케미) 포함 결과'));
+        box.append(el('p', "'가중치 포함' 결과의 선수 점수에 케미 가산점을 더한 결과입니다 (BEST11 화면과 같은 케미 계산, 기본 가중치 기준).", 'muted'));
+        const row = el('div', undefined, 'weighted-row');
+        [['H', `${data.home_name} 승`], ['D', '무승부'], ['A', `${data.away_name} 승`]].forEach(([k, label]) => {
+            const v = r.probabilities[k];
+            const d = Math.round((v - main[k]) * 10) / 10;
+            const card = el('div', undefined, 'weighted-card');
+            card.append(el('span', label), el('strong', `${v.toFixed(1)}%`), el('small', `가중치 포함 결과 대비 ${signed(d)}%p`));
+            row.append(card);
+        });
+        box.append(row);
+        box.append(el(
+            'p',
+            `팀 케미 평균: ${data.home_name} ${signed(r.team_chem.home)} · ${data.away_name} ${signed(r.team_chem.away)}  |  공격/수비 지수 (가산점 포함): ${data.home_name} ${r.home.attack.toFixed(1)}/${r.home.defense.toFixed(1)} · ${data.away_name} ${r.away.attack.toFixed(1)}/${r.away.defense.toFixed(1)} (기준 ${r.reference.attack.toFixed(1)}/${r.reference.defense.toFixed(1)})`,
+            'muted'
+        ));
+        const list = el('details', undefined, 'extra-players');
+        list.append(el('summary', '선수별 케미 가산점 보기'));
+        for (const side of ['home', 'away']) {
+            const name = side === 'home' ? data.home_name : data.away_name;
+            list.append(el('p', `${name}: ` + r.players[side].map(p => `${p.name} ${signed(p.bonus)}`).join(' · ')));
+        }
+        list.append(el('p', '케미 가산점은 패스 주고받기 데이터가 없어 역할 보완·인접 라인 연계·같은 구단으로 추정한 값입니다 (선수당 -2 ~ +5).', 'muted'));
+        box.append(list);
+        return box;
+    }
+
     /* 내 BEST11 가중치(BEST11 화면의 감독 연구실 설정)로 평가한 확률 — 기본 확률과 나란히 */
     function weightedBlock(data) {
         const m = data.best11_weighted;
@@ -810,7 +844,45 @@
         return box;
     }
 
-    function showResult(data) {
+    /* 결과 보기 선택: 기록만 / 가중치 포함 */
+    let resultMode = 'weighted';
+    let lastResult = null;
+    try { resultMode = localStorage.getItem('kleague-sim-result-mode') || 'weighted'; } catch (e) { /* 저장 불가여도 동작 */ }
+
+    function viewData(data) {
+        // 고른 결과를 카드에 크게, 다른 결과를 비교선(이전 막대)으로 보여 준다
+        if (!data.views) return {data, compare: '기본'};
+        const mode = data.views[resultMode] ? resultMode : 'weighted';
+        const other = mode === 'record' ? 'weighted' : 'record';
+        const now = data.views[mode].probabilities, cmp = data.views[other].probabilities;
+        const probabilities = data.probabilities.map(p => ({
+            ...p, before: cmp[p.code], after: now[p.code], change: Math.round((now[p.code] - cmp[p.code]) * 10) / 10,
+        }));
+        return {data: {...data, probabilities}, compare: data.views[other].label, mode};
+    }
+
+    function modeBar(data, mode) {
+        const bar = el('div', undefined, 'result-mode');
+        ['record', 'weighted'].forEach(key => {
+            const v = data.views[key];
+            const b = el('button', `${v.label}`, key === mode ? 'on' : '');
+            b.type = 'button';
+            b.title = v.detail;
+            b.addEventListener('click', () => {
+                resultMode = key;
+                try { localStorage.setItem('kleague-sim-result-mode', key); } catch (e) { /* 무시 */ }
+                showResult(lastResult);
+            });
+            bar.append(b);
+        });
+        bar.append(el('span', data.views[mode].detail, 'muted'));
+        return bar;
+    }
+
+    function showResult(raw) {
+        lastResult = raw;
+        const picked = viewData(raw);
+        const data = picked.data;
         const root = byId('result');
         const details = byId('result-details');
 
@@ -827,6 +899,7 @@
         byId('result-empty').hidden = true;
 
         const cards = el('div', undefined, 'result-bars');
+        if (raw.views) root.append(modeBar(raw, picked.mode));
 
         data.probabilities.forEach(p => {
             const card = el('div', undefined, 'prob-card');
@@ -861,7 +934,7 @@
                 after,
                 el(
                     'p',
-                    `기본 대비 ${signed(p.change)}%p`
+                    `${picked.compare} 대비 ${signed(p.change)}%p`
                 )
             );
 
@@ -905,9 +978,11 @@
             ));
         }
 
-        if (data.best11_weighted) {
-            root.append(weightedBlock(data));
+        if (data.bonus_result) {
+            root.append(bonusBlock(data));
         }
+
+        // 내 BEST11 가중치 결과는 위의 '가중치 포함'에 합쳐졌다 (views.weighted)
 
         if (data.player_part) {
             root.append(playerBlock(data));

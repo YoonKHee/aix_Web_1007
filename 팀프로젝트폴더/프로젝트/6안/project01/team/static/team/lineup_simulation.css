@@ -2044,3 +2044,9 @@ main {
 .weighted-card strong{font-size:22px;color:#92400e}
 .weighted-card small{color:#64748b}
 @media (max-width:600px){.weighted-row{grid-template-columns:1fr}}
+
+/* 결과 보기 선택: 기록만 / 가중치 포함 */
+.result-mode{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.result-mode button{padding:7px 16px;border-radius:999px;border:1px solid #94a3b8;background:#fff;color:#0f172a;font-weight:700;cursor:pointer}
+.result-mode button.on{background:#0f5132;border-color:#0f5132;color:#fff}
+.result-mode .muted{font-size:13px}
