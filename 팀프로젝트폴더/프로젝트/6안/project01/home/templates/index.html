@@ -683,44 +683,6 @@
   }
 </style>
 {% include 'shared/site_assets.html' %}
-<style>
-  .site-shell .site-link.site-predict,
-  .site-shell .site-link.site-best11 {
-    font-size: 30px;
-    font-weight: 800;
-    padding: 16px 28px;
-    border-radius: 14px;
-  }
-  /* 평소: 움직임을 부드럽게 */
-.site-shell .site-link.site-predict,
-.site-shell .site-link.site-best11 {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* 마우스를 올리거나 키보드로 선택했을 때 */
-.site-shell .site-link.site-predict:hover,
-.site-shell .site-link.site-best11:hover,
-.site-shell .site-link.site-predict:focus-visible,
-.site-shell .site-link.site-best11:focus-visible {
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-}
-
-/* 클릭하는 순간 */
-.site-shell .site-link.site-predict:active,
-.site-shell .site-link.site-best11:active {
-  transform: translateY(-1px) scale(0.98);
-}
-
-/* 기기에서 움직임 줄이기를 설정한 경우 */
-@media (prefers-reduced-motion: reduce) {
-  .site-shell .site-link.site-predict,
-  .site-shell .site-link.site-best11 {
-    transition: none;
-    transform: none;
-  }
-}
-</style>
 </head>
 
 <body class="site-shell">

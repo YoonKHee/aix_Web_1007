@@ -115,6 +115,37 @@ body.site-shell {
   font-weight:800;
 }
 
+/* 강조 버튼(승부예측·BEST11·GPS 모의경기·축구게임): 모든 화면에서 같은 크기.
+   예전에는 메인(index.html)에만 30px로 따로 있었는데, 버튼이 4개라 한 줄에 들어가는 크기로 통일 */
+@media (min-width:1001px) {
+  .site-shell .site-link.site-predict,
+  .site-shell .site-link.site-best11 {
+    font-size:20px;
+    padding:12px 20px;
+    border-radius:14px;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .site-shell .site-link.site-predict:hover,
+  .site-shell .site-link.site-best11:hover,
+  .site-shell .site-link.site-predict:focus-visible,
+  .site-shell .site-link.site-best11:focus-visible {
+    transform:translateY(-3px) scale(1.03);
+    box-shadow:0 8px 16px rgba(0,0,0,.25);
+  }
+  .site-shell .site-link.site-predict:active,
+  .site-shell .site-link.site-best11:active {
+    transform:translateY(-1px) scale(.98);
+  }
+}
+@media (max-width:1200px) and (min-width:1001px) {
+  .site-shell .site-link.site-predict,
+  .site-shell .site-link.site-best11 { font-size:16px; padding:10px 14px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .site-shell .site-link.site-predict,
+  .site-shell .site-link.site-best11 { transition:none; transform:none; }
+}
+
 .site-shell .site-account {
   display:flex;
   align-items:center;
