@@ -2,6 +2,7 @@
 {% block title %}제외 선수{% endblock %}
 {% block content %}
 <h1>BEST11 제외 선수</h1>
+<div class="box warn"><b>안내:</b> 이 화면의 제외 선수 목록은 사용자 화면의 <b>BEST11 · 감독 연구실 · 승부예측(모의 경기)에는 적용되지 않습니다.</b> BEST11은 관리자와 선수·선수 기록만 공유하고, 제외 선수는 별도로 관리합니다.</div>
 {% if not initialized %}
 <div class="box"><p>지금은 <code>player/services.py</code> 의 <code>EXCLUDED_PLAYER_IDS</code> (아래 목록)를 쓰고 있습니다. 이 화면에서 관리하려면 한 번 DB로 가져와야 합니다. 가져온 뒤에는 services.py 의 목록은 무시됩니다.</p>
 <form method="post">{% csrf_token %}<button name="action" value="init">기존 목록 가져오기</button></form></div>

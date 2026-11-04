@@ -241,7 +241,14 @@ def backup_restore(request, name):
             return redirect('manager:backups')
         for c in connections.all():
             c.close()
+        # 옛 백업에는 나중에 생긴 테이블(예: 경기 결과 team_matchresult)이 없을 수 있어서, 복원 직후 migrate 로 다시 만든다
+        try:
+            from django.core.management import call_command
+            call_command('migrate', interactive=False, verbosity=0)
+        except Exception as e:
+            messages.warning(request, f'복원 후 테이블 정리(migrate)에 실패했습니다: {e} — python manage.py migrate 를 직접 실행하세요.')
         messages.success(request, f'{item["created"]} 시점으로 복원했습니다. (복원 직전 상태는 {safety} 로 백업됨)')
+        messages.info(request, '복원한 백업에 경기 결과가 없거나 적으면 승부예측이 멈출 수 있습니다. 관리자 > 경기 결과에서 "기존 JSON 경기 가져오기" 후 "예측 모델 갱신"을 누르세요.')
         return redirect('manager:backups')
     return render(request, 'manager/backup_restore.html', {'item': item, 'later': later, 'later_batches': later_batches})
 

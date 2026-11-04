@@ -70,6 +70,14 @@
           🏆 BEST11
         </a>
 
+        <a
+          class="site-link site-best11"
+          href="{% url 'player:tracking_demo' %}"
+          {% if active == 'tracking' %}aria-current="page"{% endif %}
+        >
+          📡 GPS 모의경기
+        </a>
+
         {% if soccer_game_url %}
           <a
             class="site-link site-best11"

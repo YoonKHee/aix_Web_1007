@@ -655,7 +655,16 @@ def load_matches():
         for match in original
     }
 
-    for row in MatchResult.objects.all():
+    from django.db import DatabaseError
+    try:
+        rows = list(MatchResult.objects.all())
+    except DatabaseError as exc:          # 예: 옛 백업 복원으로 경기 결과 테이블이 없을 때
+        raise PredictionUnavailable(
+            '경기 결과 자료를 읽을 수 없습니다. '
+            '관리자가 python manage.py migrate 후 경기 결과를 가져와 예측 모델을 갱신해야 합니다.'
+        ) from exc
+
+    for row in rows:
         key = (
             row.match_date.isoformat(),
             row.home_team_id,
