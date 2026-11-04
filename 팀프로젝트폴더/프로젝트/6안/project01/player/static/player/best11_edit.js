@@ -35,8 +35,10 @@
   var KEY = 'kleague-my-best11-v1', SKEY = 'kleague-b11-settings-v1';
   var POS_ORDER = ['FW', 'MF', 'DF', 'GK'], POS_LABEL = { FW: '공격수', MF: '미드필더', DF: '수비수', GK: '골키퍼' };
   var teamSel = document.getElementById('teamSelect'), formSel = document.getElementById('formationSelect');
-  function team() { return teamSel ? teamSel.value : ''; }
-  function formation() { return formSel ? formSel.value : '4-3-3'; }
+  // 화면에 실제 적용된 값(페이지를 열 때의 값)을 기억한다. 적용 버튼을 누르기 전에 선택 상자만 바꿔도 영향 없음
+  var appliedTeam = teamSel ? teamSel.value : '', appliedFormation = formSel ? formSel.value : '4-3-3';
+  function team() { return appliedTeam; }
+  function formation() { return appliedFormation; }
   function storeKey() { return (team() || 'all') + '|' + formation(); }
   function csrfToken() { var i = document.querySelector('input[name=csrfmiddlewaretoken]'); return i ? i.value : ''; }
   function sign(n) { return (n >= 0 ? '+' : '') + n; }
@@ -348,7 +350,7 @@
     closeModal();
     if (!formSel) return;
     formSel.value = f;
-    formSel.dispatchEvent(new Event('change', { bubbles: true }));     // 화면의 기존 필터가 자동으로 다시 불러온다
+    if (formSel.form) formSel.form.submit();     // 추천 표의 "이 포메이션" 버튼은 누르면 바로 적용
   }
 
   /* ---------- 선수 팝업: 이름 옆 케미 표시 + VS 비교 ---------- */

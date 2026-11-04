@@ -4171,51 +4171,9 @@
 
 
     // =====================================================
-    // 구단 / 포메이션을 바꾸면 바로 적용
+    // 구단 / 포메이션은 "적용" 버튼을 눌러야 반영된다.
+    // (예전에는 고르는 순간 바로 제출되어 적용 버튼이 쓸모없었음)
     // =====================================================
-
-    const teamSelect =
-        document.getElementById(
-            'teamSelect'
-        );
-
-    const formationSelect =
-        document.getElementById(
-            'formationSelect'
-        );
-
-    const best11FilterForm =
-        document.getElementById(
-            'best11FilterForm'
-        );
-
-
-    if (
-        teamSelect
-        && formationSelect
-        && best11FilterForm
-    ) {
-
-        teamSelect.addEventListener(
-            'change',
-            function() {
-
-                best11FilterForm.submit();
-
-            }
-        );
-
-
-        formationSelect.addEventListener(
-            'change',
-            function() {
-
-                best11FilterForm.submit();
-
-            }
-        );
-
-    }
 
 
     let playerRadarChart = null;
