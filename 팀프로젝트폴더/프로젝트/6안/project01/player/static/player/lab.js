@@ -36,6 +36,11 @@
   /* ---------- 결과 표시 (계산은 best11_edit.js 가 한다. 여기서는 받은 결과를 보여 주기만 한다) ---------- */
   function render() {
     var r = S.last; if (!r) return;
+    if (r.partial) {      // 나만의 BEST11을 채우는 중: 분석은 11명이 필요
+      clear($('labSummary')).appendChild(el('span', { class: 'lab-muted', text: '라인업 11명을 모두 채우면 분석이 나옵니다. (지금 ' + r.players.length + '/11명)' }));
+      clear($('labRecs')); clear($('labTab'));
+      return;
+    }
     var sum = clear($('labSummary'));
     sum.appendChild(el('span', { text: '라인업 총점 ' + r.total }));
     sum.appendChild(el('span', { text: '팀 케미 평균 +' + r.chem_team }));
@@ -52,6 +57,7 @@
   /* ---------- 탭 ---------- */
   function renderTab() {
     var r = S.last, t = clear($('labTab'));
+    if (r && r.partial && S.tab !== 'quality') return;
     Array.prototype.forEach.call($('labTabs').children, function (b) { b.className = b.getAttribute('data-tab') === S.tab ? 'on' : ''; });
     if (S.tab === 'irr') return tabIrr(r, t);
     if (S.tab === 'quality') return tabQuality(t);

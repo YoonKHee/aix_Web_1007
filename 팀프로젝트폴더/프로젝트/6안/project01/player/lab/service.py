@@ -461,7 +461,8 @@ def api_evaluate(body):
     c = Ctx(body)
     ids = _validate_lineup(c, body)
     lineup = c.lineup_profiles(ids)
-    if len(lineup) != 11:
+    partial = bool(body.get('partial')) and 1 <= len(lineup) < 11   # 빈 칸부터 한 명씩 채우는 중
+    if len(lineup) != 11 and not partial:
         return {'error': '선수 11명이 필요합니다.'}
     total, chem = c.score_lineup(lineup)
     players = []
@@ -476,6 +477,11 @@ def api_evaluate(body):
                          for q in cp['partners'][:3]]
         d['chem_reason'] = _chem_reason(p, lineup, cp)
         players.append(d)
+
+    opp_name = next((i['team'] for i in c.info.values() if i['team_id'] == c.opponent), None) if c.opponent else None
+    if partial:          # 11명이 다 차기 전에는 선수 점수·총점만 (대체불가지수·진단 리포트는 11명이 필요)
+        return {'players': players, 'total': round(total, 1), 'chem_team': chem['team_score'], 'partial': True,
+                'opponent': {'name': opp_name, 'reasons': c.opp_reasons, 'mult': c.opp_mult} if c.opponent else None}
 
     # 추천: 이 라인업 밖에서 라인업 선수와 케미가 좋은 선수
     taken = set(ids)
@@ -607,6 +613,8 @@ def api_candidates(body):
     """교체 후보: out_id 자리에 넣었을 때 라인업 총점이 높은 순. 맨 위가 '추천'이다."""
     c = Ctx(body)
     ids = _validate_lineup(c, body)
+    if body.get('out_id') in (None, '') and body.get('position') in ('GK', 'DF', 'MF', 'FW'):
+        return _empty_slot_candidates(c, ids, body['position'])
     try:
         out_id = int(body.get('out_id'))
     except (TypeError, ValueError):
@@ -637,6 +645,29 @@ def api_candidates(body):
         d['recommended'] = k < 3 and d['delta'] > 0
     return {'candidates': rows, 'position': pos}
 
+
+
+def _empty_slot_candidates(c, ids, pos):
+    """빈 칸 후보: 지금까지 고른 선수(0~10명)에 더했을 때 라인업 총점이 많이 오르는 순. 맨 위가 '추천'이다."""
+    lineup = c.lineup_profiles(ids)
+    base_total = c.score_lineup(lineup)[0] if lineup else 0.0
+    taken = set(ids)
+    cands = [p for p in c.pool() if p['position'] == pos and p['id'] not in taken]
+    cands.sort(key=lambda p: -c.adj(p['id']))
+    rows = []
+    for cand in cands[:CANDIDATE_LIMIT * 2]:
+        t, chem = c.score_lineup(lineup + [cand])
+        cp = chem['players'][cand['id']]
+        d = c.brief(cand['id'])
+        d.update(c.badges(cand['id']))
+        d.update(chem_bonus=cp['bonus'], delta=round(t - base_total, 1), final=round(CH.final_score(c.adj(cand['id']), cp['bonus']), 1),
+                 partners=[{'id': q['id'], 'name': q['name'], 'score': q['score']} for q in cp['partners'][:2]])
+        rows.append(d)
+    rows.sort(key=lambda d: -d['delta'])
+    rows = rows[:CANDIDATE_LIMIT]
+    for k, d in enumerate(rows):
+        d['recommended'] = k < 3
+    return {'candidates': rows, 'position': pos}
 
 
 def api_formations(body):

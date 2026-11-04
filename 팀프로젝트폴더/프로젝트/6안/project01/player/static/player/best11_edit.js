@@ -18,6 +18,7 @@
   if (!field || !URLS.evaluate || !URLS.candidates) return;
   var cards = Array.prototype.slice.call(field.querySelectorAll('.player-card'));
   if (cards.length !== 11) return;
+  var slotPos = null;                  // 칸마다 포지션 (서버 순서 GK, DF, MF, FW)
   /* 화면(DOM)은 FW → MF → DF → GK 줄 순서인데 서버 라인업은 GK → DF → MF → FW 순서다.
      카드를 서버 순서(GK, DF, MF, FW)로 다시 늘어놓아야 공격수 칸에 골키퍼가 들어가지 않는다. */
   (function () {
@@ -30,6 +31,7 @@
     if (tagged.some(function (t) { return !t.pos; })) return;       // 줄 정보가 없으면 건드리지 않는다
     tagged.sort(function (a, b) { return RANK[a.pos] - RANK[b.pos] || a.i - b.i; });
     cards = tagged.map(function (t) { return t.c; });
+    slotPos = tagged.map(function (t) { return t.pos; });
   })();                      // 포메이션을 만들 수 없는 화면이면 사용하지 않음
 
   var KEY = 'kleague-my-best11-v1', SKEY = 'kleague-b11-settings-v1';
@@ -40,6 +42,12 @@
   function team() { return appliedTeam; }
   function formation() { return appliedFormation; }
   function storeKey() { return (team() || 'all') + '|' + formation(); }
+  if (!slotPos) {                       // 줄 정보가 없으면 포메이션 이름(예: 4-2-3-1)으로 칸 포지션을 정한다
+    var nums = formation().split('-').map(Number);
+    slotPos = ['GK'];
+    nums.forEach(function (n, k) { var ps = k === 0 ? 'DF' : (k === nums.length - 1 ? 'FW' : 'MF'); for (var j = 0; j < n; j++) slotPos.push(ps); });
+    if (slotPos.length !== 11) return;
+  }
   function csrfToken() { var i = document.querySelector('input[name=csrfmiddlewaretoken]'); return i ? i.value : ''; }
   function sign(n) { return (n >= 0 ? '+' : '') + n; }
   function num1(n) { return Math.round(n * 10) / 10; }
@@ -67,14 +75,16 @@
   }
   var originalIds = cards.map(cardId);
   if (originalIds.some(function (x) { return x == null; })) return;
-  var ids = originalIds.slice();
+  /* 나만의 BEST11: 처음에는 11칸이 모두 빈 상태(null)에서 한 명씩 채운다. '자동으로 채우기'로 남은 칸을 자동 선발 선수로 채울 수 있다. */
+  var ids = originalIds.map(function () { return null; });
+  function filled() { return ids.filter(function (x) { return x != null; }); }
   var last = null;                     // 마지막 평가 결과
   var INIT = null;                     // 서버 초기 정보 (구단·프리셋·지표)
   var ST = readJSON(SKEY, {});
   var S = { preset: ST.preset || 'default', mult: ST.mult || {}, chem: typeof ST.chem === 'number' ? ST.chem : 1, exp: typeof ST.exp === 'number' ? ST.exp : 1.5, opponent: ST.opponent || '' };
   function saveSettings() { writeJSON(SKEY, S); }
   function isDefaultSettings() { return S.preset === 'default' && !Object.keys(S.mult).length && S.chem === 1 && S.exp === 1.5 && !S.opponent; }
-  function params() { return { team: team(), formation: formation(), lineup: ids, preset: S.preset, mult: S.mult, chem_scale: S.chem, exp_scale: S.exp, opponent: S.opponent || null }; }
+  function params() { var f = filled(); return { team: team(), formation: formation(), lineup: f, partial: f.length < 11, preset: S.preset, mult: S.mult, chem_scale: S.chem, exp_scale: S.exp, opponent: S.opponent || null }; }
   function isCustom() { return ids.some(function (x, i) { return x !== autoIds[i]; }); }
   var autoIds = originalIds.slice();   // '자동 선발' 기준 라인업 (설정이 기본이면 화면이 원래 보여 준 선수, 아니면 서버가 가중치로 다시 뽑은 선수)
 
@@ -88,6 +98,10 @@
     var b = el('button', { type: 'button', class: 'b11-swap', title: '이 자리 선수 교체', 'aria-label': '선수 교체', text: '⇄ 교체' });
     b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openCands(i); });
     card.appendChild(b);
+    var rm = el('button', { type: 'button', class: 'b11-remove', title: '이 자리 비우기', 'aria-label': '선수 빼기', text: '✕' });
+    rm.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); removeAt(i); });
+    card.appendChild(rm);
+    card.addEventListener('click', function (e) { if (ids[i] == null) { e.preventDefault(); e.stopPropagation(); openCands(i); } });
   });
   var modal = el('div', { class: 'lab-modal b11-modal', hidden: '' }, [
     el('div', { class: 'lab-modal-box', role: 'dialog', 'aria-modal': 'true' }, [
@@ -205,17 +219,52 @@
   }
   function settingsChanged() {
     // 내가 직접 바꾼 라인업이 있으면 선수는 그대로 두고 점수만 다시 계산, 아니면 가중치로 다시 선발
-    run(function () { return isCustom() ? evaluate() : autoPick(false); });
+    run(function () { return (filled().length === 11 && !isCustom()) ? autoPick(false) : evaluate(); });
   }
   function autoPick(optimize) {
     var b = params(); b.optimize = !!optimize; delete b.lineup;
     return post(URLS.lineup, b).then(function (r) { autoIds = r.lineup.slice(); ids = r.lineup.slice(); save(); return evaluate(); });
   }
   function pick(optimize) { run(function () { return autoPick(optimize); }); }
-  function evaluate() { return post(URLS.evaluate, params()).then(render); }
+  function evaluate() {
+    if (!filled().length) { renderEmpty(); return Promise.resolve(); }
+    return post(URLS.evaluate, params()).then(render);
+  }
+  function refreshAuto() {             // 현재 가중치로 자동 선발 라인업(autoIds)을 다시 구한다
+    if (isDefaultSettings()) { autoIds = originalIds.slice(); return Promise.resolve(); }
+    var b = params(); delete b.lineup; delete b.partial;
+    return post(URLS.lineup, b).then(function (r) { autoIds = r.lineup.slice(); });
+  }
+  function fillRest() {                // 빈 칸만 자동 선발 선수로 채운다 (이미 고른 선수는 그대로)
+    run(function () {
+      return refreshAuto().then(function () {
+        cards.forEach(function (c, i) {
+          if (ids[i] != null) return;
+          var pick = autoIds.filter(function (id, j) { return slotPos[j] === slotPos[i] && ids.indexOf(id) < 0; })[0];
+          if (pick != null) ids[i] = pick;
+        });
+        save(); return evaluate();
+      });
+    });
+  }
+  function clearAll() { ids = ids.map(function () { return null; }); save(); run(evaluate); }
+  function removeAt(i) { ids[i] = null; save(); run(evaluate); }
 
   /* ---------- 카드 다시 그리기 ---------- */
+  function paintEmpty(card, i) {
+    card.classList.add('b11-empty');
+    var a = card.querySelector('.player-popup-link');
+    a.setAttribute('onclick', 'return false;');
+    var photo = card.querySelector('.player-photo'); clear(photo);
+    photo.appendChild(el('div', { class: 'b11-empty-plus', text: '+' }));
+    card.querySelector('.player-name').textContent = '선수 선택';
+    var tn = card.querySelector('.team-name'); clear(tn);
+    tn.appendChild(el('span', { text: POS_LABEL[slotPos[i]] + ' · ' + slotPos[i] }));
+    clear(card.querySelector('.player-score'));
+    var mark = card.querySelector('.b11-mark'); if (mark) mark.remove();
+  }
   function paint(card, p) {
+    card.classList.remove('b11-empty');
     var a = card.querySelector('.player-popup-link');
     a.setAttribute('onclick', 'openPlayerModal(' + p.id + '); return false;');
     var photo = card.querySelector('.player-photo'); clear(photo);
@@ -233,18 +282,41 @@
     var mark = card.querySelector('.b11-mark'); if (mark) mark.remove();
     if (p.id !== autoIds[cards.indexOf(card)]) a.appendChild(el('div', { class: 'b11-mark', text: '내 선택' }));
   }
-  function render(r) {
-    last = r;
-    r.players.forEach(function (p, i) { paint(cards[i], p); });
-    var changed = isCustom();
-    var parts = [
-      el('span', { text: changed ? '내 BEST11 (직접 교체함)' : (isDefaultSettings() ? 'BEST11 (자동 선발)' : 'BEST11 (가중치 적용 자동 선발)') }),
-      el('span', { text: '라인업 총점 ' + r.total + ' · 라인업 평균 ' + (r.players.length ? (r.total / r.players.length).toFixed(1) : '-') + ' · 팀 케미 평균 ' + sign(r.chem_team) }),
-      el('span', { class: 'lab-muted', text: '카드의 ⇄ 교체 버튼으로 선수를 바꿀 수 있습니다' }),
-      changed ? el('button', { type: 'button', text: '자동 선발로 되돌리기', onclick: reset }) : null,
+  function barButtons(n) {
+    return [
+      n < 11 ? el('button', { type: 'button', class: 'b11-primary', text: n ? '남은 칸 자동으로 채우기' : '자동으로 채우기', title: '빈 칸을 지금 가중치의 자동 선발 선수로 채웁니다', onclick: fillRest }) : null,
+      n ? el('button', { type: 'button', text: '모두 비우기', onclick: clearAll }) : null,
       isDefaultSettings() ? null : el('button', { type: 'button', text: '가중치 초기화', onclick: resetSettings })];
+  }
+  function renderEmpty() {
+    last = null;
+    cards.forEach(function (c, i) { paintEmpty(c, i); });
     clear(bar);
-    parts.filter(Boolean).forEach(function (n) { bar.appendChild(n); });
+    [el('span', { text: '내 BEST11 만들기 0/11명' }), el('span', { class: 'lab-muted', text: '빈 칸을 눌러 선수를 한 명씩 고르세요' })]
+      .concat(barButtons(0)).filter(Boolean).forEach(function (n) { bar.appendChild(n); });
+    oppRptBtn.hidden = true; oppNote.textContent = '';
+    document.dispatchEvent(new CustomEvent('b11:result', { detail: { result: { partial: true, players: [] }, params: params() } }));
+    updateModalTag();
+  }
+  function render(r) {
+    var byId = {}; r.players.forEach(function (p) { byId[p.id] = p; });
+    cards.forEach(function (c, i) {
+      var p = ids[i] != null ? byId[ids[i]] : null;
+      if (p && p.position !== slotPos[i]) p = null;          // 포지션이 맞지 않는 저장값은 버린다
+      if (!p) { ids[i] = null; paintEmpty(c, i); } else paint(c, p);
+    });
+    var n = filled().length;
+    if (n < r.players.length) { save(); return evaluate(); }  // 버린 선수가 있으면 다시 계산
+    last = r;
+    var full = n === 11;
+    var title = full ? (isCustom() ? '내 BEST11 (11/11명 완성)' : (isDefaultSettings() ? 'BEST11 (자동 선발)' : 'BEST11 (가중치 적용 자동 선발)')) : '내 BEST11 만들기 ' + n + '/11명';
+    var parts = [
+      el('span', { text: title }),
+      el('span', { text: '라인업 총점 ' + r.total + ' · 라인업 평균 ' + (n ? (r.total / n).toFixed(1) : '-') + ' · 팀 케미 평균 ' + sign(r.chem_team) }),
+      el('span', { class: 'lab-muted', text: full ? '카드의 ⇄ 교체 버튼으로 선수를 바꿀 수 있습니다' : '빈 칸을 눌러 선수를 고르세요 · 교체·대체 보고서와 아래 라인업 분석은 11명을 채우면 나옵니다' })]
+      .concat(barButtons(n));
+    clear(bar);
+    parts.filter(Boolean).forEach(function (x) { bar.appendChild(x); });
     oppRptBtn.hidden = !r.opponent;
     oppNote.textContent = r.opponent ? r.opponent.name + ' 상대 맞춤: ' + (r.opponent.reasons.length ? r.opponent.reasons.join(' / ') : '조정할 규칙 없음') : '';
     document.dispatchEvent(new CustomEvent('b11:result', { detail: { result: r, params: params() } }));
@@ -252,7 +324,7 @@
   }
   function save() {
     var o = readJSON(KEY, {});
-    if (isCustom()) o[storeKey()] = ids; else delete o[storeKey()];
+    if (filled().length) o[storeKey()] = ids; else delete o[storeKey()];
     writeJSON(KEY, o);
   }
   function reset() { run(function () { ids = autoIds.slice(); save(); return evaluate(); }); }
@@ -267,13 +339,17 @@
 
   /* ---------- 교체 ---------- */
   function openCands(slot) {
+    var empty = ids[slot] == null;
     var box = el('div', {}, [el('p', { class: 'lab-muted', text: '불러오는 중…' })]);
-    openModal(cards[slot].querySelector('.player-name').textContent + ' 교체 후보', box);
-    var b = params(); b.out_id = ids[slot];
+    openModal(empty ? POS_LABEL[slotPos[slot]] + ' 선택 (' + (filled().length + 1) + '번째 선수)' : cards[slot].querySelector('.player-name').textContent + ' 교체 후보', box);
+    var b = params();
+    if (empty) b.position = slotPos[slot]; else b.out_id = ids[slot];
     post(URLS.candidates, b).then(function (r) {
       clear(box);
-      box.appendChild(el('p', { class: 'lab-muted', text: '같은 포지션만 나옵니다. 라인업 총점(능력+케미)이 가장 많이 오르는 순서이고, 위쪽 후보가 추천입니다.' }));
-      if (!r.candidates.length) box.appendChild(el('p', { text: '교체할 수 있는 선수가 없습니다.' }));
+      box.appendChild(el('p', { class: 'lab-muted', text: empty
+        ? '같은 포지션 선수만 나옵니다. 지금까지 고른 선수와의 케미를 포함해 라인업 총점이 가장 많이 오르는 순서이고, 위쪽이 추천입니다.'
+        : '같은 포지션만 나옵니다. 라인업 총점(능력+케미)이 가장 많이 오르는 순서이고, 위쪽 후보가 추천입니다.' }));
+      if (!r.candidates.length) box.appendChild(el('p', { text: '고를 수 있는 선수가 없습니다.' }));
       r.candidates.forEach(function (c) {
         var d = c.delta;
         var kids = [el('div', {}, [el('b', { text: c.name }), ' ', el('span', { class: 'lab-muted', text: c.team + ' · BEST11 ' + c.ability + '점 ' }),
@@ -281,7 +357,7 @@
           c.recommended ? el('span', { class: 'lab-badge info', text: '추천' }) : null].concat(c.badges.map(badge)).concat(
           [c.partners.length ? el('div', { class: 'lab-muted', text: '케미: ' + c.partners.map(function (q) { return q.name; }).join(', ') }) : null])),
           el('div', {}, [el('span', { class: 'lab-delta ' + (d >= 0 ? 'pos' : 'neg'), text: sign(d) + ' ' }),
-            el('button', { type: 'button', text: '교체', onclick: function () { choose(slot, c.id); } })])];
+            el('button', { type: 'button', text: empty ? '선택' : '교체', onclick: function () { choose(slot, c.id); } })])];
         box.appendChild(el('div', { class: 'lab-cand' + (c.recommended ? ' rec' : '') }, kids));
       });
     }).catch(function (e) { clear(box).appendChild(el('p', { class: 'lab-msg err', text: e.message })); });
@@ -325,7 +401,10 @@
     }).catch(function (e) { clear(box).appendChild(el('p', { class: 'lab-msg err', text: e.message })); });
   }
   function openIrrReport() {
-    if (!last || !last.irreplaceability) return;
+    if (!last || !last.irreplaceability) {
+      openModal('교체·대체 보고서', el('p', { text: '11명을 모두 채우면 볼 수 있습니다. 지금 ' + filled().length + '/11명입니다. (빈 칸은 "자동으로 채우기"로 한 번에 채울 수 있습니다)' }));
+      return;
+    }
     var box = el('div', { class: 'b11-rpt' });
     var rows = last.irreplaceability.slice().sort(function (a, b) { return b.drop - a.drop; });
     openModal('교체·대체 보고서', box, true);
@@ -543,9 +622,15 @@
   function gradeWord(g) { return g >= 70 ? '최상급' : g >= 60 ? '상급' : g >= 55 ? '평균 이상' : g >= 45 ? '평균' : g >= 40 ? '평균 이하' : '취약'; }
   function gradeCls(g) { return g >= 60 ? 'hi' : g >= 45 ? 'mid' : 'lo'; }
   var RECS = { '강력 추천': ['영입 권장', 'A'], '추천': ['영입 고려', 'B'], '무난': ['관찰', 'C'], '대안 검토': ['보류', 'D'], '표본 부족': ['추가 관찰 필요', '-'] };
-  function boldLead(x) {                     // "강점: …" → 앞의 짧은 라벨만 굵게
+  function numBold(t) {                      // 문장 속 숫자(0.78, +37.4점, 1위, 3.5배 …)를 굵게
+    var out = [], re = /([+-]?\d+(?:\.\d+)?(?:%|점|위|개|분|배|명|경기|골|도움)?)/g, i = 0, m;
+    while ((m = re.exec(t))) { if (m.index > i) out.push(t.slice(i, m.index)); out.push(el('b', { class: 'b11-num', text: m[1] })); i = re.lastIndex; }
+    if (i < t.length) out.push(t.slice(i));
+    return out;
+  }
+  function boldLead(x) {                     // "강점: …" → 앞의 짧은 라벨은 칩으로, 숫자는 굵게
     var m = /^(\[?[^:\[\]]{1,8}\]?):\s*(.*)$/.exec(x);
-    return m ? el('li', {}, [el('b', { class: 'b11-lead', text: m[1] }), ' ' + m[2]]) : el('li', { text: x });
+    return m ? el('li', {}, [el('b', { class: 'b11-lead', text: m[1] }), ' '].concat(numBold(m[2]))) : el('li', {}, numBold(x));
   }
   function bulletBox(title, arr, cls) {
     var ul = el('ul', {}); arr.forEach(function (x) { ul.appendChild(boldLead(x)); });
@@ -563,18 +648,18 @@
         el('div', { class: 'lab-muted', text: o.basis + ' · 기록 신뢰도 ' + o.confidence })]),
       el('div', { class: 'b11-sc-ovr' }, [el('small', { text: 'OVR (20–80)' }), el('b', { class: gradeCls(ovr), text: String(ovr) }), el('span', { text: gradeWord(ovr) })]),
       el('div', { class: 'b11-sc-rec' }, [el('small', { text: '스카우트 의견' }), el('b', { class: 'b11-verdict ' + (VCLS[o.verdict] || 'mid'), text: rec[0] }),
-        el('span', { text: o.rank_total ? o.rank_total + '명 중 ' + o.rank + '위 · 상위 ' + o.top_pct + '%' : '순위 참고용' })])]));
-    var sc = [el('div', {}, [el('small', { text: '능력 점수' }), el('b', { text: String(o.ability) })])];
-    if (o.final != null) {
-      sc.push(el('span', { text: '+' }), el('div', {}, [el('small', { text: '케미' }), el('b', { class: 'b11-cn ' + (o.chem > 0 ? 'pos' : o.chem < 0 ? 'neg' : 'zero'), text: sign(o.chem) })]),
-        el('span', { text: '=' }), el('div', {}, [el('small', { text: '최종 점수' }), el('b', { text: String(o.final) })]));
-    }
-    box.appendChild(el('div', { class: 'b11-rpt-score' }, sc));
-    box.appendChild(el('div', { class: 'b11-sc-sum' }, [el('small', { text: '한 줄 평가' }), el('p', { text: o.conclusion })]));
+        el('span', { text: o.rank_total ? o.rank_total + '명 중 ' + o.rank + '위 · 상위 ' + o.top_pct + '%' : '순위 참고용' })]),
+      // 능력 점수(케미가 있으면 최종 점수까지)를 헤더 안에 함께 표시
+      el('div', { class: 'b11-sc-ovr b11-sc-abl' }, [el('small', { text: o.final != null ? '최종 점수' : '능력 점수' }),
+        el('b', { text: String(o.final != null ? o.final : o.ability) }),
+        el('span', { text: o.final != null ? '능력 ' + o.ability + ' · 케미 ' + sign(o.chem) : '100점 만점' })])]));
+    // 한 줄 평가: 헤더에 이미 있는 "구단 포지션 이름:" 앞부분은 빼고 핵심만
+    var concl = String(o.conclusion || '').replace(/^[^:]{1,40}:\s*/, '');
+    box.appendChild(el('div', { class: 'b11-sc-sum' }, [el('small', { text: '한 줄 평가' }), el('p', {}, numBold(concl))]));
 
     // 능력치 평가
     var at = el('div', { class: 'b11-rpt-sec' }, [el('h4', { text: '능력치 평가' }), el('p', { class: 'b11-sc-sub', text: '20–80 등급 · 가운데 선(50) = 같은 포지션 주전급 평균' })]);
-    o.rows.forEach(function (x) {
+    o.rows.slice().sort(function (a, b) { return b.weight - a.weight; }).forEach(function (x) {   // 비중이 큰 지표부터
       var g = grade(x.pct), w = (g - 20) / 60 * 100;
       at.appendChild(el('div', { class: 'b11-sc-item' }, [
         el('div', { class: 'b11-hb b11-sc-row' }, [
@@ -582,7 +667,8 @@
           el('span', { class: 'b11-hb-t' }, [el('span', { class: 'b11-hb-f g-' + gradeCls(g), style: 'width:' + w + '%' }), el('span', { class: 'b11-hb-m', style: 'left:50%' })]),
           el('b', { class: 'b11-sc-g ' + gradeCls(g), text: String(g) }),
           el('span', { class: 'b11-sc-w ' + gradeCls(g), text: gradeWord(g) })]),
-        el('div', { class: 'b11-sc-d', text: x.value + (x.unit === 'rate' ? '' : ' /90분') + ' · 평균 ' + x.mean + ' · ' + x.rank + '위 · 비중 ' + x.weight + '%' })]));
+        el('div', { class: 'b11-sc-d' }, [(x.unit === 'rate' ? '' : '90분당 '), el('b', { text: String(x.value) }), ' (주전급 평균 ' + x.mean + ')',
+          el('span', { class: 'b11-sc-sep', text: '·' }), '리그 ' + x.rank + '위', el('span', { class: 'b11-sc-sep', text: '·' }), el('span', { class: 'b11-sc-wt', text: '비중 ' + x.weight + '%' })])]));
     });
     box.appendChild(at);
 
@@ -590,10 +676,19 @@
     box.appendChild(el('details', { class: 'b11-rpt-sec b11-sc-more' }, [el('summary', { text: '📊 점수 구성 근거 (펼쳐 보기)' }), el('ul', {}, o.why.map(boldLead))]));
     if (o.h2h) box.appendChild(o.h2h);
     if (o.alt) box.appendChild(o.alt);
+    var ruleTxt = String(o.rule || '').replace(/^판단 기준:\s*/, '').replace(/\.\s*$/, '');
+    var ruleTb = el('table', { class: 'b11-rule-table' }, ruleTxt.split(/\s*\/\s*/).filter(Boolean).map(function (r) {
+      var kv = r.split(/\s*=\s*/);
+      return el('tr', {}, kv.length === 2 ? [el('td', { text: kv[0] }), el('th', { text: kv[1] })] : [el('td', { colspan: '2', text: r })]);
+    }));
     box.appendChild(el('div', { class: 'b11-rpt-sec b11-sc-final' }, [el('h4', { text: '최종 의견: ' + rec[0] + (rec[1] !== '-' ? ' (등급 ' + rec[1] + ')' : '') }),
-      el('p', { text: o.conclusion }), el('p', { class: 'lab-muted', text: o.rule })]));
+      el('p', {}, numBold(concl)),
+      ruleTxt ? el('details', { class: 'b11-rule' }, [el('summary', { text: '판단 기준 보기' }), ruleTb]) : null]));
     box.appendChild(helpChips());
-    box.appendChild(el('p', { class: 'lab-muted', text: '등급 읽는 법: 20–80 스케일은 스카우팅에서 쓰는 표기로, 같은 포지션 주전급(450분 이상) 선수들 사이의 위치를 정규분포로 환산해 5점 단위로 반올림했습니다. 50 평균, 60 상위 약 16%, 70 상위 약 2%, 40 하위 약 16%입니다. ' + (o.notes || '') }));
+    box.appendChild(el('details', { class: 'b11-rule b11-grade-help' }, [el('summary', { text: '등급(20–80) 읽는 법 · 작성 기준' }),
+      el('table', { class: 'b11-rule-table' }, [['80', '최상위 (상위 약 0.1%)'], ['70', '상위 약 2%'], ['60', '상위 약 16%'], ['50', '같은 포지션 주전급 평균'], ['40', '하위 약 16%'], ['20', '최하위']].map(function (g) {
+        return el('tr', {}, [el('td', { text: g[0] }), el('th', { text: g[1] })]); })),
+      el('p', { class: 'lab-muted', text: '같은 포지션 주전급(450분 이상) 선수들 사이의 위치를 정규분포로 환산해 5점 단위로 반올림했습니다. ' + (o.notes || '') })]));
     return box;
   }
   function renderLeagueReport(r, meta) {
@@ -605,14 +700,17 @@
   }
   function openReport(pid) {
     if (pid == null) return;
-    if (URLS.reportsFile && isDefaultSettings()) {
+    var notFull = filled().length < 11 || ids.indexOf(pid) < 0;
+    if (URLS.reportsFile && (isDefaultSettings() || notFull)) {   // 내 설정 기준 보고서는 11명이 다 찬 라인업의 선수만 계산할 수 있다
       var box0 = el('div', { class: 'b11-rpt' }, [el('p', { class: 'lab-muted', text: '불러오는 중…' })]);
       openModal('분석 보고서', box0, true);
       loadReports().then(function (j) {
         var r = j.players[String(pid)];
         if (!r) throw new Error('이 선수의 보고서가 없습니다. (올 시즌 기록이 없는 선수)');
         modal.querySelector('#b11Title').textContent = r.name + ' 분석 보고서';
-        clear(modal.querySelector('#b11Body')).appendChild(renderLeagueReport(r, j.meta));
+        var body = clear(modal.querySelector('#b11Body'));
+        if (!isDefaultSettings()) body.appendChild(el('p', { class: 'lab-msg', text: '라인업 11명을 모두 채우면 내 가중치 설정 기준 보고서로 바뀝니다. 지금은 기본 설정 보고서입니다.' }));
+        body.appendChild(renderLeagueReport(r, j.meta));
       }).catch(function (e) { clear(box0).appendChild(el('p', { class: 'lab-msg err', text: e.message })); });
       return;
     }
@@ -780,30 +878,13 @@
   /* ---------- 시작 ---------- */
   buildTools();
   var saved = readJSON(KEY, {})[storeKey()];
-  function startAuto() {
-    // 기본 설정이면 화면이 원래 보여 준 선수 그대로, 설정을 바꿔 둔 상태면 그 가중치로 다시 선발
-    run(function () { return autoPick(false); });
-  }
-  function startSaved() {
-    var keep = ids; ids = saved.map(Number);
-    return post(URLS.evaluate, params()).then(function (r) {
-      var okPos = r.players.every(function (p, i) { return p.position === cards[i].querySelector('.team-name span').textContent.split('·').pop().trim(); });
-      if (!okPos) throw new Error('saved lineup mismatch');
-      render(r);
-    }).catch(function () { ids = keep; var o = readJSON(KEY, {}); delete o[storeKey()]; writeJSON(KEY, o); return autoPick(false); });
-  }
   function begin() {
-    if (Array.isArray(saved) && saved.length === 11) {
-      // 직접 고른 라인업이 있으면 '자동 선발' 기준(autoIds)은 현재 설정으로 다시 구해 둔다
-      run(function () {
-        var b = params(); delete b.lineup;
-        var base = post(URLS.lineup, b).then(function (r) { return r.lineup; });
-        return base.then(function (a) { autoIds = a.slice(); return startSaved(); });
-      });
-    } else startAuto();
+    // 저장해 둔 '내 BEST11'(일부만 채운 것 포함)이 있으면 이어서, 없으면 빈 칸에서 시작
+    if (Array.isArray(saved) && saved.length === 11) ids = saved.map(function (x) { return x == null ? null : Number(x); });
+    run(evaluate);
   }
   if (URLS.init) {
     post(URLS.init, {}).then(function (r) { INIT = r; fillTools(); begin(); })
       .catch(function (e) { bar.textContent = '가중치 도구를 불러오지 못했습니다: ' + e.message; });
-  } else { run(evaluate); }
+  } else { begin(); }
 })();

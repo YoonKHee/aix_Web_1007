@@ -153,3 +153,30 @@
 
 /* 지표별 가중치 합계 (100 초과 경고) */
 .b11-tools .b11-wsum{margin:6px 0 0;font-size:12px;color:#475569}.b11-tools .b11-wsum.over{color:#b91c1c;font-weight:700}
+
+/* 나만의 BEST11: 빈 칸 */
+.b11-empty{cursor:pointer}
+.football-field .player-card.b11-empty .player-photo{display:flex;align-items:center;justify-content:center;border:2px dashed #fff;background:rgba(255,255,255,.22);box-shadow:none}
+.football-field .player-card.b11-empty .b11-empty-plus{font-size:34px;font-weight:700;color:#fff;line-height:1}
+.football-field .player-card.b11-empty .player-score{visibility:hidden}
+.football-field .player-card.b11-empty:hover .player-photo{background:rgba(255,255,255,.4)}
+.b11-empty .player-name{opacity:.9}
+.b11-empty .b11-swap,.b11-empty .b11-remove{display:none}
+.b11-remove{position:absolute;top:2px;left:2px;z-index:3;width:22px;height:22px;border-radius:50%;border:none;background:rgba(15,23,42,.65);color:#fff;font-size:12px;line-height:22px;cursor:pointer;padding:0}
+.b11-remove:hover{background:#b91c1c}
+.b11-bar .b11-primary{background:#16a34a;color:#fff;border-color:#16a34a;font-weight:600}
+
+/* 분석 보고서 가독성 */
+.b11-sc-abl b{color:#fff}
+.b11-scout .b11-num{font-weight:700;color:#0f172a}
+.b11-sc-sum .b11-num{color:#1d4ed8}
+.b11-sc-d b{color:#0f172a}
+.b11-sc-sep{margin:0 6px;color:#cbd5e1}
+.b11-sc-wt{display:inline-block;padding:0 6px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px}
+.b11-scout .b11-sc-box li{line-height:1.6;margin:4px 0}
+.b11-rule{margin-top:8px}
+.b11-rule summary{cursor:pointer;color:#1d4ed8;font-size:13px}
+.b11-rule-table{border-collapse:collapse;margin:6px 0;font-size:13px}
+.b11-rule-table td,.b11-rule-table th{border:1px solid #e2e8f0;padding:4px 10px;text-align:left}
+.b11-rule-table th{font-weight:600;background:#f8fafc}
+.b11-grade-help{padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;margin-top:10px}
