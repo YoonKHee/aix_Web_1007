@@ -1,0 +1,3469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<link rel="shortcut icon" href="/images/portal/favicon.ico">
+	<link href="/css/portal/reset.css" rel="stylesheet" type="text/css">
+	<link href="/css/portal/font.css" rel="stylesheet" type="text/css">
+	<link href="/css/portal/common.css" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Electrolize|Orbitron" rel="stylesheet">	
+	<link rel="stylesheet" href="/resources/jquery-ui-1.12.1/jquery-ui.min.css">
+	<script src="/js/jquery-1.12.4.js"></script>
+	<script src="/js/jquery-migrate-1.4.1.js"></script>
+	<script src="/resources/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+	<script src="/resources/jquery-ui-1.12.1/datepicker-ko.js"></script>
+	<script src="/js/jquery.cookie.js"></script>
+	<script src="/js/common.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/resources/tablesorter/jquery.tablesorter.js"></script>
+	
+<title>K LEAGUE PORTAL</title>
+<script>
+function goExcel(){
+	
+	if($("#tmpPopFrm").length>=1){
+		$("#tmpPopFrm").remove();
+	}
+	
+	var paramObj = {
+			selectYear:$("#selectYear").val(),
+			selectMeetSeq:$("#selectMeetSeq").val(),
+			selectTeamId:$("#selectTeamId").val(),
+			selectGameId:$("#selectGameId").val()
+		};
+
+	var html="<form method='post' name='tmpPopFrm' id='tmpPopFrm' action='/data/addition/player/additionPlayerDataBySeasonPopupExcel.do'>";
+	for(var key in paramObj){
+		html+="<input type='hidden' name='"+key+"' value='"+paramObj[key]+"'/>";
+	}
+	html+="</form>";
+	$("body").append(html);
+	
+	submitToPopupPage(document.forms.tmpPopFrm, "popPlayerAdditionDataSeason", 500, 500);
+
+}
+
+$(document).ready(function(){
+	$("#teamDataTableSeason").tablesorter({
+		 headers : {
+	        	0 : {sorter : 'desc'},
+	        	1 : {sorter : 'text'},
+	            2 : {sorter : 'desc'},
+	            3 : {sorter : 'desc'},
+	            4 : {sorter : 'desc'},
+	            5 : {sorter : 'desc'},
+	            6 : {sorter : 'desc'},
+	            7 : {sorter : 'desc'},
+	            8 : {sorter : 'desc'},
+	            9 : {sorter : 'percent'},
+	            10 : {sorter : 'desc'},
+	            11 : {sorter : 'desc'},
+	            12 : {sorter : 'desc'},
+	            13 : {sorter : 'desc'},
+	            14 : {sorter : 'percent'},
+	            15 : {sorter : 'desc'},
+	            16 : {sorter : 'desc'},
+	            17 : {sorter : 'desc'},
+	            18 : {sorter : 'desc'},
+	            19 : {sorter : 'desc'},
+	            20 : {sorter : 'percent'},
+	            21 : {sorter : 'desc'},
+	            22 : {sorter : 'desc'},
+	            23 : {sorter : 'percent'},
+	            24 : {sorter : 'desc'},
+	            25 : {sorter : 'desc'},
+	            26 : {sorter : 'percent'},
+	            27 : {sorter : 'desc'},
+	            28 : {sorter : 'desc'},
+	            29 : {sorter : 'percent'},
+	            30 : {sorter : 'desc'},
+	            31 : {sorter : 'desc'},
+	            32 : {sorter : 'percent'},
+	            33 : {sorter : 'desc'},
+	            34 : {sorter : 'desc'},
+	            35 : {sorter : 'percent'},
+	            36 : {sorter : 'desc'},
+	            37 : {sorter : 'desc'},
+	            38 : {sorter : 'percent'},
+	            39 : {sorter : 'desc'},
+	            40 : {sorter : 'desc'},
+	            41 : {sorter : 'desc'},
+	            42 : {sorter : 'desc'},
+	            43 : {sorter : 'desc'}
+	          },
+	});      
+	full();
+});
+function full(){
+	var w = screen.width;
+	var h = screen.height;
+	window.resizeTo (w,h);
+	window.moveTo (0,0);
+}
+</script>
+</head>
+<body leftmargin="0" topmargin="0" scroll="auto" >
+<center>
+	<input id="selectYear" type="text" style="display: none;"  value="2026">
+	<input id="selectMeetSeq" type="text" style="display: none;"  value="1">
+	<input id="selectTeamId" type="text" style="display: none;"  value="K26">
+	<input id="selectGameId" type="text" style="display: none;"  value="">
+	
+	<table cellspacing="0" cellpadding="0" border="0"  width="99%">
+		<tr>
+			<td width="100%">
+			<!--여기서 부터 테두리 테이블 시작-->
+	
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="5"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->	
+	
+				<table cellspacing=0 cellpadding=0 border=0 width=100% >
+					<tr>
+						<td width=50%  align=left>한국프로축구연맹</td>
+						<td width=50% align=right></td>
+					</tr>
+					<tr>
+						<td width=100% colspan=2 height=2 bgcolor=#666></td>
+					</tr>
+					<tr>
+						<td width=100% colspan=2 height=3 ></td>
+					</tr>
+					<tr>
+						<td width=100% colspan=2 height=1 bgcolor=#666></td>
+					</tr>
+				</table>
+	
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="15"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->	
+	
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td align="center"><font size="2"><b><u>년도별 선수기록</u></b></font></td>
+				  	</tr>
+				</table>
+	
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="15"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->		
+	
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td width="15%" >년도 :&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;2026&nbsp;&nbsp;&nbsp;</u></td>
+				  		<td width="50%" >대회 :&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;하나은행 K리그1&nbsp;&nbsp;&nbsp;</u></td>
+				  		<td width="15%" align="right">팀 :&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;부천&nbsp;&nbsp;&nbsp;</u></td>
+				  	</tr>
+				</table>
+				
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="20"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->		
+				
+				<!-- 험팀 -->
+				<button type="button" id="btnSearch" class="btn-primary btn-sm-print" onclick="goExcel()">Export</button>
+				<div class="sub-team-table">
+			<table id="playerDataTable" class="table table-overflowAuto tablesorter">
+				<thead>
+					<tr>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">년도</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">선수명</th>
+						<th width="40"  rowspan="2" align="center" class="bar_bottm_right">포지션</th>
+						<th width="40"  rowspan="2" align="center" class="bar_bottm_right">등번호</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">출전시간(분)</th> 
+						
+						<!-- 공격지표 -->
+						<th width="35"  rowspan="2" align="center" class="bar_bottm_right">득점</th>
+						<th width="35"  rowspan="2" align="center" class="bar_bottm_right">도움</th>
+						<th width="35"  rowspan="2" align="center" class="bar_bottm_right">슈팅</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">유효 슈팅</th>
+						<th width="60"  rowspan="2" align="center" class="bar_bottm_right">차단된슈팅</th>
+						<th width="60"  rowspan="2" align="center" class="bar_bottm_right">벗어난슈팅</th>
+						<th width="60"  rowspan="2" align="center" class="bar_bottm_right">PA내 슈팅</th>
+						<th width="60"  rowspan="2" align="center" class="bar_bottm_right">PA외 슈팅</th>
+						<th width="60"  rowspan="2" align="center" class="bar_bottm_right">오프사이드</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">프리킥</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">코너킥</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">스로인</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">드리블</th>
+						
+						<!-- 패스지표 -->
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">패스</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">키패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">전방 패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">후방 패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">횡패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">공격지역패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">수비지역패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">중앙지역패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">롱패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">중거리패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">숏패스</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">크로스</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">탈압박</th>
+						
+						<!-- 수비지표 -->
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">경합 지상</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">경합 공중</th>
+						<th width="120" colspan="3" align="center" class="bar_bottm_right">태클</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">클리어링</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">인터셉트</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">차단</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">획득</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">블락</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">볼미스</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">파울</th>
+						<th width="50"  rowspan="2" align="center" class="bar_bottm_right">피파울</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">경고</th>
+						<th width="30"  rowspan="2" align="center" class="bar_bottm_right">퇴장</th>
+					</tr>
+					<tr>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>
+						<th class="bar_bottm_right">시도</th>
+						<th class="bar_bottm_right">성공</th>
+						<th class="bar_bottm_right">성공%</th>																								
+					</tr>              
+				</thead>               
+				<tbody>
+				<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김찬영</td>
+								<td align="center" class="bar_bottm_right">GK</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김현엽</td>
+								<td align="center" class="bar_bottm_right">GK</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">1127</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">49</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">281</td>
+								<td align="center" class="bar_bottm_right">118</td>
+								<td align="center" class="bar_bottm_right">42.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">261</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">272</td>
+								<td align="center" class="bar_bottm_right">110</td>
+								<td align="center" class="bar_bottm_right">40.4</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">88.9</td>								
+								<td align="center" class="bar_bottm_right">237</td>
+								<td align="center" class="bar_bottm_right">75</td>
+								<td align="center" class="bar_bottm_right">31.6</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">96.6</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김형근</td>
+								<td align="center" class="bar_bottm_right">GK</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2080</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">61</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">518</td>
+								<td align="center" class="bar_bottm_right">246</td>
+								<td align="center" class="bar_bottm_right">47.5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">461</td>
+								<td align="center" class="bar_bottm_right">191</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">57</td>
+								<td align="center" class="bar_bottm_right">55</td>
+								<td align="center" class="bar_bottm_right">96.5</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">511</td>
+								<td align="center" class="bar_bottm_right">244</td>
+								<td align="center" class="bar_bottm_right">47.7</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">28.6</td>								
+								<td align="center" class="bar_bottm_right">388</td>
+								<td align="center" class="bar_bottm_right">119</td>
+								<td align="center" class="bar_bottm_right">30.7</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">70</td>
+								<td align="center" class="bar_bottm_right">98.6</td>
+								<td align="center" class="bar_bottm_right">59</td>
+								<td align="center" class="bar_bottm_right">57</td>
+								<td align="center" class="bar_bottm_right">96.6</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">97</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이상현</td>
+								<td align="center" class="bar_bottm_right">GK</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김종민</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">46</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">88.9</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">87.5</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">80.0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">400.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">백동규</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">2165</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">721</td>
+								<td align="center" class="bar_bottm_right">620</td>
+								<td align="center" class="bar_bottm_right">86.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">261</td>
+								<td align="center" class="bar_bottm_right">171</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">49</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">98.0</td>
+								<td align="center" class="bar_bottm_right">411</td>
+								<td align="center" class="bar_bottm_right">401</td>
+								<td align="center" class="bar_bottm_right">97.6</td>																
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">30.0</td>
+								<td align="center" class="bar_bottm_right">299</td>
+								<td align="center" class="bar_bottm_right">264</td>
+								<td align="center" class="bar_bottm_right">88.3</td>
+								<td align="center" class="bar_bottm_right">412</td>
+								<td align="center" class="bar_bottm_right">353</td>
+								<td align="center" class="bar_bottm_right">85.7</td>								
+								<td align="center" class="bar_bottm_right">106</td>
+								<td align="center" class="bar_bottm_right">53</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">345</td>
+								<td align="center" class="bar_bottm_right">314</td>
+								<td align="center" class="bar_bottm_right">91.0</td>
+								<td align="center" class="bar_bottm_right">270</td>
+								<td align="center" class="bar_bottm_right">253</td>
+								<td align="center" class="bar_bottm_right">93.7</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">55.9</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">43</td>
+								<td align="center" class="bar_bottm_right">126.5</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">22.7</td>
+								<td align="center" class="bar_bottm_right">133</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">99</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">1</td>																
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">신재원</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">77</td>
+								<td align="center" class="bar_bottm_right">837</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">45</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">223</td>
+								<td align="center" class="bar_bottm_right">177</td>
+								<td align="center" class="bar_bottm_right">79.4</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">104</td>
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">82.0</td>																
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">53</td>
+								<td align="center" class="bar_bottm_right">79.1</td>
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">72.2</td>
+								<td align="center" class="bar_bottm_right">120</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">81.7</td>								
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">65.0</td>
+								<td align="center" class="bar_bottm_right">90</td>
+								<td align="center" class="bar_bottm_right">62</td>
+								<td align="center" class="bar_bottm_right">68.9</td>
+								<td align="center" class="bar_bottm_right">113</td>
+								<td align="center" class="bar_bottm_right">102</td>
+								<td align="center" class="bar_bottm_right">90.3</td>																
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">15.8</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">75.0</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">275.0</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">27.3</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">45</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">6</td>																
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">안태현</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">2414</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">27.3</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">611</td>
+								<td align="center" class="bar_bottm_right">509</td>
+								<td align="center" class="bar_bottm_right">83.3</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">246</td>
+								<td align="center" class="bar_bottm_right">168</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">208</td>
+								<td align="center" class="bar_bottm_right">200</td>
+								<td align="center" class="bar_bottm_right">96.2</td>
+								<td align="center" class="bar_bottm_right">157</td>
+								<td align="center" class="bar_bottm_right">141</td>
+								<td align="center" class="bar_bottm_right">89.8</td>																
+								<td align="center" class="bar_bottm_right">175</td>
+								<td align="center" class="bar_bottm_right">151</td>
+								<td align="center" class="bar_bottm_right">86.3</td>
+								<td align="center" class="bar_bottm_right">126</td>
+								<td align="center" class="bar_bottm_right">94</td>
+								<td align="center" class="bar_bottm_right">74.6</td>
+								<td align="center" class="bar_bottm_right">310</td>
+								<td align="center" class="bar_bottm_right">264</td>
+								<td align="center" class="bar_bottm_right">85.2</td>								
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">62.9</td>
+								<td align="center" class="bar_bottm_right">145</td>
+								<td align="center" class="bar_bottm_right">115</td>
+								<td align="center" class="bar_bottm_right">79.3</td>
+								<td align="center" class="bar_bottm_right">431</td>
+								<td align="center" class="bar_bottm_right">372</td>
+								<td align="center" class="bar_bottm_right">86.3</td>																
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">30.6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">41.4</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">79.3</td>
+								<td align="center" class="bar_bottm_right">65</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">21.5</td>
+								<td align="center" class="bar_bottm_right">68</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">154</td>
+								<td align="center" class="bar_bottm_right">42</td>
+								<td align="center" class="bar_bottm_right">11</td>																
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">유승현</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">66</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이상혁</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">65</td>
+								<td align="center" class="bar_bottm_right">110</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">40</td>
+								<td align="center" class="bar_bottm_right">90.9</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">90.0</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">91.7</td>								
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">95.7</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">300.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이예찬</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이재원</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">310</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">133</td>
+								<td align="center" class="bar_bottm_right">106</td>
+								<td align="center" class="bar_bottm_right">79.7</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">62</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">91.7</td>
+								<td align="center" class="bar_bottm_right">47</td>
+								<td align="center" class="bar_bottm_right">43</td>
+								<td align="center" class="bar_bottm_right">91.5</td>																
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">63.6</td>
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">73.3</td>
+								<td align="center" class="bar_bottm_right">92</td>
+								<td align="center" class="bar_bottm_right">77</td>
+								<td align="center" class="bar_bottm_right">83.7</td>								
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">37.5</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">82.9</td>
+								<td align="center" class="bar_bottm_right">76</td>
+								<td align="center" class="bar_bottm_right">66</td>
+								<td align="center" class="bar_bottm_right">86.8</td>																
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">166.7</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>																
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">정호진</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">1438</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">80</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">66.7</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">605</td>
+								<td align="center" class="bar_bottm_right">499</td>
+								<td align="center" class="bar_bottm_right">82.5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">310</td>
+								<td align="center" class="bar_bottm_right">209</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">104</td>
+								<td align="center" class="bar_bottm_right">104</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">191</td>
+								<td align="center" class="bar_bottm_right">186</td>
+								<td align="center" class="bar_bottm_right">97.4</td>																
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">78.4</td>
+								<td align="center" class="bar_bottm_right">194</td>
+								<td align="center" class="bar_bottm_right">149</td>
+								<td align="center" class="bar_bottm_right">76.8</td>
+								<td align="center" class="bar_bottm_right">374</td>
+								<td align="center" class="bar_bottm_right">321</td>
+								<td align="center" class="bar_bottm_right">85.8</td>								
+								<td align="center" class="bar_bottm_right">68</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">57.4</td>
+								<td align="center" class="bar_bottm_right">245</td>
+								<td align="center" class="bar_bottm_right">196</td>
+								<td align="center" class="bar_bottm_right">80.0</td>
+								<td align="center" class="bar_bottm_right">292</td>
+								<td align="center" class="bar_bottm_right">264</td>
+								<td align="center" class="bar_bottm_right">90.4</td>																
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">52.6</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">136.8</td>
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">35.3</td>
+								<td align="center" class="bar_bottm_right">53</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">97</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">4</td>																
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">조성준</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">83</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">95.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">75.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">100.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">85.7</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">100.0</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">티아깅요</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">1878</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">53</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">35.7</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">449</td>
+								<td align="center" class="bar_bottm_right">328</td>
+								<td align="center" class="bar_bottm_right">73.1</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">170</td>
+								<td align="center" class="bar_bottm_right">82</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">156</td>
+								<td align="center" class="bar_bottm_right">149</td>
+								<td align="center" class="bar_bottm_right">95.5</td>
+								<td align="center" class="bar_bottm_right">123</td>
+								<td align="center" class="bar_bottm_right">97</td>
+								<td align="center" class="bar_bottm_right">78.9</td>																
+								<td align="center" class="bar_bottm_right">151</td>
+								<td align="center" class="bar_bottm_right">115</td>
+								<td align="center" class="bar_bottm_right">76.2</td>
+								<td align="center" class="bar_bottm_right">94</td>
+								<td align="center" class="bar_bottm_right">55</td>
+								<td align="center" class="bar_bottm_right">58.5</td>
+								<td align="center" class="bar_bottm_right">204</td>
+								<td align="center" class="bar_bottm_right">158</td>
+								<td align="center" class="bar_bottm_right">77.5</td>								
+								<td align="center" class="bar_bottm_right">56</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">46.4</td>
+								<td align="center" class="bar_bottm_right">117</td>
+								<td align="center" class="bar_bottm_right">85</td>
+								<td align="center" class="bar_bottm_right">72.6</td>
+								<td align="center" class="bar_bottm_right">276</td>
+								<td align="center" class="bar_bottm_right">217</td>
+								<td align="center" class="bar_bottm_right">78.6</td>																
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">23.1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">35.7</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">78.6</td>
+								<td align="center" class="bar_bottm_right">51</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">25.5</td>
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">119</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">9</td>																
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">패트릭</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2534</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">51</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">25.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">901</td>
+								<td align="center" class="bar_bottm_right">696</td>
+								<td align="center" class="bar_bottm_right">77.2</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">503</td>
+								<td align="center" class="bar_bottm_right">312</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">84</td>
+								<td align="center" class="bar_bottm_right">84</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">314</td>
+								<td align="center" class="bar_bottm_right">300</td>
+								<td align="center" class="bar_bottm_right">95.5</td>																
+								<td align="center" class="bar_bottm_right">49</td>
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">71.4</td>
+								<td align="center" class="bar_bottm_right">334</td>
+								<td align="center" class="bar_bottm_right">239</td>
+								<td align="center" class="bar_bottm_right">71.6</td>
+								<td align="center" class="bar_bottm_right">518</td>
+								<td align="center" class="bar_bottm_right">422</td>
+								<td align="center" class="bar_bottm_right">81.5</td>								
+								<td align="center" class="bar_bottm_right">182</td>
+								<td align="center" class="bar_bottm_right">85</td>
+								<td align="center" class="bar_bottm_right">46.7</td>
+								<td align="center" class="bar_bottm_right">375</td>
+								<td align="center" class="bar_bottm_right">301</td>
+								<td align="center" class="bar_bottm_right">80.3</td>
+								<td align="center" class="bar_bottm_right">344</td>
+								<td align="center" class="bar_bottm_right">310</td>
+								<td align="center" class="bar_bottm_right">90.1</td>																
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">64.9</td>
+								<td align="center" class="bar_bottm_right">107</td>
+								<td align="center" class="bar_bottm_right">68</td>
+								<td align="center" class="bar_bottm_right">183.8</td>
+								<td align="center" class="bar_bottm_right">47</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">34.0</td>
+								<td align="center" class="bar_bottm_right">137</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">168</td>
+								<td align="center" class="bar_bottm_right">54</td>
+								<td align="center" class="bar_bottm_right">7</td>																
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">홍성욱</td>
+								<td align="center" class="bar_bottm_right">DF</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">3105</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">100</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">1,183</td>
+								<td align="center" class="bar_bottm_right">988</td>
+								<td align="center" class="bar_bottm_right">83.5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">619</td>
+								<td align="center" class="bar_bottm_right">446</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">174</td>
+								<td align="center" class="bar_bottm_right">173</td>
+								<td align="center" class="bar_bottm_right">99.4</td>
+								<td align="center" class="bar_bottm_right">390</td>
+								<td align="center" class="bar_bottm_right">369</td>
+								<td align="center" class="bar_bottm_right">94.6</td>																
+								<td align="center" class="bar_bottm_right">78</td>
+								<td align="center" class="bar_bottm_right">56</td>
+								<td align="center" class="bar_bottm_right">71.8</td>
+								<td align="center" class="bar_bottm_right">387</td>
+								<td align="center" class="bar_bottm_right">305</td>
+								<td align="center" class="bar_bottm_right">78.8</td>
+								<td align="center" class="bar_bottm_right">718</td>
+								<td align="center" class="bar_bottm_right">627</td>
+								<td align="center" class="bar_bottm_right">87.3</td>								
+								<td align="center" class="bar_bottm_right">103</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">48.5</td>
+								<td align="center" class="bar_bottm_right">509</td>
+								<td align="center" class="bar_bottm_right">419</td>
+								<td align="center" class="bar_bottm_right">82.3</td>
+								<td align="center" class="bar_bottm_right">571</td>
+								<td align="center" class="bar_bottm_right">519</td>
+								<td align="center" class="bar_bottm_right">90.9</td>																
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">12.5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">47.2</td>
+								<td align="center" class="bar_bottm_right">143</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">258.3</td>
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">22.7</td>
+								<td align="center" class="bar_bottm_right">203</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">176</td>
+								<td align="center" class="bar_bottm_right">61</td>
+								<td align="center" class="bar_bottm_right">7</td>																
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김동현</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">481</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">132</td>
+								<td align="center" class="bar_bottm_right">112</td>
+								<td align="center" class="bar_bottm_right">84.8</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">53</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">93.5</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">42</td>
+								<td align="center" class="bar_bottm_right">87.5</td>																
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">32</td>
+								<td align="center" class="bar_bottm_right">82.1</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">64.3</td>
+								<td align="center" class="bar_bottm_right">79</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">89.9</td>								
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">42.9</td>
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">87.9</td>
+								<td align="center" class="bar_bottm_right">92</td>
+								<td align="center" class="bar_bottm_right">80</td>
+								<td align="center" class="bar_bottm_right">87.0</td>																
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>																
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김상준</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">1990</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">57.1</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">697</td>
+								<td align="center" class="bar_bottm_right">583</td>
+								<td align="center" class="bar_bottm_right">83.6</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">283</td>
+								<td align="center" class="bar_bottm_right">190</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">140</td>
+								<td align="center" class="bar_bottm_right">140</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">274</td>
+								<td align="center" class="bar_bottm_right">253</td>
+								<td align="center" class="bar_bottm_right">92.3</td>																
+								<td align="center" class="bar_bottm_right">76</td>
+								<td align="center" class="bar_bottm_right">63</td>
+								<td align="center" class="bar_bottm_right">82.9</td>
+								<td align="center" class="bar_bottm_right">126</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">77.8</td>
+								<td align="center" class="bar_bottm_right">495</td>
+								<td align="center" class="bar_bottm_right">422</td>
+								<td align="center" class="bar_bottm_right">85.3</td>								
+								<td align="center" class="bar_bottm_right">104</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">68.3</td>
+								<td align="center" class="bar_bottm_right">226</td>
+								<td align="center" class="bar_bottm_right">193</td>
+								<td align="center" class="bar_bottm_right">85.4</td>
+								<td align="center" class="bar_bottm_right">367</td>
+								<td align="center" class="bar_bottm_right">319</td>
+								<td align="center" class="bar_bottm_right">86.9</td>																
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">42.9</td>
+								<td align="center" class="bar_bottm_right">68</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">221.4</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">20.8</td>
+								<td align="center" class="bar_bottm_right">60</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">145</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">12</td>																
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김종우</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">1080</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">66.7</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">418</td>
+								<td align="center" class="bar_bottm_right">368</td>
+								<td align="center" class="bar_bottm_right">88.0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">139</td>
+								<td align="center" class="bar_bottm_right">106</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">133</td>
+								<td align="center" class="bar_bottm_right">126</td>
+								<td align="center" class="bar_bottm_right">94.7</td>
+								<td align="center" class="bar_bottm_right">146</td>
+								<td align="center" class="bar_bottm_right">136</td>
+								<td align="center" class="bar_bottm_right">93.2</td>																
+								<td align="center" class="bar_bottm_right">82</td>
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">84.1</td>
+								<td align="center" class="bar_bottm_right">82</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">86.6</td>
+								<td align="center" class="bar_bottm_right">254</td>
+								<td align="center" class="bar_bottm_right">228</td>
+								<td align="center" class="bar_bottm_right">89.8</td>								
+								<td align="center" class="bar_bottm_right">32</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">81.2</td>
+								<td align="center" class="bar_bottm_right">127</td>
+								<td align="center" class="bar_bottm_right">111</td>
+								<td align="center" class="bar_bottm_right">87.4</td>
+								<td align="center" class="bar_bottm_right">259</td>
+								<td align="center" class="bar_bottm_right">231</td>
+								<td align="center" class="bar_bottm_right">89.2</td>																
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">40.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">55.6</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">22.0</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">82</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">5</td>																
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">성신</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">155</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">79.4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">90.0</td>																
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">62.5</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">80.0</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">85.7</td>								
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">70.0</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">78.9</td>																
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">성예건</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">876</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">280</td>
+								<td align="center" class="bar_bottm_right">219</td>
+								<td align="center" class="bar_bottm_right">78.2</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">115</td>
+								<td align="center" class="bar_bottm_right">64</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">72</td>
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">95.8</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">86</td>
+								<td align="center" class="bar_bottm_right">92.5</td>																
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">83.8</td>
+								<td align="center" class="bar_bottm_right">59</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">69.5</td>
+								<td align="center" class="bar_bottm_right">184</td>
+								<td align="center" class="bar_bottm_right">147</td>
+								<td align="center" class="bar_bottm_right">79.9</td>								
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">43.5</td>
+								<td align="center" class="bar_bottm_right">83</td>
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">83.1</td>
+								<td align="center" class="bar_bottm_right">174</td>
+								<td align="center" class="bar_bottm_right">140</td>
+								<td align="center" class="bar_bottm_right">80.5</td>																
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">42.9</td>
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">200.0</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">28.0</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">79</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">7</td>																
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">여봉훈</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">388</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">75</td>
+								<td align="center" class="bar_bottm_right">61</td>
+								<td align="center" class="bar_bottm_right">81.3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">89.5</td>																
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">87.5</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">64.3</td>
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">83.8</td>								
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">81.8</td>
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">40</td>
+								<td align="center" class="bar_bottm_right">90.9</td>																
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">75.0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">16.7</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">2</td>																
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">윤빛가람</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1193</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">522</td>
+								<td align="center" class="bar_bottm_right">462</td>
+								<td align="center" class="bar_bottm_right">88.5</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">175</td>
+								<td align="center" class="bar_bottm_right">126</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">161</td>
+								<td align="center" class="bar_bottm_right">159</td>
+								<td align="center" class="bar_bottm_right">98.8</td>
+								<td align="center" class="bar_bottm_right">186</td>
+								<td align="center" class="bar_bottm_right">177</td>
+								<td align="center" class="bar_bottm_right">95.2</td>																
+								<td align="center" class="bar_bottm_right">82</td>
+								<td align="center" class="bar_bottm_right">73</td>
+								<td align="center" class="bar_bottm_right">89.0</td>
+								<td align="center" class="bar_bottm_right">62</td>
+								<td align="center" class="bar_bottm_right">52</td>
+								<td align="center" class="bar_bottm_right">83.9</td>
+								<td align="center" class="bar_bottm_right">378</td>
+								<td align="center" class="bar_bottm_right">337</td>
+								<td align="center" class="bar_bottm_right">89.2</td>								
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">69.2</td>
+								<td align="center" class="bar_bottm_right">177</td>
+								<td align="center" class="bar_bottm_right">161</td>
+								<td align="center" class="bar_bottm_right">91.0</td>
+								<td align="center" class="bar_bottm_right">306</td>
+								<td align="center" class="bar_bottm_right">274</td>
+								<td align="center" class="bar_bottm_right">89.5</td>																
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">23.8</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">60.0</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">180.0</td>
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">18.2</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">101</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">7</td>																
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">최원철</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">카즈</td>
+								<td align="center" class="bar_bottm_right">MF</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">1293</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">40.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">538</td>
+								<td align="center" class="bar_bottm_right">467</td>
+								<td align="center" class="bar_bottm_right">86.8</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">210</td>
+								<td align="center" class="bar_bottm_right">151</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">95</td>
+								<td align="center" class="bar_bottm_right">95</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">233</td>
+								<td align="center" class="bar_bottm_right">221</td>
+								<td align="center" class="bar_bottm_right">94.8</td>																
+								<td align="center" class="bar_bottm_right">70</td>
+								<td align="center" class="bar_bottm_right">65</td>
+								<td align="center" class="bar_bottm_right">92.9</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">80</td>
+								<td align="center" class="bar_bottm_right">81.6</td>
+								<td align="center" class="bar_bottm_right">370</td>
+								<td align="center" class="bar_bottm_right">322</td>
+								<td align="center" class="bar_bottm_right">87.0</td>								
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">47</td>
+								<td align="center" class="bar_bottm_right">70.1</td>
+								<td align="center" class="bar_bottm_right">191</td>
+								<td align="center" class="bar_bottm_right">172</td>
+								<td align="center" class="bar_bottm_right">90.1</td>
+								<td align="center" class="bar_bottm_right">280</td>
+								<td align="center" class="bar_bottm_right">248</td>
+								<td align="center" class="bar_bottm_right">88.6</td>																
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">150.0</td>
+								<td align="center" class="bar_bottm_right">47</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">25.5</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">127</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">6</td>																
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">가브리엘</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">63</td>
+								<td align="center" class="bar_bottm_right">1220</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">42.9</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">95</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">52.6</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">47</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">80.0</td>
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">63.6</td>																
+								<td align="center" class="bar_bottm_right">42</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">66.7</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">60.0</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">39.6</td>								
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">75.0</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">53.6</td>
+								<td align="center" class="bar_bottm_right">63</td>
+								<td align="center" class="bar_bottm_right">32</td>
+								<td align="center" class="bar_bottm_right">50.8</td>																
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">49</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">44.9</td>
+								<td align="center" class="bar_bottm_right">123</td>
+								<td align="center" class="bar_bottm_right">54</td>
+								<td align="center" class="bar_bottm_right">110.2</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">12</td>																
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">갈레고</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">2744</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">78</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">45</td>
+								<td align="center" class="bar_bottm_right">52</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">40.4</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">580</td>
+								<td align="center" class="bar_bottm_right">445</td>
+								<td align="center" class="bar_bottm_right">76.7</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">195</td>
+								<td align="center" class="bar_bottm_right">113</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">202</td>
+								<td align="center" class="bar_bottm_right">191</td>
+								<td align="center" class="bar_bottm_right">94.6</td>
+								<td align="center" class="bar_bottm_right">183</td>
+								<td align="center" class="bar_bottm_right">141</td>
+								<td align="center" class="bar_bottm_right">77.0</td>																
+								<td align="center" class="bar_bottm_right">239</td>
+								<td align="center" class="bar_bottm_right">190</td>
+								<td align="center" class="bar_bottm_right">79.5</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">44</td>
+								<td align="center" class="bar_bottm_right">62.0</td>
+								<td align="center" class="bar_bottm_right">270</td>
+								<td align="center" class="bar_bottm_right">211</td>
+								<td align="center" class="bar_bottm_right">78.1</td>								
+								<td align="center" class="bar_bottm_right">46</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">60.9</td>
+								<td align="center" class="bar_bottm_right">168</td>
+								<td align="center" class="bar_bottm_right">122</td>
+								<td align="center" class="bar_bottm_right">72.6</td>
+								<td align="center" class="bar_bottm_right">366</td>
+								<td align="center" class="bar_bottm_right">295</td>
+								<td align="center" class="bar_bottm_right">80.6</td>																
+								<td align="center" class="bar_bottm_right">112</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">18.8</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">43.8</td>
+								<td align="center" class="bar_bottm_right">59</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">118.8</td>
+								<td align="center" class="bar_bottm_right">77</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">20.8</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">179</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">27</td>																
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">42</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">구스타보</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">99</td>
+								<td align="center" class="bar_bottm_right">479</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">45</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">57.8</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">78.6</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">42.9</td>																
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">31.2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">71.4</td>								
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">34</td>
+								<td align="center" class="bar_bottm_right">21</td>
+								<td align="center" class="bar_bottm_right">61.8</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">60.0</td>
+								<td align="center" class="bar_bottm_right">76</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">290.0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>																
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김민준</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">884</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">177</td>
+								<td align="center" class="bar_bottm_right">141</td>
+								<td align="center" class="bar_bottm_right">79.7</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">72</td>
+								<td align="center" class="bar_bottm_right">46</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">97.1</td>
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">77.8</td>																
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">55</td>
+								<td align="center" class="bar_bottm_right">82.1</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">82.6</td>
+								<td align="center" class="bar_bottm_right">87</td>
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">77.0</td>								
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">56.7</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">79.5</td>
+								<td align="center" class="bar_bottm_right">108</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">86.1</td>																
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">17.1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">25.0</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">13.3</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">49</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">5</td>																
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">김승빈</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">71</td>
+								<td align="center" class="bar_bottm_right">766</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">12.5</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">245</td>
+								<td align="center" class="bar_bottm_right">202</td>
+								<td align="center" class="bar_bottm_right">82.4</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">93</td>
+								<td align="center" class="bar_bottm_right">66</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">72</td>
+								<td align="center" class="bar_bottm_right">69</td>
+								<td align="center" class="bar_bottm_right">95.8</td>
+								<td align="center" class="bar_bottm_right">80</td>
+								<td align="center" class="bar_bottm_right">67</td>
+								<td align="center" class="bar_bottm_right">83.8</td>																
+								<td align="center" class="bar_bottm_right">81</td>
+								<td align="center" class="bar_bottm_right">64</td>
+								<td align="center" class="bar_bottm_right">79.0</td>
+								<td align="center" class="bar_bottm_right">40</td>
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">90.0</td>
+								<td align="center" class="bar_bottm_right">124</td>
+								<td align="center" class="bar_bottm_right">102</td>
+								<td align="center" class="bar_bottm_right">82.3</td>								
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">65.2</td>
+								<td align="center" class="bar_bottm_right">52</td>
+								<td align="center" class="bar_bottm_right">46</td>
+								<td align="center" class="bar_bottm_right">88.5</td>
+								<td align="center" class="bar_bottm_right">170</td>
+								<td align="center" class="bar_bottm_right">141</td>
+								<td align="center" class="bar_bottm_right">82.9</td>																
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">30.8</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">75.0</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">175.0</td>
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">63</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">3</td>																
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">몬타뇨</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">645</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">12.5</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">94</td>
+								<td align="center" class="bar_bottm_right">73</td>
+								<td align="center" class="bar_bottm_right">77.7</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">15</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">87.9</td>
+								<td align="center" class="bar_bottm_right">37</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">78.4</td>																
+								<td align="center" class="bar_bottm_right">33</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">81.8</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">63.6</td>
+								<td align="center" class="bar_bottm_right">50</td>
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">78.0</td>								
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">71.4</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">82.4</td>
+								<td align="center" class="bar_bottm_right">70</td>
+								<td align="center" class="bar_bottm_right">54</td>
+								<td align="center" class="bar_bottm_right">77.1</td>																
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">54.5</td>
+								<td align="center" class="bar_bottm_right">61</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">77.3</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">36.4</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">7</td>																
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">바사니</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">1587</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">31</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">46</td>
+								<td align="center" class="bar_bottm_right">66</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">359</td>
+								<td align="center" class="bar_bottm_right">291</td>
+								<td align="center" class="bar_bottm_right">81.1</td>
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">153</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">101</td>
+								<td align="center" class="bar_bottm_right">95</td>
+								<td align="center" class="bar_bottm_right">94.1</td>
+								<td align="center" class="bar_bottm_right">105</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">93.3</td>																
+								<td align="center" class="bar_bottm_right">135</td>
+								<td align="center" class="bar_bottm_right">111</td>
+								<td align="center" class="bar_bottm_right">82.2</td>
+								<td align="center" class="bar_bottm_right">32</td>
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">71.9</td>
+								<td align="center" class="bar_bottm_right">192</td>
+								<td align="center" class="bar_bottm_right">157</td>
+								<td align="center" class="bar_bottm_right">81.8</td>								
+								<td align="center" class="bar_bottm_right">39</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">66.7</td>
+								<td align="center" class="bar_bottm_right">91</td>
+								<td align="center" class="bar_bottm_right">72</td>
+								<td align="center" class="bar_bottm_right">79.1</td>
+								<td align="center" class="bar_bottm_right">229</td>
+								<td align="center" class="bar_bottm_right">193</td>
+								<td align="center" class="bar_bottm_right">84.3</td>																
+								<td align="center" class="bar_bottm_right">107</td>
+								<td align="center" class="bar_bottm_right">24</td>
+								<td align="center" class="bar_bottm_right">22.4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">52.0</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">28.0</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">34.2</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">5</td>																
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">박정인</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">253</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">23</td>
+								<td align="center" class="bar_bottm_right">17</td>
+								<td align="center" class="bar_bottm_right">73.9</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">70.0</td>																
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">88.9</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">100.0</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">54.5</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">80.0</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">13</td>
+								<td align="center" class="bar_bottm_right">72.2</td>																
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">125.0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">11</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>																
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">어담</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이의형</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">18</td>
+								<td align="center" class="bar_bottm_right">546</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">7</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">98</td>
+								<td align="center" class="bar_bottm_right">70</td>
+								<td align="center" class="bar_bottm_right">71.4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">38</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">28</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">92.9</td>
+								<td align="center" class="bar_bottm_right">32</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">78.1</td>																
+								<td align="center" class="bar_bottm_right">40</td>
+								<td align="center" class="bar_bottm_right">25</td>
+								<td align="center" class="bar_bottm_right">62.5</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">66.7</td>
+								<td align="center" class="bar_bottm_right">52</td>
+								<td align="center" class="bar_bottm_right">41</td>
+								<td align="center" class="bar_bottm_right">78.8</td>								
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">70.0</td>
+								<td align="center" class="bar_bottm_right">75</td>
+								<td align="center" class="bar_bottm_right">55</td>
+								<td align="center" class="bar_bottm_right">73.3</td>																
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">200.0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">4</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">6</td>																
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">이충현</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">30</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>																
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						<tr>
+								<td align="center" class="bar_bottm_right">2026</td>
+								<td align="center" class="bar_bottm_right">한지호</td>
+								<td align="center" class="bar_bottm_right">FW</td>
+								<td align="center" class="bar_bottm_right">22</td>
+								<td align="center" class="bar_bottm_right">463</td>
+								<!-- 공격지표 -->
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								
+								<!-- 패스지표 -->
+								<td align="center" class="bar_bottm_right">81</td>
+								<td align="center" class="bar_bottm_right">63</td>
+								<td align="center" class="bar_bottm_right">77.8</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">26</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">0.0</td>								
+								<td align="center" class="bar_bottm_right">36</td>
+								<td align="center" class="bar_bottm_right">35</td>
+								<td align="center" class="bar_bottm_right">97.2</td>
+								<td align="center" class="bar_bottm_right">19</td>
+								<td align="center" class="bar_bottm_right">14</td>
+								<td align="center" class="bar_bottm_right">73.7</td>																
+								<td align="center" class="bar_bottm_right">27</td>
+								<td align="center" class="bar_bottm_right">20</td>
+								<td align="center" class="bar_bottm_right">74.1</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">50.0</td>
+								<td align="center" class="bar_bottm_right">48</td>
+								<td align="center" class="bar_bottm_right">40</td>
+								<td align="center" class="bar_bottm_right">83.3</td>								
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">60.0</td>
+								<td align="center" class="bar_bottm_right">16</td>
+								<td align="center" class="bar_bottm_right">9</td>
+								<td align="center" class="bar_bottm_right">56.2</td>
+								<td align="center" class="bar_bottm_right">60</td>
+								<td align="center" class="bar_bottm_right">51</td>
+								<td align="center" class="bar_bottm_right">85.0</td>																
+								<td align="center" class="bar_bottm_right">10</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">30.0</td>
+								<td align="center" class="bar_bottm_right">0</td>
+								
+								<!-- 수비지표 -->
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">33.3</td>
+								<td align="center" class="bar_bottm_right">29</td>
+								<td align="center" class="bar_bottm_right">6</td>
+								<td align="center" class="bar_bottm_right">200.0</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">20.0</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">1</td>
+								<td align="center" class="bar_bottm_right">3</td>
+								<td align="center" class="bar_bottm_right">12</td>
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">5</td>																
+								<td align="center" class="bar_bottm_right">5</td>
+								<td align="center" class="bar_bottm_right">8</td>
+								<td align="center" class="bar_bottm_right">2</td>
+								<td align="center" class="bar_bottm_right">0</td>
+							</tr>							
+						</tbody>
+			</table>
+			<table class="table table-overflowAuto">
+				<tr>
+							<td width="230" align="center" colspan="5" class="bar_bottm_right bg-eblue red">합계</td>
+							<!-- 공격지표 -->
+							<td width="35" align="center"  class="bar_bottm_right bg-eblue red">29</td>
+							<td width="35" align="center"  class="bar_bottm_right bg-eblue red">23</td>
+							<td width="35" align="center"  class="bar_bottm_right bg-eblue red">295</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">106</td>
+							<td width="60" align="center"  class="bar_bottm_right bg-eblue red">49</td>
+							<td width="60" align="center"  class="bar_bottm_right bg-eblue red">137</td>
+							<td width="60" align="center"  class="bar_bottm_right bg-eblue red">161</td>
+							<td width="60" align="center"  class="bar_bottm_right bg-eblue red">131</td>
+							<td width="60" align="center"  class="bar_bottm_right bg-eblue red">28</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">390</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">115</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">531</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">184</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">65</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">35.3</td>
+							
+							<!-- 패스지표 -->
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">10,192</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">8,031</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">78.8</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">188</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">4,718</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,914</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">0.0</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,127</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,059</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">96.8</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">3,347</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">3,058</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">91.4</td>														
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">1,689</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">1,344</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">79.6</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,963</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,035</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">68.7</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">5,540</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">4,652</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">84.0</td>							
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">1,662</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">783</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">47.1</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">3,316</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">2,746</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">82.8</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">5,214</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">4,502</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">86.3</td>														
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">484</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">104</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">0.0</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">0</td>
+							
+							<!-- 수비지표 -->
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">374</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">184</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">0.0</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">1,166</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">526</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">0.0</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">721</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">170</td>
+							<td width="36" align="center"  class="bar_bottm_right bg-eblue red">0.0</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">973</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">280</td>
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">428</td>
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">2,112</td>
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">513</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">166</td>														
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">362</td>
+							<td width="50" align="center"  class="bar_bottm_right bg-eblue red">344</td>
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">67</td>
+							<td width="30" align="center"  class="bar_bottm_right bg-eblue red">1</td>
+						</tr>
+					</table>				
+					</div>
+	
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="13"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->			
+	
+				<!-- 빈칸 -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+				  		<td height="15"></td>
+					</tr>
+				</table>
+				<!-- 빈칸 끝 -->			
+	<!--여기까지 테두리 테이블 끝-->
+			</td>
+		</tr>
+	</table>
+</center>
+</body>
+</html>

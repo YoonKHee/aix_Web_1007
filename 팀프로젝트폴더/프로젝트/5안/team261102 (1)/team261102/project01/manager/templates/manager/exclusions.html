@@ -1,0 +1,30 @@
+{% extends 'manager/base.html' %}
+{% block title %}제외 선수{% endblock %}
+{% block content %}
+<h1>BEST11 제외 선수</h1>
+{% if not initialized %}
+<div class="box"><p>지금은 <code>player/services.py</code> 의 <code>EXCLUDED_PLAYER_IDS</code> (아래 목록)를 쓰고 있습니다. 이 화면에서 관리하려면 한 번 DB로 가져와야 합니다. 가져온 뒤에는 services.py 의 목록은 무시됩니다.</p>
+<form method="post">{% csrf_token %}<button name="action" value="init">기존 목록 가져오기</button></form></div>
+{% endif %}
+<h3>현재 제외 중 ({{ current|length }}명)</h3>
+<table><tr><th>선수</th><th>사유</th><th></th></tr>
+{% for x in current %}<tr><td>{{ x.snapshot }}{% if x.player.id %} <small>(id {{ x.player.id }})</small>{% endif %}</td><td>{{ x.reason|default:"-" }}</td>
+ <td>{% if initialized and x.pk %}<form method="post" style="display:inline">{% csrf_token %}<input type="hidden" name="pk" value="{{ x.pk }}"><button name="action" value="remove" style="background:#6e7781">해제</button></form>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="3">없음</td></tr>{% endfor %}</table>
+
+{% if initialized %}
+<h3>선수 추가</h3>
+<form method="get"><input name="q" value="{{ q }}" placeholder="선수 이름 검색"> <button>검색</button></form>
+{% if q %}<table><tr><th>선수</th><th>사유</th><th></th></tr>
+{% for p in found %}<tr><td><form id="f{{ p.id }}" method="post">{% csrf_token %}<input type="hidden" name="player" value="{{ p.id }}"></form>{{ p.team.team_name }} {{ p.name }} <small>({{ p.position }}, id {{ p.id }})</small></td>
+ <td><input form="f{{ p.id }}" name="reason" placeholder="사유" size="30"></td>
+ <td><button form="f{{ p.id }}" name="action" value="add">제외</button></td></tr>
+{% empty %}<tr><td colspan="3">검색 결과 없음</td></tr>{% endfor %}</table>{% endif %}
+
+<h3>의심 목록 <small>2026 기록은 있지만 생년월일과 사진이 모두 없는 선수</small></h3>
+<table><tr><th>선수</th><th></th></tr>
+{% for p in suspects %}<tr><td>{{ p.team.team_name }} {{ p.name }} <small>({{ p.position }})</small></td>
+ <td><form method="post" style="display:inline">{% csrf_token %}<input type="hidden" name="player" value="{{ p.id }}"><input type="hidden" name="reason" value="임시 데이터 의심(생년월일·사진 없음)"><button name="action" value="add">제외</button></form></td></tr>
+{% empty %}<tr><td colspan="2">없음</td></tr>{% endfor %}</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>선수 움직임 분석 데모</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #10251c;
+      color: #fff;
+      font-family: "Malgun Gothic", sans-serif;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 26px;
+    }
+
+    .notice {
+      padding: 14px;
+      background: #493b16;
+      border: 1px solid #e7bd48;
+      border-radius: 10px;
+      line-height: 1.7;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    button, select {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 0;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      background: #ffce32;
+      color: #17251b;
+      font-weight: bold;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    #eventText {
+      padding: 16px;
+      background: #1d3b2d;
+      border-radius: 10px;
+      min-height: 24px;
+    }
+
+    .legend {
+      line-height: 1.8;
+      color: #d0dfd6;
+    }
+  </style>
+</head>
+
+<body>
+<main>
+  <h1>⚽ 선수 움직임 분석 데모</h1>
+
+  <p class="notice">
+    가상 데이터입니다. 실제 선수의 움직임이나 경기력이 아닙니다.<br>
+    홈팀 공격 방향: 왼쪽 → 오른쪽
+  </p>
+
+  <canvas
+    id="pitch"
+    width="1150"
+    height="780"
+    aria-label="가상 선수 22명과 공의 위치"
+  ></canvas>
+
+  <div class="controls">
+    <button id="playButton" type="button">▶ 재생</button>
+    <button id="resetButton" type="button">처음으로</button>
+
+    <label>
+      속도
+      <select id="speed">
+        <option value="0.5">0.5배</option>
+        <option value="1" selected>1배</option>
+        <option value="2">2배</option>
+        <option value="4">4배</option>
+      </select>
+    </label>
+
+    <input
+      id="timeline"
+      type="range"
+      min="0"
+      max="60"
+      step="0.1"
+      value="0"
+      aria-label="재생 위치"
+    >
+
+    <span id="timeText">00:00 / 01:00</span>
+  </div>
+
+  <p class="legend">
+    🔴 홈팀　🔵 원정팀　⚪ 공<br>
+    선수 안의 숫자는 등번호, 아래 글자는 세부 포지션입니다.
+    노란 선은 진행 중인 패스입니다.
+  </p>
+
+  <div id="eventText" aria-live="polite">
+    재생하면 패스 이벤트가 표시됩니다.
+  </div>
+
+  {{ demo_data|json_script:"tracking-data" }}
+  <script src="{% static 'player/tracking_demo.js' %}"></script>
+</main>
+</body>
+</html>
