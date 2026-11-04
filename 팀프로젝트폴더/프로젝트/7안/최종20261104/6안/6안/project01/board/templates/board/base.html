@@ -1,0 +1,18 @@
+{% load static board_tags %}<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}자유게시판{% endblock %} · 감독? 내가한다!</title>
+<link rel="stylesheet" href="{% static 'board/board.css' %}">
+{% include 'shared/site_assets.html' %}
+</head>
+<body class="site-shell">
+{% include 'shared/site_header.html' with active='board' %}
+
+{% if messages %}<div class="flash">{% for m in messages %}<div class="{{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+<main class="bd-wrap">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

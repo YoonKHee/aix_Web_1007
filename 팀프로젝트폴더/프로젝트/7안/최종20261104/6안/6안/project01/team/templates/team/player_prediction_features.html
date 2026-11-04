@@ -1,0 +1,49 @@
+{% if prediction and player_features %}
+  <section>
+    <h2>선수 기록 기반 전력 비교</h2>
+
+    {% if player_features.available %}
+      <p>
+        현재 DB 기록으로 선정한
+        {{ player_features.formation }} BEST11 기준입니다.
+        실제 출전 명단은 아닙니다.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th>{{ player_features.home_name }} · 홈</th>
+              <th>{{ player_features.away_name }} · 원정</th>
+              <th>홈 − 원정</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for row in player_features.rows %}
+              <tr>
+                <th>{{ row.label }}</th>
+                <td>{{ row.home|floatformat:2 }}</td>
+                <td>{{ row.away|floatformat:2 }}</td>
+                <td>{{ row.difference|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="muted">
+        차이가 양수이면 홈팀 점수가,
+        음수이면 원정팀 점수가 더 높습니다.<br>
+        현재는 비교용이며 위 승무패 확률에는 반영하지 않습니다.
+        과거 경기 당시의 선수 전력을 나타내는 값은 아닙니다.
+      </p>
+    {% else %}
+      <p>
+        선수 전력 비교 불가:
+        {{ player_features.message }}
+      </p>
+    {% endif %}
+  </section>
+{% endif %}

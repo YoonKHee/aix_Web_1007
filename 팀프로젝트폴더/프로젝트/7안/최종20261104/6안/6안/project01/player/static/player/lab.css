@@ -1,0 +1,185 @@
+.lab{max-width:1100px;margin:32px auto;padding:0 16px;font-family:inherit;color:#1a1a1a}
+.lab-wrap{background:#fff;border:1px solid #d9dde3;border-radius:12px;padding:12px 16px}
+.lab-wrap>summary{cursor:pointer;font-size:18px;font-weight:700}
+.lab-wrap>summary small{font-weight:400;color:#6b7280;margin-left:8px;font-size:13px}
+.lab-note{font-size:13px;color:#6b7280;margin:10px 0}
+.lab-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.lab-label{font-weight:600}
+.lab select,.lab button{font:inherit;padding:6px 10px;border:1px solid #c7ccd4;border-radius:8px;background:#f8f9fb}
+.lab button{cursor:pointer}.lab button:hover:not(:disabled){background:#eaf1ff}.lab button:disabled{opacity:.5;cursor:not-allowed}
+.lab-presets button.on,.lab-tabs button.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.lab-slider input{vertical-align:middle}
+.lab-detail{margin:6px 0}.lab-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px}
+.lab-metrics fieldset{border:1px solid #e5e7eb;border-radius:8px;padding:8px}.lab-metrics legend{font-weight:600}
+.lab-metrics label{display:flex;justify-content:space-between;gap:8px;font-size:13px;align-items:center}
+.lab-metrics input{width:110px}
+.lab-muted{color:#6b7280;font-size:13px}
+.lab-msg{min-height:20px;font-size:14px}.lab-msg.err{color:#b91c1c}
+.lab-summary{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0;font-weight:600}
+.lab-pitch{background:linear-gradient(#2f7d46,#256b3a);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.lab-line{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.lab-card{width:128px;background:#fff;border-radius:10px;padding:8px;text-align:center;cursor:pointer;border:2px solid transparent;font-size:13px}
+.lab-card:hover,.lab-card:focus{border-color:#2563eb;outline:none}
+.lab-card img,.lab-card .ph{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#e5e7eb;display:block;margin:0 auto 4px}
+.lab-card .nm{font-weight:700}.lab-card .sc{font-size:18px;font-weight:800}.lab-card .ch{color:#047857;font-size:12px}.lab-card .ch.neg{color:#b91c1c}
+.lab-badge{display:inline-block;font-size:11px;padding:1px 6px;border-radius:999px;background:#fee2e2;color:#991b1b;margin:2px 1px}
+.lab-badge.soft{background:#fef3c7;color:#92400e}.lab-badge.info{background:#e0e7ff;color:#3730a3}
+.lab-recs{display:grid;gap:8px}
+.lab-rec{border:1px solid #d1fae5;background:#f0fdf4;border-radius:8px;padding:8px 10px;font-size:14px;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.lab-tabs{display:flex;gap:6px;margin:16px 0 8px;flex-wrap:wrap}
+.lab-tab table{width:100%;border-collapse:collapse;font-size:14px}.lab-tab th,.lab-tab td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+.lab-bar{display:inline-block;height:10px;border-radius:5px;background:#2563eb;vertical-align:middle}
+.lab-prob{display:flex;height:14px;border-radius:7px;overflow:hidden;min-width:160px}.lab-prob i{display:block}
+.lab-prob .w{background:#16a34a}.lab-prob .d{background:#9ca3af}.lab-prob .l{background:#dc2626}
+.lab-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999}
+.lab-modal[hidden]{display:none}
+.lab-modal-box{background:#fff;border-radius:12px;width:min(640px,94vw);max-height:84vh;overflow:auto;padding:14px}
+.lab-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.lab-cand{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 2px;font-size:14px}
+.lab-cand.rec{background:#f0fdf4}
+.lab-delta.pos{color:#047857;font-weight:700}.lab-delta.neg{color:#b91c1c}
+@media (max-width:640px){.lab-card{width:calc(33% - 10px)}}
+
+/* 나만의 BEST11 (BEST11 화면 안의 도구 모음·카드 위 교체 버튼·VS 비교) */
+.b11-tools{max-width:1100px;margin:10px auto;padding:10px 12px;border:1px solid #d9dde3;border-radius:10px;background:#fff;font-size:14px;color:#1a1a1a}
+.b11-tools-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0}
+.b11-tools button,.b11-tools select,.b11-bar button,.b11-modal button,.b11-modal select{font:inherit;padding:5px 10px;border:1px solid #c7ccd4;border-radius:8px;background:#f8f9fb;cursor:pointer}
+.b11-tools button:hover,.b11-bar button:hover,.b11-modal button:hover{background:#eaf1ff}
+.b11-presets button.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.b11-slider input{vertical-align:middle}
+.b11-tools .lab-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px}
+.b11-tools .lab-metrics fieldset{border:1px solid #e5e7eb;border-radius:8px;padding:8px}.b11-tools .lab-metrics legend{font-weight:600}
+.b11-tools .lab-metrics label{display:flex;justify-content:space-between;gap:8px;font-size:13px;align-items:center}.b11-tools .lab-metrics input{width:110px}
+.b11-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px auto;max-width:1100px;padding:8px 12px;border:1px solid #d9dde3;border-radius:10px;background:#fff;font-size:14px;color:#1a1a1a}
+.b11-bar.busy{opacity:.6}
+.b11-bar span:first-child{font-weight:700}
+.b11-swap{position:absolute;top:4px;right:4px;font-size:11px;padding:2px 6px;border:1px solid #c7ccd4;border-radius:999px;background:#fff;cursor:pointer;z-index:3}
+.b11-swap:hover,.b11-swap:focus{background:#eaf1ff;border-color:#2563eb;outline:none}
+/* 케미 가산점: 점수 옆의 다른 색 숫자 */
+.b11-cn{font-weight:700;margin-left:2px}.b11-cn.pos{color:#16a34a}.b11-cn.neg{color:#dc2626}.b11-cn.zero{color:#9ca3af}
+.football-field .b11-cn.pos{color:#86efac}.football-field .b11-cn.neg{color:#fca5a5}.football-field .b11-cn.zero{color:#d1d5db}
+.b11-mark{display:inline-block;font-size:11px;padding:1px 6px;border-radius:999px;background:#e0e7ff;color:#3730a3;margin-top:2px}
+/* 선수 팝업의 이름 옆 케미 표시와 VS 버튼 */
+.b11-mwrap{display:inline-flex;gap:8px;align-items:center;margin-left:10px;vertical-align:middle}
+.b11-mtag{font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:#f3f4f6}
+.b11-mtag.pos{color:#15803d;background:#dcfce7}.b11-mtag.neg{color:#b91c1c;background:#fee2e2}.b11-mtag.zero{color:#6b7280}
+.b11-vs{font:inherit;font-size:12px;padding:2px 10px;border:1px solid #2563eb;border-radius:999px;background:#fff;color:#2563eb;cursor:pointer}
+.b11-vs:hover{background:#eaf1ff}
+.b11-modal{z-index:100000}
+.b11-modal .lab-modal-box.wide{width:min(900px,96vw)}
+.b11-modal .lab-modal-box{color:#1a1a1a;font-size:14px}
+.b11-modal select{max-width:100%}
+/* 포메이션 추천 표 */
+.b11-ftable{width:100%;border-collapse:collapse;font-size:14px}.b11-ftable th,.b11-ftable td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+.b11-ftable tr.cur{background:#f0f9ff}
+/* VS 비교 */
+.b11-cmp-head{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:8px}
+.b11-cmp-grid{display:grid;grid-template-columns:minmax(260px,1.1fr) minmax(240px,1fr);gap:14px;align-items:start}
+.b11-radar{width:100%;height:auto}
+.b11-grow{transform-origin:210px 170px;animation:b11grow 900ms cubic-bezier(.2,.8,.2,1) both}
+@keyframes b11grow{from{transform:scale(0);opacity:.2}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.b11-grow{animation:none}}
+.b11-legend{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;justify-content:center}
+.b11-legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px}
+.b11-pc{border-left:4px solid;padding:4px 10px;margin-bottom:8px;font-size:14px}
+.b11-cmp-table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}.b11-cmp-table th,.b11-cmp-table td{border-bottom:1px solid #eee;padding:4px 6px;text-align:left}
+.b11-cmp-table td.win{font-weight:700}
+@media (max-width:700px){.b11-cmp-grid{grid-template-columns:1fr}}
+
+/* 선수 분석 보고서 */
+.b11-rpt-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:15px;margin-bottom:8px}
+.b11-verdict{font-weight:800;padding:2px 12px;border-radius:999px;color:#fff}
+.b11-verdict.good{background:#16a34a}.b11-verdict.mid{background:#6b7280}.b11-verdict.bad{background:#dc2626}
+.b11-rpt-score{display:flex;gap:14px;align-items:center;justify-content:center;margin:8px 0 12px;padding:10px;background:#f8fafc;border-radius:10px}
+.b11-rpt-score div{text-align:center}.b11-rpt-score small{display:block;color:#6b7280;font-size:12px}.b11-rpt-score b{font-size:24px}
+.b11-rpt-sec{margin:10px 0;padding:8px 12px;border-left:4px solid #cbd5e1;background:#fff}
+.b11-rpt-sec.hire{border-color:#16a34a;background:#f0fdf4}.b11-rpt-sec.warn{border-color:#f59e0b;background:#fffbeb}
+.b11-rpt-sec h4{margin:0 0 4px;font-size:15px}.b11-rpt-sec ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55}
+.b11-rpt-table td:nth-child(n+2),.b11-rpt-table th:nth-child(n+2){text-align:right}
+.b11-rpt-concl{font-weight:700;font-size:15px;line-height:1.5;margin:6px 0}
+
+.b11-hb{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.b11-hb-l{width:78px;flex:none;font-weight:600}
+.b11-hb-t{position:relative;flex:1;height:14px;background:#e5e7eb;border-radius:7px;overflow:hidden}
+.b11-hb-f{display:block;height:100%;border-radius:7px}
+.b11-hb-f.above{background:#16a34a}.b11-hb-f.below{background:#f59e0b}
+.b11-hb-m{position:absolute;top:0;bottom:0;width:2px;background:#111827}
+.b11-hb-v{width:150px;flex:none;text-align:right;color:#374151;font-size:12px}
+.b11-help-row{display:flex;flex-wrap:wrap;gap:6px}
+.b11-help-chip{border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:3px 10px;font-size:13px;cursor:pointer}
+.b11-help-chip.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.b11-help-body{margin:8px 0 0;font-size:14px;line-height:1.55}
+@media(max-width:560px){.b11-hb{flex-wrap:wrap}.b11-hb-v{width:100%;text-align:left}}
+.b11-rpt .b11-help-chip.on{background:#1d4ed8!important;color:#fff!important;border-color:#1d4ed8!important}.b11-rpt .b11-help-chip{color:#111827}
+
+.b11-cr{display:block;font-size:10px;font-weight:400;line-height:1.25;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.b11-cr-pop{font-size:11px;color:#6b7280;margin:0 6px 0 4px}
+
+/* 스카우터 양식 보고서 */
+.b11-sc-head{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:#0f172a;color:#f8fafc}
+.b11-sc-head small{display:block;font-size:11px;letter-spacing:.08em;opacity:.7}
+.b11-sc-id{flex:1;min-width:200px}.b11-sc-id h3{margin:2px 0 4px;font-size:22px;color:#fff}.b11-sc-id .lab-muted{color:#cbd5e1}
+.b11-sc-ovr,.b11-sc-rec{text-align:center;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08);min-width:96px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.b11-sc-ovr b{font-size:34px;line-height:1}.b11-sc-ovr b.hi{color:#4ade80}.b11-sc-ovr b.mid{color:#fde68a}.b11-sc-ovr b.lo{color:#fca5a5}
+.b11-sc-rec span,.b11-sc-ovr span{font-size:12px}
+.b11-sc-sum{font-weight:700;font-size:15px;line-height:1.5;margin:10px 0}
+.b11-sc-row{align-items:center}.b11-sc-g{width:30px;text-align:right;flex:none}.b11-sc-g.hi{color:#15803d}.b11-sc-g.mid{color:#a16207}.b11-sc-g.lo{color:#b91c1c}
+.b11-hb-f.g-hi{background:#16a34a}.b11-hb-f.g-mid{background:#eab308}.b11-hb-f.g-lo{background:#ef4444}
+.b11-sc-row .b11-hb-v{width:230px}
+.b11-sc-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.b11-sc-box{padding:8px 12px;border-radius:8px;border-left:4px solid #cbd5e1}.b11-sc-box.hire{border-color:#16a34a;background:#f0fdf4}.b11-sc-box.warn{border-color:#f59e0b;background:#fffbeb}
+.b11-sc-box h4{margin:0 0 4px;font-size:15px}.b11-sc-box ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55}
+.b11-sc-final{border-color:#1d4ed8;background:#eff6ff}
+@media(max-width:700px){.b11-sc-cols{grid-template-columns:1fr}.b11-sc-row{flex-wrap:wrap}.b11-sc-row .b11-hb-v{width:100%;text-align:left}}
+
+/* 스카우터 보고서 가독성 */
+.b11-scout{font-size:15px;line-height:1.6;color:#111827}
+.b11-scout .b11-rpt-sec{border:1px solid #e5e7eb;border-left-width:4px;border-radius:10px;padding:12px 14px;margin:12px 0}
+.b11-scout h4{font-size:16px;margin:0 0 2px}
+.b11-sc-sub{margin:0 0 8px;font-size:13px;color:#6b7280}
+.b11-sc-sum{margin:12px 0;padding:10px 14px;border-radius:10px;background:#f1f5f9}
+.b11-sc-sum small{font-size:12px;color:#64748b;letter-spacing:.04em}.b11-sc-sum p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.5}
+.b11-sc-item{padding:7px 0;border-bottom:1px solid #f1f5f9}.b11-sc-item:last-child{border-bottom:0}
+.b11-sc-item .b11-hb{margin:0}
+.b11-scout .b11-hb-l{width:92px;font-size:15px}.b11-scout .b11-hb-t{height:16px}
+.b11-sc-g{width:34px;font-size:18px}
+.b11-sc-w{width:64px;flex:none;font-size:13px;font-weight:700}.b11-sc-w.hi{color:#15803d}.b11-sc-w.mid{color:#a16207}.b11-sc-w.lo{color:#b91c1c}
+.b11-sc-d{margin:2px 0 0 100px;font-size:13px;color:#6b7280}
+.b11-sc-box{padding:12px 14px}.b11-sc-box ul{padding-left:16px;font-size:14.5px}.b11-sc-box li{margin:4px 0}
+.b11-lead{color:#111827;background:rgba(0,0,0,.05);border-radius:4px;padding:0 5px;margin-right:2px}
+.b11-sc-more summary{cursor:pointer;font-weight:700;font-size:15px}.b11-sc-more ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+.b11-sc-final p{margin:4px 0;font-size:15px}
+@media(max-width:700px){.b11-sc-d{margin-left:0}.b11-scout .b11-hb-l{width:70px}.b11-sc-row{flex-wrap:nowrap!important}}
+
+/* 지표별 가중치 합계 (100 초과 경고) */
+.b11-tools .b11-wsum{margin:6px 0 0;font-size:12px;color:#475569}.b11-tools .b11-wsum.over{color:#b91c1c;font-weight:700}
+
+/* 나만의 BEST11: 빈 칸 */
+.b11-empty{cursor:pointer}
+.football-field .player-card.b11-empty .player-photo{display:flex;align-items:center;justify-content:center;border:2px dashed #fff;background:rgba(255,255,255,.22);box-shadow:none}
+.football-field .player-card.b11-empty .b11-empty-plus{font-size:34px;font-weight:700;color:#fff;line-height:1}
+.football-field .player-card.b11-empty .player-score{visibility:hidden}
+.football-field .player-card.b11-empty:hover .player-photo{background:rgba(255,255,255,.4)}
+.b11-empty .player-name{opacity:.9}
+.b11-empty .b11-swap,.b11-empty .b11-remove{display:none}
+.b11-remove{position:absolute;top:2px;left:2px;z-index:3;width:22px;height:22px;border-radius:50%;border:none;background:rgba(15,23,42,.65);color:#fff;font-size:12px;line-height:22px;cursor:pointer;padding:0}
+.b11-remove:hover{background:#b91c1c}
+.b11-bar .b11-primary{background:#16a34a;color:#fff;border-color:#16a34a;font-weight:600}
+
+/* 분석 보고서 가독성 */
+.b11-sc-abl b{color:#fff}
+.b11-scout .b11-num{font-weight:700;color:#0f172a}
+.b11-sc-sum .b11-num{color:#1d4ed8}
+.b11-sc-d b{color:#0f172a}
+.b11-sc-sep{margin:0 6px;color:#cbd5e1}
+.b11-sc-wt{display:inline-block;padding:0 6px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px}
+.b11-scout .b11-sc-box li{line-height:1.6;margin:4px 0}
+.b11-rule{margin-top:8px}
+.b11-rule summary{cursor:pointer;color:#1d4ed8;font-size:13px}
+.b11-rule-table{border-collapse:collapse;margin:6px 0;font-size:13px}
+.b11-rule-table td,.b11-rule-table th{border:1px solid #e2e8f0;padding:4px 10px;text-align:left}
+.b11-rule-table th{font-weight:600;background:#f8fafc}
+.b11-grade-help{padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;margin-top:10px}
+
+.b11-bar .b11-sim-link{display:inline-block;padding:6px 12px;border-radius:8px;background:#78e7ff;color:#073344;font-weight:700;text-decoration:none}
+.b11-bar .b11-sim-link:hover{filter:brightness(.95)}

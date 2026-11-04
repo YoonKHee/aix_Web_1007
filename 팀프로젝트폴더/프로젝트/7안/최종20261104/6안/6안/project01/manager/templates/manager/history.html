@@ -1,0 +1,16 @@
+{% extends 'manager/base.html' %}
+{% block title %}반영 기록{% endblock %}
+{% block content %}
+<h1>반영 기록</h1>
+<table>
+  <tr><th>시각</th><th>올린 사람</th><th>파일</th><th>상태</th><th>결과</th><th>구조 변경 기록 파일</th><th></th></tr>
+  {% for b in batches %}
+  <tr>
+    <td>{{ b.created_at|date:"Y-m-d H:i" }}</td><td>{{ b.created_by }}</td><td>{{ b.filenames }}</td>
+    <td>{{ b.status }}</td><td>{{ b.result }}</td><td>{{ b.schema_file }}</td>
+    <td><a href="{% url 'manager:import_report' b.pk %}">보기</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="7">아직 기록이 없습니다.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

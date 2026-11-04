@@ -1,0 +1,49 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+<div style="padding:16px; margin-bottom:16px;
+            border:1px solid #aaa; border-radius:8px;">
+
+  <p>
+    <strong>예측 모델:</strong> {{ model_status }}
+
+    {% if trained_through %}
+      · 학습 기준일 {{ trained_through }}
+    {% endif %}
+
+    {% if prediction_count != None %}
+      · 예측용 {{ prediction_count }}경기
+    {% endif %}
+  </p>
+
+  <p>
+    종료된 경기만 입력하세요.
+    결과를 모두 저장한 후 예측 모델을 갱신하세요.
+    갱신 중에는 경기 결과를 수정하지 마세요.
+  </p>
+
+  {% if can_import %}
+    <form method="post"
+          action="{% url 'admin:team_matchresult_import' %}"
+          style="display:inline-block; margin-right:12px;">
+      {% csrf_token %}
+      <button type="submit" class="button">
+        기존 JSON 경기 가져오기
+      </button>
+    </form>
+  {% endif %}
+
+  {% if can_train %}
+    <form method="post"
+          action="{% url 'admin:team_matchresult_train' %}"
+          style="display:inline-block;">
+      {% csrf_token %}
+      <button type="submit" class="button">
+        예측 모델 갱신
+      </button>
+    </form>
+  {% endif %}
+</div>
+
+{{ block.super }}
+{% endblock %}

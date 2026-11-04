@@ -1,0 +1,71 @@
+{% if prediction and gps_features %}
+  <section>
+    <h2>GPS·이벤트 비교 — 더미데이터</h2>
+
+    {% if gps_features.available %}
+      <p>
+        이 홈·원정 대진의 가상 경기
+        {{ gps_features.run_count }}회,
+        {{ gps_features.scenario_count }}개 시나리오를
+        평균한 값입니다.<br>
+
+        실제 선수의 측정 기록이 아니며
+        승무패 확률에는 반영하지 않습니다.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th>{{ gps_features.home_name }} · 홈</th>
+              <th>{{ gps_features.away_name }} · 원정</th>
+              <th>홈 − 원정</th>
+              <th>비교 횟수</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for row in gps_features.rows %}
+              <tr>
+                <th>{{ row.label }}</th>
+
+                {% if row.count %}
+                  <td>
+                    {{ row.home|floatformat:2 }}
+                    {{ row.unit }}
+                  </td>
+                  <td>
+                    {{ row.away|floatformat:2 }}
+                    {{ row.unit }}
+                  </td>
+                  <td>
+                    {{ row.difference|floatformat:2 }}
+                    {{ row.difference_unit }}
+                  </td>
+                {% else %}
+                  <td>자료 없음</td>
+                  <td>자료 없음</td>
+                  <td>비교 불가</td>
+                {% endif %}
+
+                <td>{{ row.count }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="muted">
+        패스 시도가 없는 등 성공률을 계산할 수 없는 기록은
+        해당 지표 평균에서 제외합니다.<br>
+
+        현재 전술은 홈팀에 적용되고 원정팀은 기본 전술이므로,
+        차이를 실제 구단의 전력 차이로 해석하면 안 됩니다.
+      </p>
+
+    {% else %}
+      <p>{{ gps_features.message }}</p>
+    {% endif %}
+  </section>
+{% endif %}

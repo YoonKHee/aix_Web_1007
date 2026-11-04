@@ -1,0 +1,29 @@
+{% load static board_tags %}<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}자유게시판{% endblock %} · 감독? 내가한다!</title>
+<link rel="stylesheet" href="{% static 'board/board.css' %}">
+</head>
+<body>
+<header class="bd-head"><div class="in">
+  <a class="bd-logo" href="{% url 'board:list' %}">⚽ 자유게시판<small>감독? 내가한다!</small></a>
+  <nav class="bd-nav">
+    <a href="/">메인으로</a>
+    {% if user.is_authenticated %}
+      <span>{{ user|nick }}님</span>
+      {% if user.is_staff %}<a href="/admin/board/">관리</a>{% endif %}
+      <form method="post" action="{% url 'board:logout' %}">{% csrf_token %}<button type="submit">로그아웃</button></form>
+    {% else %}
+      <a href="{% url 'board:login' %}">로그인</a>
+      <a href="{% url 'board:signup' %}">회원가입</a>
+    {% endif %}
+  </nav>
+</div></header>
+{% if messages %}<div class="flash">{% for m in messages %}<div class="{{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+<main class="bd-wrap">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

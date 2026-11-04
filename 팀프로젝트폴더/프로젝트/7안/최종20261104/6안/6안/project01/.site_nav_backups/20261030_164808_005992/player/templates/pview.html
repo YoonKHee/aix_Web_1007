@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>선수 상세정보</title>
+</head>
+
+<body>
+
+    <!-- ============================================= -->
+    <!-- 선수 기본정보 -->
+    <!-- ============================================= -->
+
+    <h1>선수 상세정보</h1>
+
+    <table border="1">
+
+        <tr>
+            <th>번호</th>
+            <td>{{ player.id }}</td>
+        </tr>
+
+        <tr>
+            <th>구단</th>
+            <td>{{ player.team.team_name }}</td>
+        </tr>
+
+        <tr>
+            <th>선수명</th>
+            <td>{{ player.name }}</td>
+        </tr>
+
+        <tr>
+            <th>등번호</th>
+            <td>{{ player.number }}</td>
+        </tr>
+
+        <tr>
+            <th>포지션</th>
+            <td>{{ player.position }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <a href="/player/plist/">
+        선수목록
+    </a>
+
+    <hr>
+
+
+    <!-- ============================================= -->
+    <!-- 선수 시즌 기록 -->
+    <!-- ============================================= -->
+
+    <h2>선수 시즌 기록</h2>
+
+
+    {% for s in stats %}
+
+
+    <!-- ============================================= -->
+    <!-- 1. 기본 기록 -->
+    <!-- ============================================= -->
+
+    <h3>1. 기본 기록</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>시즌</th>
+            <td>{{ s.season }}</td>
+        </tr>
+
+        <tr>
+            <th>출전시간</th>
+            <td>{{ s.minutes }}분</td>
+        </tr>
+
+        <tr>
+            <th>득점</th>
+            <td>{{ s.goals }}</td>
+        </tr>
+
+        <tr>
+            <th>도움</th>
+            <td>{{ s.assists }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 1-1. 90분당 주요 기록 -->
+    <!-- ============================================= -->
+
+    <h3>1-1. 90분당 주요 기록</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>90분당 득점</th>
+            <th>90분당 도움</th>
+            <th>90분당 슈팅</th>
+            <th>90분당 유효슈팅</th>
+            <th>90분당 키패스</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.goals_per90 }}</td>
+            <td>{{ s.assists_per90 }}</td>
+            <td>{{ s.shots_per90 }}</td>
+            <td>{{ s.shots_on_target_per90 }}</td>
+            <td>{{ s.key_passes_per90 }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 2. 슈팅 기록 -->
+    <!-- ============================================= -->
+
+    <h3>2. 슈팅 기록</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>슈팅</th>
+            <th>유효슈팅</th>
+            <th>차단된 슈팅</th>
+            <th>벗어난 슈팅</th>
+            <th>PA내 슈팅</th>
+            <th>PA외 슈팅</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.shots }}</td>
+            <td>{{ s.shots_on_target }}</td>
+            <td>{{ s.shots_blocked }}</td>
+            <td>{{ s.shots_off_target }}</td>
+            <td>{{ s.shots_inside_box }}</td>
+            <td>{{ s.shots_outside_box }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 3. 공격 기타 -->
+    <!-- ============================================= -->
+
+    <h3>3. 공격 기타</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>오프사이드</th>
+            <th>프리킥</th>
+            <th>코너킥</th>
+            <th>스로인</th>
+            <th>탈압박</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.offsides }}</td>
+            <td>{{ s.free_kicks }}</td>
+            <td>{{ s.corner_kicks }}</td>
+            <td>{{ s.throw_ins }}</td>
+            <td>{{ s.escape_pressure }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 4. 드리블 -->
+    <!-- ============================================= -->
+
+    <h3>4. 드리블</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>시도</th>
+            <th>성공</th>
+            <th>성공률</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.dribble_attempt }}</td>
+            <td>{{ s.dribble_success }}</td>
+            <td>{{ s.dribble_success_rate }}%</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 5. 전체 패스 -->
+    <!-- ============================================= -->
+
+    <h3>5. 전체 패스</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>패스 시도</th>
+            <th>패스 성공</th>
+            <th>패스 성공률</th>
+            <th>키패스</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.pass_attempt }}</td>
+            <td>{{ s.pass_success }}</td>
+            <td>{{ s.pass_success_rate }}%</td>
+            <td>{{ s.key_passes }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 6. 패스 방향 -->
+    <!-- ============================================= -->
+
+    <h3>6. 패스 방향</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>구분</th>
+            <th>시도</th>
+            <th>성공</th>
+        </tr>
+
+        <tr>
+            <th>전방 패스</th>
+            <td>{{ s.forward_pass_attempt }}</td>
+            <td>{{ s.forward_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>후방 패스</th>
+            <td>{{ s.backward_pass_attempt }}</td>
+            <td>{{ s.backward_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>횡패스</th>
+            <td>{{ s.lateral_pass_attempt }}</td>
+            <td>{{ s.lateral_pass_success }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 7. 지역별 패스 -->
+    <!-- ============================================= -->
+
+    <h3>7. 지역별 패스</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>구분</th>
+            <th>시도</th>
+            <th>성공</th>
+        </tr>
+
+        <tr>
+            <th>공격지역 패스</th>
+            <td>{{ s.attacking_third_pass_attempt }}</td>
+            <td>{{ s.attacking_third_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>수비지역 패스</th>
+            <td>{{ s.defensive_third_pass_attempt }}</td>
+            <td>{{ s.defensive_third_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>중앙지역 패스</th>
+            <td>{{ s.middle_third_pass_attempt }}</td>
+            <td>{{ s.middle_third_pass_success }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 8. 거리별 패스 -->
+    <!-- ============================================= -->
+
+    <h3>8. 거리별 패스</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>구분</th>
+            <th>시도</th>
+            <th>성공</th>
+        </tr>
+
+        <tr>
+            <th>롱패스</th>
+            <td>{{ s.long_pass_attempt }}</td>
+            <td>{{ s.long_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>중거리패스</th>
+            <td>{{ s.medium_pass_attempt }}</td>
+            <td>{{ s.medium_pass_success }}</td>
+        </tr>
+
+        <tr>
+            <th>숏패스</th>
+            <td>{{ s.short_pass_attempt }}</td>
+            <td>{{ s.short_pass_success }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 9. 크로스 -->
+    <!-- ============================================= -->
+
+    <h3>9. 크로스</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>시도</th>
+            <th>성공</th>
+            <th>성공률</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.cross_attempt }}</td>
+            <td>{{ s.cross_success }}</td>
+            <td>{{ s.cross_success_rate }}%</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 10. 경합 -->
+    <!-- ============================================= -->
+
+    <h3>10. 경합</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>구분</th>
+            <th>시도</th>
+            <th>성공</th>
+            <th>성공률</th>
+        </tr>
+
+        <tr>
+            <th>지상 경합</th>
+            <td>{{ s.ground_duel_attempt }}</td>
+            <td>{{ s.ground_duel_success }}</td>
+            <td>{{ s.ground_duel_success_rate }}%</td>
+        </tr>
+
+        <tr>
+            <th>공중 경합</th>
+            <td>{{ s.aerial_duel_attempt }}</td>
+            <td>{{ s.aerial_duel_success }}</td>
+            <td>{{ s.aerial_duel_success_rate }}%</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 11. 태클 -->
+    <!-- ============================================= -->
+
+    <h3>11. 태클</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>태클 시도</th>
+            <th>태클 성공</th>
+            <th>태클 성공률</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.tackle_attempt }}</td>
+            <td>{{ s.tackle_success }}</td>
+            <td>{{ s.tackle_success_rate }}%</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 12. 수비 기록 -->
+    <!-- ============================================= -->
+
+    <h3>12. 수비 기록</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>클리어링</th>
+            <th>인터셉트</th>
+            <th>차단</th>
+            <th>획득</th>
+            <th>블락</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.clearances }}</td>
+            <td>{{ s.interceptions }}</td>
+            <td>{{ s.defensive_blocks }}</td>
+            <td>{{ s.recoveries }}</td>
+            <td>{{ s.blocks }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+
+    <!-- ============================================= -->
+    <!-- 13. 볼미스 / 파울 / 카드 -->
+    <!-- ============================================= -->
+
+    <h3>13. 볼미스 / 파울 / 카드</h3>
+
+    <table border="1">
+
+        <tr>
+            <th>볼미스</th>
+            <th>파울</th>
+            <th>피파울</th>
+            <th>경고</th>
+            <th>퇴장</th>
+        </tr>
+
+        <tr>
+            <td>{{ s.ball_misses }}</td>
+            <td>{{ s.fouls }}</td>
+            <td>{{ s.fouls_won }}</td>
+            <td>{{ s.yellow_cards }}</td>
+            <td>{{ s.red_cards }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+    <hr>
+
+
+    {% empty %}
+
+        <p>등록된 시즌 기록이 없습니다.</p>
+
+    {% endfor %}
+
+
+</body>
+
+</html>

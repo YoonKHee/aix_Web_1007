@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>K리그 선수목록</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================= -->
+    <!-- 제목 -->
+    <!-- ============================================= -->
+
+    <h1>K리그 선수목록</h1>
+
+
+    <!-- ============================================= -->
+    <!-- 검색 -->
+    <!-- ============================================= -->
+
+    <form
+        action="/player/plist/"
+        method="get"
+    >
+
+
+        <!-- 팀 선택 -->
+
+        <label>구단</label>
+
+        <select name="team">
+
+            <option value="">
+                전체 구단
+            </option>
+
+
+            {% for t in teams %}
+
+                <option
+                    value="{{t.id}}"
+
+                    {% if team_id == t.id|stringformat:"s" %}
+                        selected
+                    {% endif %}
+                >
+
+                    {{t.team_name}}
+
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+
+        <!-- 포지션 선택 -->
+
+        <label>포지션</label>
+
+        <select name="position">
+
+            <option value="">
+                전체 포지션
+            </option>
+
+
+            <option
+                value="GK"
+                {% if position == 'GK' %}
+                    selected
+                {% endif %}
+            >
+                GK
+            </option>
+
+
+            <option
+                value="DF"
+                {% if position == 'DF' %}
+                    selected
+                {% endif %}
+            >
+                DF
+            </option>
+
+
+            <option
+                value="MF"
+                {% if position == 'MF' %}
+                    selected
+                {% endif %}
+            >
+                MF
+            </option>
+
+
+            <option
+                value="FW"
+                {% if position == 'FW' %}
+                    selected
+                {% endif %}
+            >
+                FW
+            </option>
+
+
+        </select>
+
+
+
+        <!-- 검색 버튼 -->
+
+        <button type="submit">
+            검색
+        </button>
+
+
+        <!-- 전체보기 -->
+
+        <a href="/player/plist/">
+            전체보기
+        </a>
+
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- ============================================= -->
+    <!-- 검색 결과 수 -->
+    <!-- ============================================= -->
+
+    <h3>
+        검색된 선수 : {{list|length}}명
+    </h3>
+
+
+
+    <!-- ============================================= -->
+    <!-- 선수 목록 -->
+    <!-- ============================================= -->
+
+    <table border="1">
+
+        <tr>
+
+            <th>번호</th>
+
+            <th>구단</th>
+
+            <th>선수명</th>
+
+            <th>등번호</th>
+
+            <th>포지션</th>
+
+        </tr>
+
+
+        {% for p in list %}
+
+        <tr>
+
+
+            <!-- DB의 Player id -->
+
+            <td>
+                {{p.id}}
+            </td>
+
+
+            <!-- 팀 -->
+
+            <td>
+                {{p.team.team_name}}
+            </td>
+
+
+            <!-- 선수명 -->
+
+            <td>
+
+                <a href="/player/pview/{{p.id}}/">
+
+                    {{p.name}}
+
+                </a>
+
+            </td>
+
+
+            <!-- 등번호 -->
+
+            <td>
+                {{p.number}}
+            </td>
+
+
+            <!-- 포지션 -->
+
+            <td>
+                {{p.position}}
+            </td>
+
+
+        </tr>
+
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="5">
+
+                검색된 선수가 없습니다.
+
+            </td>
+
+        </tr>
+
+
+        {% endfor %}
+
+
+    </table>
+
+
+</body>
+
+</html>
