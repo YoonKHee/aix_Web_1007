@@ -1,0 +1,271 @@
+{
+  "version": 2,
+  "algorithm": "poisson",
+  "created_at": "2026-11-02T02:25:22.943650+00:00",
+  "dataset_sha256": "320415a4a734b338cbc89d2eac5af308b01162abe1bc50b84edda90f2f5cada3",
+  "trained_through": "2026-11-01",
+  "training_match_count": 202,
+  "feature_row_count": 171,
+  "skipped_warmup_matches": 31,
+  "feature_names": [
+    "recent_points_diff",
+    "recent_goals_for_diff",
+    "recent_goals_against_diff",
+    "venue_points_diff",
+    "venue_goals_for_diff",
+    "venue_goals_against_diff",
+    "rest_days_diff",
+    "season_points_diff",
+    "season_goals_for_diff",
+    "season_goals_against_diff",
+    "smoothed_venue_points_diff",
+    "smoothed_venue_goals_for_diff",
+    "smoothed_venue_goals_against_diff",
+    "expected_home_goals",
+    "expected_away_goals"
+  ],
+  "min_previous_matches": 5,
+  "sklearn_version": "1.7.2",
+  "evaluation": {
+    "method": "Train-only expanding time folds choose the method; same original date-based holdout compares versions.",
+    "test_features_policy": "Only earlier dates inform each match; earlier test-day outcomes may inform later test days.",
+    "previously_seen_test_period": true,
+    "selection_method": "Minimum pooled log loss over three expanding training-only time folds.",
+    "selection": {
+      "legacy": {
+        "accuracy": 0.22033898305084745,
+        "precision_macro": 0.20684193854925562,
+        "recall_macro": 0.21243386243386242,
+        "f1_macro": 0.18236559139784947,
+        "log_loss": 1.249472922541844,
+        "confusion_matrix": [
+          [
+            10,
+            7,
+            4
+          ],
+          [
+            18,
+            1,
+            1
+          ],
+          [
+            13,
+            3,
+            2
+          ]
+        ],
+        "prediction_counts": {
+          "H": 7,
+          "A": 41,
+          "D": 11
+        }
+      },
+      "season": {
+        "accuracy": 0.288135593220339,
+        "precision_macro": 0.23933933933933935,
+        "recall_macro": 0.2767195767195767,
+        "f1_macro": 0.2383141762452107,
+        "log_loss": 1.1618519632240611,
+        "confusion_matrix": [
+          [
+            13,
+            3,
+            5
+          ],
+          [
+            13,
+            2,
+            5
+          ],
+          [
+            11,
+            5,
+            2
+          ]
+        ],
+        "prediction_counts": {
+          "A": 37,
+          "H": 12,
+          "D": 10
+        }
+      },
+      "poisson": {
+        "accuracy": 0.4067796610169492,
+        "precision_macro": 0.480164374901217,
+        "recall_macro": 0.40105820105820106,
+        "f1_macro": 0.356510933722328,
+        "log_loss": 1.143098447114325,
+        "confusion_matrix": [
+          [
+            15,
+            1,
+            5
+          ],
+          [
+            11,
+            2,
+            7
+          ],
+          [
+            11,
+            0,
+            7
+          ]
+        ],
+        "prediction_counts": {
+          "D": 3,
+          "A": 37,
+          "H": 19
+        }
+      }
+    },
+    "selected_method": "poisson",
+    "selection_folds": [
+      {
+        "train_end": "2026-05-17",
+        "validation_start": "2026-07-04",
+        "validation_end": "2026-07-19",
+        "train_count": 59,
+        "validation_count": 18
+      },
+      {
+        "train_end": "2026-07-19",
+        "validation_start": "2026-07-21",
+        "validation_end": "2026-08-02",
+        "train_count": 77,
+        "validation_count": 18
+      },
+      {
+        "train_end": "2026-08-02",
+        "validation_start": "2026-08-08",
+        "validation_end": "2026-08-26",
+        "train_count": 95,
+        "validation_count": 23
+      }
+    ],
+    "train_count": 118,
+    "test_count": 53,
+    "train_start": "2026-04-04",
+    "train_end": "2026-08-26",
+    "test_start": "2026-08-29",
+    "test_end": "2026-11-01",
+    "classes": [
+      "A",
+      "D",
+      "H"
+    ],
+    "train_class_counts": {
+      "H": 37,
+      "A": 49,
+      "D": 32
+    },
+    "test_class_counts": {
+      "H": 21,
+      "D": 21,
+      "A": 11
+    },
+    "model": {
+      "accuracy": 0.37735849056603776,
+      "precision_macro": 0.2526115859449193,
+      "recall_macro": 0.4329004329004329,
+      "f1_macro": 0.3105636431504292,
+      "log_loss": 1.1224195194848419,
+      "confusion_matrix": [
+        [
+          8,
+          0,
+          3
+        ],
+        [
+          10,
+          0,
+          11
+        ],
+        [
+          9,
+          0,
+          12
+        ]
+      ],
+      "prediction_counts": {
+        "H": 26,
+        "A": 27
+      }
+    },
+    "legacy_model": {
+      "accuracy": 0.2641509433962264,
+      "precision_macro": 0.2997416020671834,
+      "recall_macro": 0.36652236652236647,
+      "f1_macro": 0.2222222222222222,
+      "log_loss": 1.1810158160727133,
+      "confusion_matrix": [
+        [
+          10,
+          1,
+          0
+        ],
+        [
+          19,
+          0,
+          2
+        ],
+        [
+          14,
+          3,
+          4
+        ]
+      ],
+      "prediction_counts": {
+        "A": 43,
+        "H": 6,
+        "D": 4
+      }
+    },
+    "frequency_baseline": {
+      "accuracy": 0.20754716981132076,
+      "precision_macro": 0.06918238993710692,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.11458333333333333,
+      "log_loss": 1.1571448624880658,
+      "confusion_matrix": [
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          21,
+          0,
+          0
+        ],
+        [
+          21,
+          0,
+          0
+        ]
+      ],
+      "prediction_counts": {
+        "A": 53
+      }
+    },
+    "majority_baseline_accuracy": 0.20754716981132076,
+    "majority_label": "A",
+    "equal_probability_log_loss": 1.0986122886681098,
+    "limitations": [
+      "The original holdout was inspected during the earlier version: this is an exploratory comparison, not a new untouched test.",
+      "One season and a small sample; probability calibration is not established.",
+      "Poisson assumes independent scoring; low-scoring draws and tactical interactions can be misrepresented.",
+      "No forced home-win bonus. Venue goal rates are estimated using prior matches only."
+    ]
+  },
+  "model": {
+    "kind": "poisson",
+    "classes": [
+      "A",
+      "D",
+      "H"
+    ],
+    "max_goals": 25
+  }
+}

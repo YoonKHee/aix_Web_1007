@@ -1,0 +1,24 @@
+{% load static %}
+{# 감독 연구실: BEST11 화면 안에서 쓰는 도구(가중치·케미·교체·VS 비교)와 아래쪽 분석 패널 (best11.html 맨 아래에서 include 로 불러온다) #}
+<link rel="stylesheet" href="{% static 'player/lab.css' %}">
+<section id="lab" class="lab" data-urls='{"quality":"{% url "player:lab_quality" %}"}'>
+  {% csrf_token %}
+  <details class="lab-wrap">
+    <summary>🧠 라인업 분석 <small>케미 추천 · 대체불가지수 · 진단 리포트 · 데이터 점검 (베타)</small></summary>
+    <p class="lab-note">위쪽 경기장에서 선택한 가중치·교체가 그대로 반영됩니다. 카드의 큰 숫자 = 능력 점수, 옆의 색 숫자 = 케미 가산점(이 사이트의 <b>게임 규칙</b>)입니다. 모든 수치는 올 시즌 기록으로 계산한 <b>추정</b>이며 실제 경기 결과를 보장하지 않습니다. 피로·경고·다음 상대·로테이션은 모의 경기 화면에서 다룹니다.</p>
+    <div id="labMsg" class="lab-msg" role="status"></div>
+    <div id="labSummary" class="lab-summary"></div>
+    <h4>이런 선수를 같이 쓰면 좋습니다</h4>
+    <div id="labRecs" class="lab-recs"></div>
+    <div class="lab-tabs" id="labTabs">
+      <button data-tab="irr" class="on" type="button">대체불가지수</button>
+      <button data-tab="report" type="button">진단 리포트</button>
+      <button data-tab="quality" type="button">데이터 점검</button>
+    </div>
+    <div id="labTab" class="lab-tab"></div>
+  </details>
+</section>
+<script src="{% static 'player/radar_grow.js' %}"></script>
+<script src="{% static 'player/lab.js' %}"></script>
+<script src="{% static 'player/best11_edit.js' %}" data-init-url="{% url 'player:lab_init' %}" data-lineup-url="{% url 'player:lab_lineup' %}" data-evaluate-url="{% url 'player:lab_evaluate' %}" data-candidates-url="{% url 'player:lab_candidates' %}" data-formations-url="{% url 'player:lab_formations' %}" data-chem-url="{% url 'player:lab_chem_partners' %}"
+        data-report-url="{% url 'player:lab_player_report' %}" data-reports-file="{% static 'player/data/player_reports.json' %}"></script>

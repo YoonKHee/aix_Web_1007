@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+}
+
+/* ---------------- LED 광고판 스타일 ---------------- */
+.ad-board {
+    position: absolute;
+    background-color: #08090c;
+    border: 1px solid #1f2937;
+    color: #38bdf8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.ad-top {
+    top: 0; left: 20px; right: 20px; height: 16px;
+    border-radius: 4px 4px 0 0;
+}
+
+.ad-bottom {
+    bottom: 0; left: 20px; right: 20px; height: 16px;
+    border-radius: 0 0 4px 4px;
+}
+
+.ad-left {
+    left: 0; top: 16px; bottom: 16px; width: 16px;
+    writing-mode: vertical-rl;
+    border-radius: 4px 0 0 4px;
+}
+
+.ad-right {
+    right: 0; top: 16px; bottom: 16px; width: 16px;
+    writing-mode: vertical-rl;
+    border-radius: 0 4px 4px 0;
+}
+
+/* ---------------- 전광판 LED 효괏값 ---------------- */
+.led-display {
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1), 0 0 12px rgba(234, 179, 8, 0.3);
+}
+
+/* ---------------- 오버레이 전환 트랜지션 ---------------- */
+.ui-screen {
+    transition: opacity 0.2s ease-in-out;
+}
