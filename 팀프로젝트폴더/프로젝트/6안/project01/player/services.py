@@ -224,14 +224,14 @@ def get_gk_metrics(stats):
             stats.average_rating
         ),
 
-        'mom': per90(
-            stats.mom,
-            stats.minutes
+        # GK는 MOM·베스트11을 90분당이 아니라 시즌 누적 횟수로 본다.
+        # (90분당으로 바꾸면 5경기 뛴 선수가 1~2번만 뽑혀도 주전보다 높아짐)
+        'mom': number(
+            stats.mom
         ),
 
-        'best11': per90(
-            stats.best11_count,
-            stats.minutes
+        'best11': number(
+            stats.best11_count
         ),
 
         'minutes': number(
