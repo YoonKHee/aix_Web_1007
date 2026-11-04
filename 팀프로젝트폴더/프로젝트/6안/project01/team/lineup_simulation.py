@@ -22,8 +22,9 @@ from player.services import (
     get_fw_metrics,
     get_mf_metrics,
     get_df_metrics,
-    get_gk_metrics,
     get_filtered_best11,
+    number,
+    per90,
 )
 from team.models import Team
 from team.match_prediction import (
@@ -67,6 +68,20 @@ PART_WEIGHTS = {
 }
 
 MAX_PROBABILITY_CHANGE = 0.08
+
+
+def get_gk_metrics(stats):
+    """모의 경기 전용 GK 지표 (5안 방식 그대로: MOM·베스트11은 90분당).
+
+    BEST11 화면(player/services.py)은 GK를 시즌 누적 횟수로 평가하도록 바뀌었지만,
+    모의 경기는 BEST11과 별개로 5안의 계산 방식을 유지한다.
+    """
+    return {
+        'rating': number(stats.average_rating),
+        'mom': per90(stats.mom, stats.minutes),
+        'best11': per90(stats.best11_count, stats.minutes),
+        'minutes': number(stats.minutes),
+    }
 
 METHODS = {
     'FW': (get_fw_metrics, FW_WEIGHTS),
