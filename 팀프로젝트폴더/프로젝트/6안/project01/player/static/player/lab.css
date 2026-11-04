@@ -180,3 +180,6 @@
 .b11-rule-table td,.b11-rule-table th{border:1px solid #e2e8f0;padding:4px 10px;text-align:left}
 .b11-rule-table th{font-weight:600;background:#f8fafc}
 .b11-grade-help{padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;margin-top:10px}
+
+.b11-bar .b11-sim-link{display:inline-block;padding:6px 12px;border-radius:8px;background:#78e7ff;color:#073344;font-weight:700;text-decoration:none}
+.b11-bar .b11-sim-link:hover{filter:brightness(.95)}

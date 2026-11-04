@@ -18,6 +18,10 @@
 {% endfor %}
 </div>
 <p><label><input type="checkbox" name="normalize"> 포지션별 합을 100으로 맞추기</label></p>
+<h3>승부예측 추가 요소 비중</h3>
+<p>추가 컬럼(체력·개인기·패스 정확도·경합·선방 등) 점수로 계산한 확률을 최종 확률에
+ <input type="number" name="extra_weight" min="0" max="50" step="1" value="{{ form.extra_weight|floatformat:"-1" }}" style="width:70px"> % 섞습니다.
+ <small>기본 30 · 0~50 · 나머지는 팀 기록 예측 + 선수 구성 보정 · 추가 컬럼 일부는 가상 데이터</small></p>
 <button name="action" value="preview">미리보기 (저장 안 함)</button>
 <button name="action" value="save">저장</button>
 <button name="action" value="reset" onclick="return confirm('기본값으로 되돌릴까요?')" style="background:#6e7781">기본값으로</button>

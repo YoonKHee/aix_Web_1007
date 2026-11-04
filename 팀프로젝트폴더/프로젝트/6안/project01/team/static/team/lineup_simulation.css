@@ -2023,3 +2023,24 @@ main {
         height: 540px;
     }
 }
+/* 추가 요소(10%) · 내 BEST11 가상 최근 5경기 */
+.extra-box{margin-top:18px;padding:14px 16px;border:1px solid #d6e4dc;border-radius:14px;background:#f7fbf8}
+.extra-box h3{margin:0 0 6px;font-size:16px}
+.extra-box table{margin:8px 0}
+.best11-recent{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff7e0;border:1px solid #f2d27a}
+.recent-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.recent-chip{padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#e5e7eb;color:#334155}
+.recent-chip.r-승{background:#dcfce7;color:#166534}.recent-chip.r-무{background:#e2e8f0;color:#334155}.recent-chip.r-패{background:#fee2e2;color:#991b1b}
+.virtual-badge{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:#7c3aed;color:#fff;font-size:11px;font-weight:700}
+.virtual-note{margin-top:8px;font-size:12px;color:#6d28d9}
+.extra-players h4{margin:10px 0 4px}
+.extra-players td:last-child{font-size:12px;color:#475569}
+
+/* 내 BEST11 가중치 반영 확률 */
+.weighted-box{margin-top:16px;padding:14px 16px;border:1px solid #f2d27a;border-radius:14px;background:#fffbeb}
+.weighted-box h3{margin:0 0 8px;font-size:16px}
+.weighted-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.weighted-card{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #fde68a}
+.weighted-card strong{font-size:22px;color:#92400e}
+.weighted-card small{color:#64748b}
+@media (max-width:600px){.weighted-row{grid-template-columns:1fr}}

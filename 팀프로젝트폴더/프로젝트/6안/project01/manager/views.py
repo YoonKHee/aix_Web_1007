@@ -281,6 +281,7 @@ def _current():
     for p, w in saved.get('weights', {}).items():
         if p in cur['weights']:
             cur['weights'][p].update({k: float(v) for k, v in w.items() if k in cur['weights'][p]})
+    cur['extra_weight'] = config.extra_weight(30)
     return cur
 
 
@@ -311,6 +312,14 @@ def _parse_form(post, base):
             out['weights'][p][k] = v
         if not errors and sum(out['weights'][p].values()) <= 0:
             errors.append(f'{p}: 가중치 합이 0입니다. 하나 이상은 0보다 커야 합니다.')
+    raw = str(post.get('extra_weight', '')).strip()
+    try:
+        ew = float(raw)
+        if not 0 <= ew <= 50:
+            raise ValueError
+        out['extra_weight'] = ew
+    except ValueError:
+        errors.append(f'승부예측 추가 요소 비중은 0~50 사이 숫자여야 합니다. (입력값: "{raw}")')
     if not errors and post.get('normalize'):
         for p in config.POSITIONS:
             t = sum(out['weights'][p].values())
@@ -367,7 +376,7 @@ def scoring(request):
             before = config.load_saved()
             obj = ScoreConfig.objects.first()
             if obj:
-                obj.data = {k: v for k, v in obj.data.items() if k not in ('min', 'weights')}
+                obj.data = {k: v for k, v in obj.data.items() if k not in ('min', 'weights', 'extra_weight')}
                 obj.save()
             ScoreConfigLog.objects.create(created_by=request.user.get_username(), summary='점수 기준을 기본값으로 되돌림',
                                           before=before, after=config.load_saved())
@@ -378,18 +387,19 @@ def scoring(request):
             ctx['errors'] = errors
             c = _current()
             form = {'min': {**c['min'], **form['min']},
-                    'weights': {p: {**c['weights'][p], **form['weights'].get(p, {})} for p in c['weights']}}
+                    'weights': {p: {**c['weights'][p], **form['weights'].get(p, {})} for p in c['weights']},
+                    'extra_weight': form.get('extra_weight', c['extra_weight'])}
         else:
             before_names = _sim_top({k: v for k, v in config.load_saved().items() if k in ('min', 'weights')} or {})
             after_names = _sim_top(form)
             if action == 'save':
                 obj = ScoreConfig.objects.first() or ScoreConfig(data={})
                 before = dict(obj.data)
-                obj.data = {**obj.data, 'min': form['min'], 'weights': form['weights']}
+                obj.data = {**obj.data, 'min': form['min'], 'weights': form['weights'], 'extra_weight': form['extra_weight']}
                 obj.save()
                 changed = sum(1 for p in config.POSITIONS for k, v in form['weights'][p].items() if v != d['weights'][p][k])
                 ScoreConfigLog.objects.create(created_by=request.user.get_username(),
-                                              summary=f'최소시간 {form["min"]["best11"]}/{form["min"]["formation"]}분, 기본값과 다른 가중치 {changed}개',
+                                              summary=f'최소시간 {form["min"]["best11"]}/{form["min"]["formation"]}분, 기본값과 다른 가중치 {changed}개, 추가 요소 비중 {form["extra_weight"]:g}%',
                                               before=before, after=obj.data)
                 messages.success(request, '저장했습니다. 지금부터 승부예측(모의 경기)의 선수 능력 계산에 적용됩니다. (BEST11에는 적용되지 않습니다)')
                 return redirect('manager:scoring')

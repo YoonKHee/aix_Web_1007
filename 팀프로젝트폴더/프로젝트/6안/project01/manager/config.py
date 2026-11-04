@@ -52,6 +52,15 @@ def min_minutes(default_best11, default_formation):
             'formation': int(d.get('formation', default_formation))}
 
 
+def extra_weight(default=30):
+    """승부예측(모의 경기)에서 추가 컬럼 점수를 최종 확률에 섞는 비중(%). 0~50."""
+    try:
+        v = float(_data().get('extra_weight', default))
+    except (TypeError, ValueError):
+        return float(default)
+    return max(0.0, min(50.0, v))
+
+
 def weights_for(position, default):
     w = _data().get('weights', {}).get(position)
     if not w:

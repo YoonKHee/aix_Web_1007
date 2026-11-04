@@ -282,8 +282,15 @@
     var mark = card.querySelector('.b11-mark'); if (mark) mark.remove();
     if (p.id !== autoIds[cards.indexOf(card)]) a.appendChild(el('div', { class: 'b11-mark', text: '내 선택' }));
   }
+  function simulateUrl() {             // 구단별 내 BEST11 → 승부예측(모의 경기) 홈팀 라인업으로
+    var q = 'b11_team=' + encodeURIComponent(team()) + '&b11_formation=' + encodeURIComponent(formation()) + '&b11_lineup=' + ids.join(',') +
+      '&b11_set=' + encodeURIComponent(JSON.stringify({ preset: S.preset, mult: S.mult, chem: S.chem, exp: S.exp }));   // 내 가중치 설정
+    return (D.simulateUrl || '/team/simulate/') + '?' + q;
+  }
   function barButtons(n) {
     return [
+      (n === 11 && team()) ? el('a', { class: 'b11-sim-link', href: simulateUrl(), text: '⚽ 이 라인업으로 승부예측', title: '내 BEST11을 승부예측 화면의 홈팀 라인업으로 가져갑니다' }) : null,
+      (n === 11 && !team()) ? el('span', { class: 'lab-muted', text: '승부예측은 구단을 선택한 BEST11만 가능합니다' }) : null,
       n < 11 ? el('button', { type: 'button', class: 'b11-primary', text: n ? '남은 칸 자동으로 채우기' : '자동으로 채우기', title: '빈 칸을 지금 가중치의 자동 선발 선수로 채웁니다', onclick: fillRest }) : null,
       n ? el('button', { type: 'button', text: '모두 비우기', onclick: clearAll }) : null,
       isDefaultSettings() ? null : el('button', { type: 'button', text: '가중치 초기화', onclick: resetSettings })];

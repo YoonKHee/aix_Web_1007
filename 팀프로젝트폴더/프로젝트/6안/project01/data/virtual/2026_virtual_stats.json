@@ -1,0 +1,1729 @@
+{
+ "virtual": true,
+ "note": "가상 데이터: 공식 기록이 없어 게임용으로 만든 값입니다. 실제 선수 기록이 아닙니다.",
+ "seed": "2026-virtual-v1",
+ "season": 2026,
+ "generated_at": "2026-11-04T12:32:24",
+ "players": {
+  "4": {
+   "distance_km_90": 5.1,
+   "sprints_90": 0.0,
+   "conceded_90": 0.77,
+   "saves_90": 1.37,
+   "save_rate": 0.639,
+   "clean_sheet_rate": 0.508,
+   "punches_90": 0.87,
+   "catches_90": 2.27,
+   "saves": 51,
+   "conceded": 29,
+   "clean_sheets": 17
+  },
+  "7": {
+   "distance_km_90": 9.74,
+   "sprints_90": 17.8
+  },
+  "8": {
+   "distance_km_90": 9.81,
+   "sprints_90": 17.4
+  },
+  "9": {
+   "distance_km_90": 10.66,
+   "sprints_90": 11.7
+  },
+  "10": {
+   "distance_km_90": 10.27,
+   "sprints_90": 16.4
+  },
+  "11": {
+   "distance_km_90": 9.74,
+   "sprints_90": 16.3
+  },
+  "12": {
+   "distance_km_90": 9.72,
+   "sprints_90": 12.4
+  },
+  "13": {
+   "distance_km_90": 10.4,
+   "sprints_90": 11.6
+  },
+  "14": {
+   "distance_km_90": 9.75,
+   "sprints_90": 17.8
+  },
+  "15": {
+   "distance_km_90": 9.49,
+   "sprints_90": 16.3
+  },
+  "16": {
+   "distance_km_90": 9.74,
+   "sprints_90": 15.4
+  },
+  "17": {
+   "distance_km_90": 10.68,
+   "sprints_90": 17.7
+  },
+  "20": {
+   "distance_km_90": 9.78,
+   "sprints_90": 12.4
+  },
+  "21": {
+   "distance_km_90": 10.02,
+   "sprints_90": 10.7
+  },
+  "22": {
+   "distance_km_90": 11.19,
+   "sprints_90": 17.0
+  },
+  "23": {
+   "distance_km_90": 10.71,
+   "sprints_90": 14.9
+  },
+  "24": {
+   "distance_km_90": 11.28,
+   "sprints_90": 23.2
+  },
+  "26": {
+   "distance_km_90": 11.18,
+   "sprints_90": 16.5
+  },
+  "27": {
+   "distance_km_90": 11.54,
+   "sprints_90": 20.5
+  },
+  "28": {
+   "distance_km_90": 10.8,
+   "sprints_90": 21.6
+  },
+  "29": {
+   "distance_km_90": 10.23,
+   "sprints_90": 18.0
+  },
+  "30": {
+   "distance_km_90": 11.08,
+   "sprints_90": 16.3
+  },
+  "31": {
+   "distance_km_90": 10.5,
+   "sprints_90": 20.6
+  },
+  "32": {
+   "distance_km_90": 10.83,
+   "sprints_90": 28.7
+  },
+  "33": {
+   "distance_km_90": 10.43,
+   "sprints_90": 27.2
+  },
+  "34": {
+   "distance_km_90": 10.21,
+   "sprints_90": 26.6
+  },
+  "35": {
+   "distance_km_90": 10.11,
+   "sprints_90": 23.7
+  },
+  "36": {
+   "distance_km_90": 9.86,
+   "sprints_90": 23.9
+  },
+  "37": {
+   "distance_km_90": 10.29,
+   "sprints_90": 24.6
+  },
+  "38": {
+   "distance_km_90": 9.51,
+   "sprints_90": 26.4
+  },
+  "39": {
+   "distance_km_90": 10.21,
+   "sprints_90": 20.5
+  },
+  "41": {
+   "distance_km_90": 4.14,
+   "sprints_90": 0.0,
+   "conceded_90": 2.33,
+   "saves_90": 4.5,
+   "save_rate": 0.659,
+   "clean_sheet_rate": 0.136,
+   "punches_90": 0.71,
+   "catches_90": 2.44,
+   "saves": 88,
+   "conceded": 45,
+   "clean_sheets": 2
+  },
+  "42": {
+   "distance_km_90": 5.89,
+   "sprints_90": 1.1,
+   "conceded_90": 2.2,
+   "saves_90": 4.5,
+   "save_rate": 0.671,
+   "clean_sheet_rate": 0.115,
+   "punches_90": 0.51,
+   "catches_90": 1.88,
+   "saves": 60,
+   "conceded": 30,
+   "clean_sheets": 1
+  },
+  "43": {
+   "distance_km_90": 5.86,
+   "sprints_90": 1.7,
+   "conceded_90": 2.27,
+   "saves_90": 4.27,
+   "save_rate": 0.653,
+   "clean_sheet_rate": 0.083,
+   "punches_90": 0.48,
+   "catches_90": 1.95,
+   "saves": 19,
+   "conceded": 10,
+   "clean_sheets": 0
+  },
+  "44": {
+   "distance_km_90": 10.05,
+   "sprints_90": 16.3
+  },
+  "45": {
+   "distance_km_90": 10.16,
+   "sprints_90": 16.0
+  },
+  "46": {
+   "distance_km_90": 9.75,
+   "sprints_90": 12.9
+  },
+  "47": {
+   "distance_km_90": 10.82,
+   "sprints_90": 16.0
+  },
+  "48": {
+   "distance_km_90": 9.43,
+   "sprints_90": 14.2
+  },
+  "49": {
+   "distance_km_90": 9.4,
+   "sprints_90": 15.8
+  },
+  "50": {
+   "distance_km_90": 9.09,
+   "sprints_90": 15.4
+  },
+  "51": {
+   "distance_km_90": 9.26,
+   "sprints_90": 13.7
+  },
+  "52": {
+   "distance_km_90": 10.2,
+   "sprints_90": 14.4
+  },
+  "53": {
+   "distance_km_90": 9.9,
+   "sprints_90": 19.0
+  },
+  "54": {
+   "distance_km_90": 10.47,
+   "sprints_90": 20.9
+  },
+  "55": {
+   "distance_km_90": 9.99,
+   "sprints_90": 14.1
+  },
+  "56": {
+   "distance_km_90": 10.47,
+   "sprints_90": 17.2
+  },
+  "57": {
+   "distance_km_90": 10.85,
+   "sprints_90": 21.2
+  },
+  "58": {
+   "distance_km_90": 10.66,
+   "sprints_90": 22.2
+  },
+  "59": {
+   "distance_km_90": 10.6,
+   "sprints_90": 20.2
+  },
+  "60": {
+   "distance_km_90": 10.3,
+   "sprints_90": 17.8
+  },
+  "61": {
+   "distance_km_90": 10.68,
+   "sprints_90": 24.4
+  },
+  "62": {
+   "distance_km_90": 10.74,
+   "sprints_90": 18.7
+  },
+  "64": {
+   "distance_km_90": 10.68,
+   "sprints_90": 16.3
+  },
+  "66": {
+   "distance_km_90": 10.66,
+   "sprints_90": 20.8
+  },
+  "67": {
+   "distance_km_90": 11.11,
+   "sprints_90": 16.7
+  },
+  "68": {
+   "distance_km_90": 11.38,
+   "sprints_90": 20.8
+  },
+  "69": {
+   "distance_km_90": 9.79,
+   "sprints_90": 22.6
+  },
+  "70": {
+   "distance_km_90": 10.64,
+   "sprints_90": 28.2
+  },
+  "71": {
+   "distance_km_90": 10.02,
+   "sprints_90": 20.9
+  },
+  "72": {
+   "distance_km_90": 10.9,
+   "sprints_90": 20.0
+  },
+  "73": {
+   "distance_km_90": 10.11,
+   "sprints_90": 27.0
+  },
+  "74": {
+   "distance_km_90": 10.23,
+   "sprints_90": 20.4
+  },
+  "75": {
+   "distance_km_90": 10.84,
+   "sprints_90": 16.5
+  },
+  "76": {
+   "distance_km_90": 10.88,
+   "sprints_90": 28.2
+  },
+  "77": {
+   "distance_km_90": 10.39,
+   "sprints_90": 24.7
+  },
+  "78": {
+   "distance_km_90": 10.91,
+   "sprints_90": 26.9
+  },
+  "79": {
+   "distance_km_90": 10.81,
+   "sprints_90": 28.8
+  },
+  "80": {
+   "distance_km_90": 4.88,
+   "sprints_90": 1.6,
+   "conceded_90": 1.33,
+   "saves_90": 4.5,
+   "save_rate": 0.772,
+   "clean_sheet_rate": 0.227,
+   "punches_90": 0.83,
+   "catches_90": 1.19,
+   "saves": 5,
+   "conceded": 2,
+   "clean_sheets": 0
+  },
+  "81": {
+   "distance_km_90": 5.63,
+   "sprints_90": 1.5,
+   "conceded_90": 1.15,
+   "saves_90": 2.68,
+   "save_rate": 0.699,
+   "clean_sheet_rate": 0.384,
+   "punches_90": 0.4,
+   "catches_90": 1.81,
+   "saves": 15,
+   "conceded": 6,
+   "clean_sheets": 2
+  },
+  "82": {
+   "distance_km_90": 4.72,
+   "sprints_90": 1.4,
+   "conceded_90": 1.25,
+   "saves_90": 2.93,
+   "save_rate": 0.701,
+   "clean_sheet_rate": 0.287,
+   "punches_90": 0.73,
+   "catches_90": 2.55,
+   "saves": 83,
+   "conceded": 36,
+   "clean_sheets": 8
+  },
+  "83": {
+   "distance_km_90": 5.27,
+   "sprints_90": 1.4,
+   "conceded_90": 1.22,
+   "saves_90": 2.99,
+   "save_rate": 0.71,
+   "clean_sheet_rate": 0.3,
+   "punches_90": 0.5,
+   "catches_90": 1.58,
+   "saves": 7,
+   "conceded": 3,
+   "clean_sheets": 1
+  },
+  "84": {
+   "distance_km_90": 9.35,
+   "sprints_90": 16.6
+  },
+  "85": {
+   "distance_km_90": 9.56,
+   "sprints_90": 12.9
+  },
+  "86": {
+   "distance_km_90": 9.73,
+   "sprints_90": 15.7
+  },
+  "87": {
+   "distance_km_90": 10.86,
+   "sprints_90": 14.0
+  },
+  "88": {
+   "distance_km_90": 10.7,
+   "sprints_90": 17.0
+  },
+  "89": {
+   "distance_km_90": 10.39,
+   "sprints_90": 17.7
+  },
+  "90": {
+   "distance_km_90": 9.86,
+   "sprints_90": 15.2
+  },
+  "91": {
+   "distance_km_90": 9.95,
+   "sprints_90": 12.0
+  },
+  "92": {
+   "distance_km_90": 8.99,
+   "sprints_90": 11.3
+  },
+  "93": {
+   "distance_km_90": 10.49,
+   "sprints_90": 12.5
+  },
+  "94": {
+   "distance_km_90": 10.34,
+   "sprints_90": 14.7
+  },
+  "95": {
+   "distance_km_90": 11.17,
+   "sprints_90": 14.0
+  },
+  "96": {
+   "distance_km_90": 10.93,
+   "sprints_90": 19.5
+  },
+  "97": {
+   "distance_km_90": 11.23,
+   "sprints_90": 14.3
+  },
+  "98": {
+   "distance_km_90": 10.78,
+   "sprints_90": 16.4
+  },
+  "99": {
+   "distance_km_90": 10.65,
+   "sprints_90": 21.9
+  },
+  "100": {
+   "distance_km_90": 11.18,
+   "sprints_90": 16.8
+  },
+  "101": {
+   "distance_km_90": 10.79,
+   "sprints_90": 20.0
+  },
+  "102": {
+   "distance_km_90": 10.64,
+   "sprints_90": 20.3
+  },
+  "103": {
+   "distance_km_90": 10.87,
+   "sprints_90": 19.6
+  },
+  "105": {
+   "distance_km_90": 10.27,
+   "sprints_90": 16.4
+  },
+  "106": {
+   "distance_km_90": 10.06,
+   "sprints_90": 30.8
+  },
+  "107": {
+   "distance_km_90": 9.9,
+   "sprints_90": 26.9
+  },
+  "108": {
+   "distance_km_90": 9.56,
+   "sprints_90": 25.1
+  },
+  "109": {
+   "distance_km_90": 10.7,
+   "sprints_90": 20.8
+  },
+  "111": {
+   "distance_km_90": 9.81,
+   "sprints_90": 22.5
+  },
+  "112": {
+   "distance_km_90": 9.85,
+   "sprints_90": 29.1
+  },
+  "113": {
+   "distance_km_90": 10.42,
+   "sprints_90": 19.8
+  },
+  "114": {
+   "distance_km_90": 10.2,
+   "sprints_90": 15.3
+  },
+  "115": {
+   "distance_km_90": 9.96,
+   "sprints_90": 28.1
+  },
+  "117": {
+   "distance_km_90": 5.31,
+   "sprints_90": 1.5,
+   "conceded_90": 1.25,
+   "saves_90": 3.44,
+   "save_rate": 0.733,
+   "clean_sheet_rate": 0.323,
+   "punches_90": 1.02,
+   "catches_90": 1.77,
+   "saves": 4,
+   "conceded": 1,
+   "clean_sheets": 0
+  },
+  "118": {
+   "distance_km_90": 5.61,
+   "sprints_90": 0.5,
+   "conceded_90": 1.19,
+   "saves_90": 2.73,
+   "save_rate": 0.697,
+   "clean_sheet_rate": 0.294,
+   "punches_90": 0.34,
+   "catches_90": 2.39,
+   "saves": 100,
+   "conceded": 44,
+   "clean_sheets": 9
+  },
+  "119": {
+   "distance_km_90": 9.68,
+   "sprints_90": 15.8
+  },
+  "121": {
+   "distance_km_90": 10.47,
+   "sprints_90": 11.9
+  },
+  "122": {
+   "distance_km_90": 8.93,
+   "sprints_90": 17.5
+  },
+  "123": {
+   "distance_km_90": 9.78,
+   "sprints_90": 13.3
+  },
+  "124": {
+   "distance_km_90": 9.97,
+   "sprints_90": 10.7
+  },
+  "125": {
+   "distance_km_90": 10.07,
+   "sprints_90": 15.4
+  },
+  "126": {
+   "distance_km_90": 10.18,
+   "sprints_90": 19.0
+  },
+  "128": {
+   "distance_km_90": 9.34,
+   "sprints_90": 13.8
+  },
+  "129": {
+   "distance_km_90": 10.02,
+   "sprints_90": 14.6
+  },
+  "130": {
+   "distance_km_90": 9.69,
+   "sprints_90": 20.1
+  },
+  "131": {
+   "distance_km_90": 10.73,
+   "sprints_90": 16.5
+  },
+  "132": {
+   "distance_km_90": 10.27,
+   "sprints_90": 17.6
+  },
+  "133": {
+   "distance_km_90": 10.6,
+   "sprints_90": 24.1
+  },
+  "134": {
+   "distance_km_90": 11.33,
+   "sprints_90": 17.0
+  },
+  "135": {
+   "distance_km_90": 10.31,
+   "sprints_90": 14.7
+  },
+  "136": {
+   "distance_km_90": 10.58,
+   "sprints_90": 16.9
+  },
+  "137": {
+   "distance_km_90": 10.77,
+   "sprints_90": 17.3
+  },
+  "138": {
+   "distance_km_90": 11.12,
+   "sprints_90": 17.2
+  },
+  "139": {
+   "distance_km_90": 10.96,
+   "sprints_90": 14.3
+  },
+  "140": {
+   "distance_km_90": 11.04,
+   "sprints_90": 18.4
+  },
+  "141": {
+   "distance_km_90": 10.54,
+   "sprints_90": 14.7
+  },
+  "142": {
+   "distance_km_90": 9.31,
+   "sprints_90": 31.0
+  },
+  "144": {
+   "distance_km_90": 10.48,
+   "sprints_90": 21.7
+  },
+  "145": {
+   "distance_km_90": 9.61,
+   "sprints_90": 25.6
+  },
+  "146": {
+   "distance_km_90": 9.91,
+   "sprints_90": 28.8
+  },
+  "147": {
+   "distance_km_90": 10.16,
+   "sprints_90": 21.7
+  },
+  "148": {
+   "distance_km_90": 10.57,
+   "sprints_90": 23.8
+  },
+  "150": {
+   "distance_km_90": 6.26,
+   "sprints_90": 1.4,
+   "conceded_90": 1.23,
+   "saves_90": 3.07,
+   "save_rate": 0.713,
+   "clean_sheet_rate": 0.288,
+   "punches_90": 0.34,
+   "catches_90": 1.99,
+   "saves": 39,
+   "conceded": 15,
+   "clean_sheets": 3
+  },
+  "151": {
+   "distance_km_90": 5.82,
+   "sprints_90": 0.3,
+   "conceded_90": 1.24,
+   "saves_90": 2.85,
+   "save_rate": 0.697,
+   "clean_sheet_rate": 0.301,
+   "punches_90": 0.7,
+   "catches_90": 2.0,
+   "saves": 72,
+   "conceded": 31,
+   "clean_sheets": 7
+  },
+  "153": {
+   "distance_km_90": 9.52,
+   "sprints_90": 16.9
+  },
+  "154": {
+   "distance_km_90": 9.27,
+   "sprints_90": 13.1
+  },
+  "155": {
+   "distance_km_90": 10.15,
+   "sprints_90": 17.4
+  },
+  "156": {
+   "distance_km_90": 9.68,
+   "sprints_90": 18.2
+  },
+  "158": {
+   "distance_km_90": 10.62,
+   "sprints_90": 17.1
+  },
+  "160": {
+   "distance_km_90": 10.87,
+   "sprints_90": 14.7
+  },
+  "161": {
+   "distance_km_90": 9.98,
+   "sprints_90": 12.9
+  },
+  "162": {
+   "distance_km_90": 9.31,
+   "sprints_90": 10.7
+  },
+  "163": {
+   "distance_km_90": 10.29,
+   "sprints_90": 14.4
+  },
+  "164": {
+   "distance_km_90": 11.0,
+   "sprints_90": 10.7
+  },
+  "165": {
+   "distance_km_90": 10.54,
+   "sprints_90": 16.1
+  },
+  "166": {
+   "distance_km_90": 10.98,
+   "sprints_90": 20.9
+  },
+  "167": {
+   "distance_km_90": 10.97,
+   "sprints_90": 20.8
+  },
+  "168": {
+   "distance_km_90": 11.19,
+   "sprints_90": 19.0
+  },
+  "169": {
+   "distance_km_90": 11.13,
+   "sprints_90": 18.2
+  },
+  "170": {
+   "distance_km_90": 11.7,
+   "sprints_90": 22.1
+  },
+  "171": {
+   "distance_km_90": 11.79,
+   "sprints_90": 18.6
+  },
+  "172": {
+   "distance_km_90": 10.89,
+   "sprints_90": 17.0
+  },
+  "174": {
+   "distance_km_90": 11.87,
+   "sprints_90": 20.2
+  },
+  "175": {
+   "distance_km_90": 10.7,
+   "sprints_90": 19.7
+  },
+  "176": {
+   "distance_km_90": 10.18,
+   "sprints_90": 19.0
+  },
+  "177": {
+   "distance_km_90": 10.09,
+   "sprints_90": 12.3
+  },
+  "178": {
+   "distance_km_90": 9.83,
+   "sprints_90": 20.6
+  },
+  "179": {
+   "distance_km_90": 9.55,
+   "sprints_90": 29.9
+  },
+  "180": {
+   "distance_km_90": 9.85,
+   "sprints_90": 21.1
+  },
+  "181": {
+   "distance_km_90": 10.99,
+   "sprints_90": 29.3
+  },
+  "182": {
+   "distance_km_90": 11.15,
+   "sprints_90": 23.0
+  },
+  "183": {
+   "distance_km_90": 10.36,
+   "sprints_90": 22.3
+  },
+  "184": {
+   "distance_km_90": 10.58,
+   "sprints_90": 23.5
+  },
+  "185": {
+   "distance_km_90": 10.04,
+   "sprints_90": 27.8
+  },
+  "186": {
+   "distance_km_90": 9.49,
+   "sprints_90": 22.5
+  },
+  "188": {
+   "distance_km_90": 4.89,
+   "sprints_90": 0.6,
+   "conceded_90": 0.83,
+   "saves_90": 1.98,
+   "save_rate": 0.704,
+   "clean_sheet_rate": 0.364,
+   "punches_90": 0.75,
+   "catches_90": 2.46,
+   "saves": 75,
+   "conceded": 32,
+   "clean_sheets": 12
+  },
+  "189": {
+   "distance_km_90": 5.32,
+   "sprints_90": 1.7,
+   "conceded_90": 0.81,
+   "saves_90": 1.66,
+   "save_rate": 0.672,
+   "clean_sheet_rate": 0.431,
+   "punches_90": 1.04,
+   "catches_90": 1.78,
+   "saves": 47,
+   "conceded": 23,
+   "clean_sheets": 11
+  },
+  "191": {
+   "distance_km_90": 9.23,
+   "sprints_90": 15.3
+  },
+  "192": {
+   "distance_km_90": 10.01,
+   "sprints_90": 14.1
+  },
+  "193": {
+   "distance_km_90": 9.9,
+   "sprints_90": 14.6
+  },
+  "194": {
+   "distance_km_90": 9.36,
+   "sprints_90": 15.5
+  },
+  "197": {
+   "distance_km_90": 10.62,
+   "sprints_90": 14.4
+  },
+  "198": {
+   "distance_km_90": 10.66,
+   "sprints_90": 13.9
+  },
+  "199": {
+   "distance_km_90": 9.88,
+   "sprints_90": 12.1
+  },
+  "200": {
+   "distance_km_90": 9.98,
+   "sprints_90": 13.5
+  },
+  "203": {
+   "distance_km_90": 11.32,
+   "sprints_90": 17.0
+  },
+  "204": {
+   "distance_km_90": 11.07,
+   "sprints_90": 20.1
+  },
+  "205": {
+   "distance_km_90": 10.54,
+   "sprints_90": 19.1
+  },
+  "206": {
+   "distance_km_90": 10.43,
+   "sprints_90": 21.0
+  },
+  "207": {
+   "distance_km_90": 11.16,
+   "sprints_90": 15.2
+  },
+  "209": {
+   "distance_km_90": 10.75,
+   "sprints_90": 17.3
+  },
+  "210": {
+   "distance_km_90": 10.26,
+   "sprints_90": 20.5
+  },
+  "212": {
+   "distance_km_90": 9.99,
+   "sprints_90": 24.8
+  },
+  "213": {
+   "distance_km_90": 8.8,
+   "sprints_90": 24.5
+  },
+  "214": {
+   "distance_km_90": 9.48,
+   "sprints_90": 21.2
+  },
+  "215": {
+   "distance_km_90": 10.39,
+   "sprints_90": 19.7
+  },
+  "216": {
+   "distance_km_90": 10.47,
+   "sprints_90": 28.5
+  },
+  "217": {
+   "distance_km_90": 10.11,
+   "sprints_90": 22.3
+  },
+  "218": {
+   "distance_km_90": 10.88,
+   "sprints_90": 29.0
+  },
+  "219": {
+   "distance_km_90": 4.7,
+   "sprints_90": 0.0,
+   "conceded_90": 1.33,
+   "saves_90": 4.06,
+   "save_rate": 0.753,
+   "clean_sheet_rate": 0.3,
+   "punches_90": 0.53,
+   "catches_90": 1.48,
+   "saves": 19,
+   "conceded": 6,
+   "clean_sheets": 1
+  },
+  "221": {
+   "distance_km_90": 4.83,
+   "sprints_90": 1.3,
+   "conceded_90": 1.5,
+   "saves_90": 4.07,
+   "save_rate": 0.731,
+   "clean_sheet_rate": 0.197,
+   "punches_90": 0.79,
+   "catches_90": 1.48,
+   "saves": 136,
+   "conceded": 50,
+   "clean_sheets": 6
+  },
+  "223": {
+   "distance_km_90": 10.07,
+   "sprints_90": 12.8
+  },
+  "224": {
+   "distance_km_90": 9.52,
+   "sprints_90": 17.3
+  },
+  "225": {
+   "distance_km_90": 10.22,
+   "sprints_90": 17.5
+  },
+  "226": {
+   "distance_km_90": 9.95,
+   "sprints_90": 17.5
+  },
+  "227": {
+   "distance_km_90": 10.22,
+   "sprints_90": 17.3
+  },
+  "228": {
+   "distance_km_90": 9.52,
+   "sprints_90": 11.5
+  },
+  "229": {
+   "distance_km_90": 9.65,
+   "sprints_90": 13.4
+  },
+  "230": {
+   "distance_km_90": 10.25,
+   "sprints_90": 14.8
+  },
+  "231": {
+   "distance_km_90": 10.41,
+   "sprints_90": 12.2
+  },
+  "232": {
+   "distance_km_90": 10.13,
+   "sprints_90": 15.2
+  },
+  "233": {
+   "distance_km_90": 9.33,
+   "sprints_90": 12.5
+  },
+  "234": {
+   "distance_km_90": 11.01,
+   "sprints_90": 14.9
+  },
+  "235": {
+   "distance_km_90": 11.0,
+   "sprints_90": 22.8
+  },
+  "236": {
+   "distance_km_90": 10.19,
+   "sprints_90": 21.4
+  },
+  "237": {
+   "distance_km_90": 11.08,
+   "sprints_90": 13.9
+  },
+  "238": {
+   "distance_km_90": 11.22,
+   "sprints_90": 12.9
+  },
+  "239": {
+   "distance_km_90": 10.87,
+   "sprints_90": 17.9
+  },
+  "240": {
+   "distance_km_90": 11.46,
+   "sprints_90": 20.6
+  },
+  "241": {
+   "distance_km_90": 10.99,
+   "sprints_90": 15.9
+  },
+  "242": {
+   "distance_km_90": 11.08,
+   "sprints_90": 22.8
+  },
+  "243": {
+   "distance_km_90": 11.77,
+   "sprints_90": 19.2
+  },
+  "244": {
+   "distance_km_90": 10.1,
+   "sprints_90": 27.4
+  },
+  "245": {
+   "distance_km_90": 9.94,
+   "sprints_90": 31.7
+  },
+  "246": {
+   "distance_km_90": 10.55,
+   "sprints_90": 23.1
+  },
+  "247": {
+   "distance_km_90": 10.7,
+   "sprints_90": 22.7
+  },
+  "248": {
+   "distance_km_90": 9.49,
+   "sprints_90": 19.0
+  },
+  "249": {
+   "distance_km_90": 10.38,
+   "sprints_90": 22.4
+  },
+  "250": {
+   "distance_km_90": 10.54,
+   "sprints_90": 27.5
+  },
+  "251": {
+   "distance_km_90": 10.12,
+   "sprints_90": 25.4
+  },
+  "252": {
+   "distance_km_90": 9.85,
+   "sprints_90": 25.2
+  },
+  "253": {
+   "distance_km_90": 10.17,
+   "sprints_90": 19.1
+  },
+  "256": {
+   "distance_km_90": 5.34,
+   "sprints_90": 0.0,
+   "conceded_90": 1.37,
+   "saves_90": 4.5,
+   "save_rate": 0.766,
+   "clean_sheet_rate": 0.247,
+   "punches_90": 0.65,
+   "catches_90": 0.8,
+   "saves": 170,
+   "conceded": 52,
+   "clean_sheets": 8
+  },
+  "259": {
+   "distance_km_90": 10.15,
+   "sprints_90": 11.9
+  },
+  "260": {
+   "distance_km_90": 9.87,
+   "sprints_90": 10.1
+  },
+  "261": {
+   "distance_km_90": 10.37,
+   "sprints_90": 18.4
+  },
+  "262": {
+   "distance_km_90": 10.39,
+   "sprints_90": 12.0
+  },
+  "263": {
+   "distance_km_90": 10.48,
+   "sprints_90": 15.7
+  },
+  "264": {
+   "distance_km_90": 10.53,
+   "sprints_90": 11.5
+  },
+  "265": {
+   "distance_km_90": 10.43,
+   "sprints_90": 15.0
+  },
+  "266": {
+   "distance_km_90": 10.53,
+   "sprints_90": 15.7
+  },
+  "267": {
+   "distance_km_90": 9.47,
+   "sprints_90": 17.0
+  },
+  "268": {
+   "distance_km_90": 9.78,
+   "sprints_90": 12.4
+  },
+  "269": {
+   "distance_km_90": 10.31,
+   "sprints_90": 13.5
+  },
+  "270": {
+   "distance_km_90": 9.86,
+   "sprints_90": 14.1
+  },
+  "272": {
+   "distance_km_90": 10.79,
+   "sprints_90": 18.2
+  },
+  "273": {
+   "distance_km_90": 10.99,
+   "sprints_90": 21.0
+  },
+  "274": {
+   "distance_km_90": 11.4,
+   "sprints_90": 16.2
+  },
+  "275": {
+   "distance_km_90": 10.76,
+   "sprints_90": 17.0
+  },
+  "276": {
+   "distance_km_90": 10.63,
+   "sprints_90": 20.3
+  },
+  "277": {
+   "distance_km_90": 11.03,
+   "sprints_90": 21.3
+  },
+  "278": {
+   "distance_km_90": 11.24,
+   "sprints_90": 20.3
+  },
+  "279": {
+   "distance_km_90": 10.95,
+   "sprints_90": 15.8
+  },
+  "281": {
+   "distance_km_90": 11.39,
+   "sprints_90": 20.1
+  },
+  "282": {
+   "distance_km_90": 9.6,
+   "sprints_90": 18.7
+  },
+  "283": {
+   "distance_km_90": 10.78,
+   "sprints_90": 21.1
+  },
+  "284": {
+   "distance_km_90": 10.38,
+   "sprints_90": 25.9
+  },
+  "285": {
+   "distance_km_90": 10.08,
+   "sprints_90": 27.8
+  },
+  "286": {
+   "distance_km_90": 9.5,
+   "sprints_90": 23.9
+  },
+  "287": {
+   "distance_km_90": 9.82,
+   "sprints_90": 27.8
+  },
+  "288": {
+   "distance_km_90": 5.63,
+   "sprints_90": 1.1,
+   "conceded_90": 1.03,
+   "saves_90": 2.01,
+   "save_rate": 0.661,
+   "clean_sheet_rate": 0.364,
+   "punches_90": 0.79,
+   "catches_90": 0.88,
+   "saves": 65,
+   "conceded": 33,
+   "clean_sheets": 11
+  },
+  "291": {
+   "distance_km_90": 5.14,
+   "sprints_90": 1.1,
+   "conceded_90": 1.05,
+   "saves_90": 2.52,
+   "save_rate": 0.706,
+   "clean_sheet_rate": 0.348,
+   "punches_90": 0.52,
+   "catches_90": 1.41,
+   "saves": 14,
+   "conceded": 6,
+   "clean_sheets": 2
+  },
+  "293": {
+   "distance_km_90": 10.53,
+   "sprints_90": 11.2
+  },
+  "294": {
+   "distance_km_90": 10.16,
+   "sprints_90": 16.9
+  },
+  "295": {
+   "distance_km_90": 9.34,
+   "sprints_90": 14.8
+  },
+  "296": {
+   "distance_km_90": 10.39,
+   "sprints_90": 16.2
+  },
+  "297": {
+   "distance_km_90": 10.43,
+   "sprints_90": 17.2
+  },
+  "298": {
+   "distance_km_90": 10.25,
+   "sprints_90": 13.8
+  },
+  "299": {
+   "distance_km_90": 9.97,
+   "sprints_90": 13.6
+  },
+  "301": {
+   "distance_km_90": 10.17,
+   "sprints_90": 16.1
+  },
+  "302": {
+   "distance_km_90": 9.84,
+   "sprints_90": 12.3
+  },
+  "303": {
+   "distance_km_90": 11.11,
+   "sprints_90": 23.3
+  },
+  "304": {
+   "distance_km_90": 10.12,
+   "sprints_90": 13.7
+  },
+  "305": {
+   "distance_km_90": 11.17,
+   "sprints_90": 20.4
+  },
+  "306": {
+   "distance_km_90": 11.13,
+   "sprints_90": 15.5
+  },
+  "307": {
+   "distance_km_90": 11.08,
+   "sprints_90": 18.5
+  },
+  "308": {
+   "distance_km_90": 10.53,
+   "sprints_90": 22.7
+  },
+  "309": {
+   "distance_km_90": 11.0,
+   "sprints_90": 10.2
+  },
+  "310": {
+   "distance_km_90": 10.71,
+   "sprints_90": 17.8
+  },
+  "311": {
+   "distance_km_90": 10.96,
+   "sprints_90": 19.5
+  },
+  "312": {
+   "distance_km_90": 11.11,
+   "sprints_90": 20.1
+  },
+  "313": {
+   "distance_km_90": 10.66,
+   "sprints_90": 21.5
+  },
+  "314": {
+   "distance_km_90": 9.82,
+   "sprints_90": 25.0
+  },
+  "315": {
+   "distance_km_90": 9.14,
+   "sprints_90": 21.9
+  },
+  "316": {
+   "distance_km_90": 10.76,
+   "sprints_90": 18.6
+  },
+  "317": {
+   "distance_km_90": 10.09,
+   "sprints_90": 26.0
+  },
+  "318": {
+   "distance_km_90": 10.45,
+   "sprints_90": 17.8
+  },
+  "319": {
+   "distance_km_90": 9.9,
+   "sprints_90": 31.1
+  },
+  "320": {
+   "distance_km_90": 10.72,
+   "sprints_90": 22.9
+  },
+  "321": {
+   "distance_km_90": 9.99,
+   "sprints_90": 21.7
+  },
+  "322": {
+   "distance_km_90": 5.95,
+   "sprints_90": 1.6,
+   "conceded_90": 1.02,
+   "saves_90": 3.11,
+   "save_rate": 0.753,
+   "clean_sheet_rate": 0.241,
+   "punches_90": 1.05,
+   "catches_90": 0.98,
+   "saves": 115,
+   "conceded": 38,
+   "clean_sheets": 8
+  },
+  "323": {
+   "distance_km_90": 5.96,
+   "sprints_90": 1.7,
+   "conceded_90": 1.05,
+   "saves_90": 3.22,
+   "save_rate": 0.754,
+   "clean_sheet_rate": 0.341,
+   "punches_90": 0.89,
+   "catches_90": 1.51,
+   "saves": 4,
+   "conceded": 1,
+   "clean_sheets": 0
+  },
+  "325": {
+   "distance_km_90": 10.6,
+   "sprints_90": 13.1
+  },
+  "327": {
+   "distance_km_90": 10.24,
+   "sprints_90": 12.9
+  },
+  "328": {
+   "distance_km_90": 9.06,
+   "sprints_90": 12.2
+  },
+  "329": {
+   "distance_km_90": 10.23,
+   "sprints_90": 11.7
+  },
+  "330": {
+   "distance_km_90": 10.02,
+   "sprints_90": 16.4
+  },
+  "331": {
+   "distance_km_90": 9.72,
+   "sprints_90": 13.8
+  },
+  "332": {
+   "distance_km_90": 10.06,
+   "sprints_90": 16.4
+  },
+  "333": {
+   "distance_km_90": 10.13,
+   "sprints_90": 12.1
+  },
+  "334": {
+   "distance_km_90": 9.92,
+   "sprints_90": 14.2
+  },
+  "336": {
+   "distance_km_90": 10.32,
+   "sprints_90": 13.7
+  },
+  "337": {
+   "distance_km_90": 10.68,
+   "sprints_90": 29.1
+  },
+  "338": {
+   "distance_km_90": 10.6,
+   "sprints_90": 16.9
+  },
+  "339": {
+   "distance_km_90": 10.62,
+   "sprints_90": 18.7
+  },
+  "340": {
+   "distance_km_90": 10.96,
+   "sprints_90": 20.0
+  },
+  "341": {
+   "distance_km_90": 10.88,
+   "sprints_90": 16.8
+  },
+  "343": {
+   "distance_km_90": 11.03,
+   "sprints_90": 19.0
+  },
+  "344": {
+   "distance_km_90": 10.78,
+   "sprints_90": 20.8
+  },
+  "345": {
+   "distance_km_90": 9.91,
+   "sprints_90": 12.8
+  },
+  "346": {
+   "distance_km_90": 11.2,
+   "sprints_90": 27.8
+  },
+  "347": {
+   "distance_km_90": 10.63,
+   "sprints_90": 19.5
+  },
+  "348": {
+   "distance_km_90": 10.63,
+   "sprints_90": 29.8
+  },
+  "349": {
+   "distance_km_90": 10.72,
+   "sprints_90": 21.2
+  },
+  "350": {
+   "distance_km_90": 10.08,
+   "sprints_90": 28.9
+  },
+  "351": {
+   "distance_km_90": 9.95,
+   "sprints_90": 29.0
+  },
+  "352": {
+   "distance_km_90": 9.82,
+   "sprints_90": 12.3
+  },
+  "353": {
+   "distance_km_90": 9.1,
+   "sprints_90": 20.4
+  },
+  "354": {
+   "distance_km_90": 10.11,
+   "sprints_90": 27.6
+  },
+  "355": {
+   "distance_km_90": 9.96,
+   "sprints_90": 23.8
+  },
+  "356": {
+   "distance_km_90": 10.38,
+   "sprints_90": 20.9
+  },
+  "357": {
+   "distance_km_90": 5.51,
+   "sprints_90": 1.2,
+   "conceded_90": 1.07,
+   "saves_90": 1.87,
+   "save_rate": 0.636,
+   "clean_sheet_rate": 0.357,
+   "punches_90": 0.47,
+   "catches_90": 1.26,
+   "saves": 71,
+   "conceded": 40,
+   "clean_sheets": 12
+  },
+  "361": {
+   "distance_km_90": 10.53,
+   "sprints_90": 15.4
+  },
+  "362": {
+   "distance_km_90": 10.46,
+   "sprints_90": 14.3
+  },
+  "363": {
+   "distance_km_90": 10.09,
+   "sprints_90": 16.8
+  },
+  "364": {
+   "distance_km_90": 10.1,
+   "sprints_90": 15.9
+  },
+  "365": {
+   "distance_km_90": 10.51,
+   "sprints_90": 14.3
+  },
+  "366": {
+   "distance_km_90": 10.6,
+   "sprints_90": 16.8
+  },
+  "367": {
+   "distance_km_90": 10.11,
+   "sprints_90": 13.2
+  },
+  "368": {
+   "distance_km_90": 10.06,
+   "sprints_90": 12.5
+  },
+  "369": {
+   "distance_km_90": 8.6,
+   "sprints_90": 11.7
+  },
+  "370": {
+   "distance_km_90": 10.07,
+   "sprints_90": 17.3
+  },
+  "371": {
+   "distance_km_90": 9.57,
+   "sprints_90": 15.3
+  },
+  "373": {
+   "distance_km_90": 11.3,
+   "sprints_90": 12.3
+  },
+  "374": {
+   "distance_km_90": 11.11,
+   "sprints_90": 19.8
+  },
+  "375": {
+   "distance_km_90": 10.37,
+   "sprints_90": 19.6
+  },
+  "376": {
+   "distance_km_90": 10.74,
+   "sprints_90": 12.5
+  },
+  "377": {
+   "distance_km_90": 11.98,
+   "sprints_90": 20.1
+  },
+  "378": {
+   "distance_km_90": 10.68,
+   "sprints_90": 17.4
+  },
+  "379": {
+   "distance_km_90": 10.92,
+   "sprints_90": 15.5
+  },
+  "380": {
+   "distance_km_90": 10.83,
+   "sprints_90": 13.8
+  },
+  "381": {
+   "distance_km_90": 11.1,
+   "sprints_90": 21.6
+  },
+  "382": {
+   "distance_km_90": 10.95,
+   "sprints_90": 20.8
+  },
+  "383": {
+   "distance_km_90": 10.14,
+   "sprints_90": 21.7
+  },
+  "384": {
+   "distance_km_90": 9.75,
+   "sprints_90": 22.4
+  },
+  "385": {
+   "distance_km_90": 10.88,
+   "sprints_90": 23.9
+  },
+  "386": {
+   "distance_km_90": 9.81,
+   "sprints_90": 26.2
+  },
+  "387": {
+   "distance_km_90": 10.53,
+   "sprints_90": 25.2
+  },
+  "388": {
+   "distance_km_90": 10.75,
+   "sprints_90": 25.7
+  },
+  "389": {
+   "distance_km_90": 9.54,
+   "sprints_90": 20.5
+  },
+  "390": {
+   "distance_km_90": 10.37,
+   "sprints_90": 21.8
+  },
+  "391": {
+   "distance_km_90": 10.44,
+   "sprints_90": 17.1
+  },
+  "392": {
+   "distance_km_90": 10.66,
+   "sprints_90": 26.6
+  },
+  "395": {
+   "distance_km_90": 4.72,
+   "sprints_90": 1.2,
+   "conceded_90": 1.12,
+   "saves_90": 2.7,
+   "save_rate": 0.707,
+   "clean_sheet_rate": 0.218,
+   "punches_90": 0.36,
+   "catches_90": 1.19,
+   "saves": 36,
+   "conceded": 15,
+   "clean_sheets": 3
+  },
+  "396": {
+   "distance_km_90": 5.02,
+   "sprints_90": 1.0,
+   "conceded_90": 1.37,
+   "saves_90": 4.28,
+   "save_rate": 0.757,
+   "clean_sheet_rate": 0.276,
+   "punches_90": 0.57,
+   "catches_90": 2.58,
+   "saves": 102,
+   "conceded": 33,
+   "clean_sheets": 6
+  },
+  "397": {
+   "distance_km_90": 10.24,
+   "sprints_90": 13.5
+  },
+  "398": {
+   "distance_km_90": 9.84,
+   "sprints_90": 16.9
+  },
+  "399": {
+   "distance_km_90": 9.88,
+   "sprints_90": 12.5
+  },
+  "400": {
+   "distance_km_90": 10.21,
+   "sprints_90": 11.4
+  },
+  "401": {
+   "distance_km_90": 8.97,
+   "sprints_90": 13.5
+  },
+  "402": {
+   "distance_km_90": 10.48,
+   "sprints_90": 13.5
+  },
+  "403": {
+   "distance_km_90": 8.61,
+   "sprints_90": 13.7
+  },
+  "404": {
+   "distance_km_90": 9.72,
+   "sprints_90": 14.5
+  },
+  "405": {
+   "distance_km_90": 10.11,
+   "sprints_90": 16.7
+  },
+  "406": {
+   "distance_km_90": 10.22,
+   "sprints_90": 13.8
+  },
+  "407": {
+   "distance_km_90": 10.2,
+   "sprints_90": 14.8
+  },
+  "408": {
+   "distance_km_90": 10.48,
+   "sprints_90": 18.9
+  },
+  "409": {
+   "distance_km_90": 10.37,
+   "sprints_90": 15.5
+  },
+  "410": {
+   "distance_km_90": 10.38,
+   "sprints_90": 18.4
+  },
+  "412": {
+   "distance_km_90": 11.01,
+   "sprints_90": 15.5
+  },
+  "413": {
+   "distance_km_90": 10.85,
+   "sprints_90": 22.4
+  },
+  "414": {
+   "distance_km_90": 10.85,
+   "sprints_90": 17.3
+  },
+  "415": {
+   "distance_km_90": 10.67,
+   "sprints_90": 18.1
+  },
+  "416": {
+   "distance_km_90": 11.01,
+   "sprints_90": 22.7
+  },
+  "417": {
+   "distance_km_90": 9.74,
+   "sprints_90": 29.5
+  },
+  "418": {
+   "distance_km_90": 10.43,
+   "sprints_90": 23.3
+  },
+  "419": {
+   "distance_km_90": 10.39,
+   "sprints_90": 19.5
+  },
+  "421": {
+   "distance_km_90": 10.87,
+   "sprints_90": 29.6
+  },
+  "422": {
+   "distance_km_90": 11.01,
+   "sprints_90": 26.7
+  },
+  "423": {
+   "distance_km_90": 10.34,
+   "sprints_90": 28.8
+  },
+  "424": {
+   "distance_km_90": 10.54,
+   "sprints_90": 19.0
+  },
+  "425": {
+   "distance_km_90": 10.74,
+   "sprints_90": 23.2
+  },
+  "426": {
+   "distance_km_90": 10.13,
+   "sprints_90": 28.1
+  },
+  "427": {
+   "distance_km_90": 11.06,
+   "sprints_90": 18.4
+  },
+  "428": {
+   "distance_km_90": 10.74,
+   "sprints_90": 22.1
+  },
+  "429": {
+   "distance_km_90": 10.02,
+   "sprints_90": 31.2
+  },
+  "439": {
+   "distance_km_90": 10.0,
+   "sprints_90": 28.8
+  }
+ }
+}

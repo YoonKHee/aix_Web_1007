@@ -35,7 +35,10 @@ from team.match_prediction import (
     forecast,
     features_for,
     predict_probabilities,
+    poisson_probabilities,
 )
+from team.sim_detail import DetailIndex
+from team import virtual_stats
 
 
 ROLE_ORDER = ('GK', 'DF', 'MF', 'FW')
@@ -126,6 +129,7 @@ class SimulationContext:
         self.bundle = load_bundle(digest)
         self.teams = team_options(self.matches)
         self.snapshot = load_snapshot()
+        self.detail = DetailIndex()          # 포지션별 추가 컬럼 점수 (실제 기록 + 가상 데이터)
 
         self.references = {}
         candidates = get_formation_candidates()
@@ -260,6 +264,7 @@ class SimulationContext:
             )
 
         team = self.db_teams[official_id]
+        extra_w = extra_weight()
 
         players = list(
             Player.objects
@@ -333,6 +338,13 @@ class SimulationContext:
                 },
                 'notes': {
                     role: value[1]
+                    for role, value in abilities.items()
+                },
+                'detail': self.detail.player(stats),
+                # 화면에 보여 줄 '종합 점수' = 기존 역할 지수 (100-비중)% + 추가 지표 점수 비중%
+                # (계산은 기존 방식 그대로: 기존 점수 → 선수 구성 보정, 추가 지표 → 추가 요소 확률)
+                'total_scores': {
+                    role: round((1 - extra_w) * value[0] + extra_w * self.detail.player(stats)['score'], 1)
                     for role, value in abilities.items()
                 },
             })
@@ -492,6 +504,121 @@ class SimulationContext:
             })
 
         return lineup
+
+
+# ---------------------------------------------------------------- 추가 컬럼 (승부예측 정밀화)
+# 포지션별 추가 컬럼 점수로 따로 계산한 승·무·패 확률을 최종 확률에 이 비중만큼 섞는다.
+EXTRA_WEIGHT = 0.30          # 기본값. 관리자 > 점수 기준에서 0~50% 로 바꿀 수 있다
+EXTRA_FACTOR_RANGE = (0.7, 1.4)     # 예상 득점을 늘리거나 줄이는 최대 범위
+FORM_FACTOR_RANGE = 0.15            # 내 BEST11 가상 최근 5경기 흐름으로 예상 득점을 ±15%까지
+
+
+def extra_weight():
+    """관리자 > 점수 기준에 저장한 '추가 요소 비중'(0~50%). 없으면 EXTRA_WEIGHT."""
+    try:
+        from manager import config
+        return config.extra_weight(EXTRA_WEIGHT * 100) / 100
+    except Exception:
+        return EXTRA_WEIGHT
+
+
+def _mean(values, default=50.0):
+    values = list(values)
+    return sum(values) / len(values) if values else default
+
+
+def team_extra(lineup):
+    """라인업의 추가 컬럼 공격·수비 지수 (50 = 리그 주전급 평균). 컨디션도 반영한다."""
+    def score(p):
+        return min(100.0, p['detail']['score'] * CONDITIONS[p['condition']])
+
+    attack = _mean(score(p) for p in lineup if p['role'] in ('FW', 'MF'))
+    df = _mean(score(p) for p in lineup if p['role'] == 'DF')
+    gk = _mean(score(p) for p in lineup if p['role'] == 'GK')
+    return {'attack': round(attack, 1), 'defense': round(0.6 * df + 0.4 * gk, 1)}
+
+
+def extra_probabilities(base_home, base_away, home, away, home_form=1.0):
+    """기본 예상 득점을 추가 컬럼 지수로 조정한 뒤 포아송으로 승·무·패 확률을 낸다."""
+    lo, hi = EXTRA_FACTOR_RANGE
+    fh = max(lo, min(hi, (home['attack'] / 50) / max(1.0, away['defense']) * 50)) * home_form
+    fa = max(lo, min(hi, (away['attack'] / 50) / max(1.0, home['defense']) * 50))
+    goals_home = max(0.05, min(4.5, base_home * fh))
+    goals_away = max(0.05, min(4.5, base_away * fa))
+    return poisson_probabilities(goals_home, goals_away), {
+        'home_goals': round(goals_home, 2), 'away_goals': round(goals_away, 2),
+        'home_factor': round(fh, 3), 'away_factor': round(fa, 3)}
+
+
+def best11_recent(lineup, home_name, opponents):
+    """내 BEST11의 '가상' 최근 5경기. 같은 11명이면 항상 같은 결과가 나온다(선수 ID가 씨앗).
+    라인업 능력이 높을수록 이길 확률이 조금 높게 만든다. 실제 경기 결과가 아니다."""
+    import random
+
+    ids = sorted(p['id'] for p in lineup)
+    rng = random.Random('best11-' + ','.join(map(str, ids)))
+    strength = _mean(p['effective_score'] for p in lineup)
+    win = max(0.15, min(0.65, 0.38 + (strength - 50) / 100 * 0.8))
+    draw = 0.27
+    games = []
+    for _ in range(5):
+        r = rng.random()
+        result = '승' if r < win else '무' if r < win + draw else '패'
+        a = rng.choice([0, 1, 1, 2, 2, 3])
+        if result == '승':
+            b = rng.randint(0, max(0, a - 1)) if a else 0
+            a = max(a, b + 1)
+        elif result == '무':
+            b = a
+        else:
+            b = a + rng.choice([1, 1, 2])
+        games.append({'opponent': rng.choice(opponents) if opponents else '상대', 'score': f'{a}:{b}', 'result': result})
+    points = sum(3 if g['result'] == '승' else 1 if g['result'] == '무' else 0 for g in games) / 5
+    form = 1 + FORM_FACTOR_RANGE * max(-1.0, min(1.0, (points - 1.4) / 1.6))
+    return {'team': home_name, 'games': games, 'points_per_game': round(points, 2), 'form_factor': round(form, 3),
+            'note': '가상 데이터: 내 BEST11이 치른 것으로 가정한 재미용 최근 5경기입니다. 실제 경기 결과가 아닙니다.'}
+
+
+def best11_weighted(context, home_id, normal, edited, settings, prior, away_change, extra_after, weight):
+    """내 BEST11 가중치(감독 연구실 설정)로 홈팀 선수를 평가했을 때의 확률.
+    BEST11 화면과 같은 엔진(player.lab)으로 선수 점수(능력 + 케미)를 다시 계산해 선수 구성 보정에 쓴다.
+    기본 비교 대상(기본 추천 라인업)도 같은 가중치로 평가해서 공정하게 비교한다."""
+    from player.lab import chemistry as CH
+    from player.lab import service as LAB
+
+    team = context.db_teams.get(home_id)
+    c = LAB.Ctx({'team': str(team.pk) if team else '', 'preset': settings.get('preset', 'default'),
+                 'mult': settings.get('mult') or {}, 'chem_scale': settings.get('chem', 1.0),
+                 'exp_scale': settings.get('exp', 1.5)})
+
+    def scores(lineup):
+        profiles = c.lineup_profiles([p['id'] for p in lineup])
+        chem = c.score_lineup(profiles)[1] if profiles else {'players': {}}
+        out = {}
+        for p in lineup:
+            pid = p['id']
+            if pid in chem['players']:
+                value = CH.final_score(c.adj(pid), chem['players'][pid]['bonus'])
+            else:
+                value = c.ability.get(pid, p['base_score'])
+            out[pid] = min(100.0, value * CONDITIONS[p['condition']])
+        return out
+
+    def parts(lineup, sc):
+        return {role: _mean(sc[p['id']] for p in lineup if p['role'] == role) for role in ROLE_ORDER}
+
+    before, after = parts(normal, scores(normal)), parts(edited, scores(edited))
+    change = sum((after[r] - before[r]) / 100 * PART_WEIGHTS[r] for r in ROLE_ORDER)
+    adjusted = adjust_probabilities(prior, change, away_change)
+    final = {k: (1 - weight) * adjusted[k] + weight * extra_after[k] for k in prior}
+    return final, {'change': round(change * 100, 2),
+                   'parts': [{'role': r, 'label': ROLE_NAMES[r], 'before': round(before[r], 1), 'after': round(after[r], 1)}
+                             for r in ROLE_ORDER]}
+
+
+def extra_players(lineup):
+    return [{'name': p['name'], 'role': p['role'], 'score': p['detail']['score'], 'note': p['detail'].get('note', ''),
+             'metrics': p['detail']['metrics']} for p in lineup]
 
 
 def department_scores(lineup):
@@ -785,6 +912,7 @@ def simulate(context, payload):
                 })
 
         teams.append({
+            '_normal': normal,
             'formation': payload[side]['formation'],
             'parts': parts,
             'change': change,
@@ -810,9 +938,36 @@ def simulate(context, payload):
         teams[1]['change'],
     )
 
+    # 추가 컬럼 확률 (10%) — 기본 라인업(비교 기준)과 지금 라인업 각각 계산
+    base_home, base_away = features[-2], features[-1]
+    normal_h, normal_a = team_extra(teams[0]['_normal']), team_extra(teams[1]['_normal'])
+    now_h, now_a = team_extra(teams[0]['lineup']), team_extra(teams[1]['lineup'])
+    recent = None
+    if payload.get('home_best11'):
+        opponents = [t['name'] for t in context.teams if t['id'] not in (home_id,)]
+        recent = best11_recent(teams[0]['lineup'], base['home_name'], opponents)
+    extra_before, _ = extra_probabilities(base_home, base_away, normal_h, normal_a)
+    extra_after, goals = extra_probabilities(base_home, base_away, now_h, now_a,
+                                             recent['form_factor'] if recent else 1.0)
+    w = extra_weight()
+    final_before = {k: (1 - w) * prior[k] + w * extra_before[k] for k in prior}
+    final_after = {k: (1 - w) * adjusted[k] + w * extra_after[k] for k in prior}
+
+    # 내 BEST11 가중치 반영 확률 (BEST11 화면에서 넘어온 내 라인업일 때만)
+    mine = None
+    settings = payload.get('home_best11_settings')
+    if payload.get('home_best11') and isinstance(settings, dict):
+        mine_final, mine_info = best11_weighted(context, home_id, teams[0]['_normal'], teams[0]['lineup'], settings,
+                                                prior, teams[1]['change'], extra_after, w)
+        _, mine_percent = bounded_display(final_before, mine_final)
+        mine = {**mine_info, 'probabilities': mine_percent}
+
+    for t in teams:
+        t.pop('_normal', None)
+
     before_percent, after_percent = bounded_display(
-        prior,
-        adjusted,
+        final_before,
+        final_after,
     )
 
     evaluation = context.bundle['evaluation']
@@ -843,6 +998,18 @@ def simulate(context, payload):
         ],
         'home': teams[0],
         'away': teams[1],
+        'extra': {
+            'weight': round(w * 100),
+            'base_goals': {'home': round(base_home, 2), 'away': round(base_away, 2)},
+            'goals': goals,
+            'home': now_h,
+            'away': now_a,
+            'probabilities': {k: round(v * 100, 1) for k, v in extra_after.items()},
+            'players': {'home': extra_players(teams[0]['lineup']), 'away': extra_players(teams[1]['lineup'])},
+            'virtual_note': virtual_stats.NOTE,
+        },
+        'best11_recent': recent,
+        'best11_weighted': mine,
         'baseline_accuracy': round(
             evaluation['model']['accuracy'] * 100,
             1,
