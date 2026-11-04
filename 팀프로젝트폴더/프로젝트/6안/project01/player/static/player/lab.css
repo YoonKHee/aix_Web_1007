@@ -150,3 +150,6 @@
 .b11-sc-more summary{cursor:pointer;font-weight:700;font-size:15px}.b11-sc-more ul{margin:8px 0 0;padding-left:18px;font-size:14px}
 .b11-sc-final p{margin:4px 0;font-size:15px}
 @media(max-width:700px){.b11-sc-d{margin-left:0}.b11-scout .b11-hb-l{width:70px}.b11-sc-row{flex-wrap:nowrap!important}}
+
+/* 지표별 가중치 합계 (100 초과 경고) */
+.b11-tools .b11-wsum{margin:6px 0 0;font-size:12px;color:#475569}.b11-tools .b11-wsum.over{color:#b91c1c;font-weight:700}

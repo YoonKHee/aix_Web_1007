@@ -130,10 +130,27 @@
       oppRptBtn,
       el('button', { type: 'button', text: '포메이션 추천', title: '이 구단·가중치에서 점수가 가장 높은 포메이션', onclick: openFormations }),
       el('span', { class: 'lab-muted', text: '카드 숫자 = 능력 점수, 옆의 색 숫자 = 케미 가산점' })]));
-    var det = el('details', { class: 'lab-detail' }, [el('summary', { text: '지표별 가중치 자세히 (배율 0~3×)' }), metricsBox]);
+    var det = el('details', { class: 'lab-detail' }, [el('summary', { text: '지표별 가중치 자세히 (점수 0~100, 포지션 합계 100 기준)' }), metricsBox]);
     tools.appendChild(det);
   }
   function fmtMult(v) { return v.toFixed(2).replace(/0$/, '') + '×'; }
+  // 지표별 가중치는 점수(0~100)로 보여주고, 서버에는 기본 가중치 대비 배율(mult)로 보낸다.
+  var MAX_WEIGHT_SUM = 100;
+  // 배율은 포지션별로 저장한다('FW:goals'). 예전에 저장된 'goals' 형식도 읽는다.
+  function multOf(pos, x) { var k = pos + ':' + x.key; return S.mult[k] != null ? S.mult[k] : (S.mult[x.key] != null ? S.mult[x.key] : 1); }
+  function weightOf(pos, x) { return Math.min(100, Math.round(x.weight * multOf(pos, x))); }
+  function setWeight(pos, x, w) {
+    if (S.mult[x.key] != null) {                       // 예전 형식이 남아 있으면 포지션별로 나눠 옮긴다
+      var old = S.mult[x.key]; delete S.mult[x.key];
+      POS_ORDER.forEach(function (p) { (INIT.metrics[p] || []).forEach(function (y) { if (y.key === x.key && Math.abs(old - 1) > 1e-9) S.mult[p + ':' + y.key] = old; }); });
+    }
+    var k = pos + ':' + x.key, m = x.weight ? w / x.weight : 1;
+    if (Math.abs(m - 1) < 1e-9) delete S.mult[k]; else S.mult[k] = Math.round(m * 10000) / 10000;
+  }
+  function resetWeightSliders() {
+    Array.prototype.forEach.call(metricsBox.querySelectorAll('input'), function (i) { i.value = i.getAttribute('data-base'); i.nextSibling.textContent = i.value; });
+    Array.prototype.forEach.call(metricsBox.querySelectorAll('fieldset'), function (f) { if (f.updateSum) f.updateSum(); });
+  }
   function fillTools() {
     clear(presetBox);
     Object.keys(INIT.presets).forEach(function (k) {
@@ -144,14 +161,26 @@
     clear(metricsBox);
     POS_ORDER.forEach(function (pos) {
       var fs = el('fieldset', {}, [el('legend', { text: POS_LABEL[pos] })]);
+      var inputs = [];
+      var sumOut = el('p', { class: 'b11-wsum' });
+      function updateSum() {                          // 포지션 가중치 합계: 100을 넘으면 경고
+        var t = inputs.reduce(function (a, i) { return a + Number(i.value); }, 0);
+        var over = t > MAX_WEIGHT_SUM;
+        sumOut.className = 'b11-wsum' + (over ? ' over' : '');
+        sumOut.textContent = '합계 ' + t + ' / ' + MAX_WEIGHT_SUM + (over ? ' — MAX(100)를 ' + (t - MAX_WEIGHT_SUM) + '점 넘었습니다. 계산할 때는 비율대로 합계 100에 맞춰집니다.' : '');
+      }
       INIT.metrics[pos].forEach(function (x) {
-        var cur = S.mult[x.key] != null ? S.mult[x.key] : 1;
-        var out = el('b', { text: fmtMult(cur) });
-        var inp = el('input', { type: 'range', min: '0', max: '3', step: '0.25', value: String(cur), 'data-key': x.key });
-        inp.addEventListener('input', function () { out.textContent = fmtMult(parseFloat(inp.value)); });
-        inp.addEventListener('change', function () { S.mult[x.key] = parseFloat(inp.value); saveSettings(); settingsChanged(); });
-        fs.appendChild(el('label', {}, [x.label + ' (' + x.weight + ')', inp, out]));
+        var cur = weightOf(pos, x);
+        var out = el('b', { text: String(cur) });
+        var inp = el('input', { type: 'range', min: '0', max: '100', step: '1', value: String(cur), 'data-key': x.key, 'data-base': String(x.weight) });
+        inputs.push(inp);
+        inp.addEventListener('input', function () { out.textContent = inp.value; updateSum(); });
+        inp.addEventListener('change', function () { setWeight(pos, x, Number(inp.value)); saveSettings(); settingsChanged(); });
+        fs.appendChild(el('label', { title: '기본 가중치 ' + x.weight }, [x.label + ' (기본 ' + x.weight + ')', inp, out]));
       });
+      fs.appendChild(sumOut);
+      fs.updateSum = updateSum;
+      updateSum();
       metricsBox.appendChild(fs);
     });
     chemInp.addEventListener('input', function () { chemVal.textContent = fmtMult(parseFloat(chemInp.value)); });
@@ -163,7 +192,7 @@
   function setPreset(k) {
     S.preset = k; S.mult = {}; saveSettings();
     Array.prototype.forEach.call(presetBox.children, function (b) { b.className = b.getAttribute('data-k') === k ? 'on' : ''; });
-    Array.prototype.forEach.call(metricsBox.querySelectorAll('input'), function (i) { i.value = '1'; i.nextSibling.textContent = '1×'; });
+    resetWeightSliders();
     settingsChanged();
   }
 
@@ -210,7 +239,7 @@
     var changed = isCustom();
     var parts = [
       el('span', { text: changed ? '내 BEST11 (직접 교체함)' : (isDefaultSettings() ? 'BEST11 (자동 선발)' : 'BEST11 (가중치 적용 자동 선발)') }),
-      el('span', { text: '라인업 총점 ' + r.total + ' · 팀 케미 평균 ' + sign(r.chem_team) }),
+      el('span', { text: '라인업 총점 ' + r.total + ' · 라인업 평균 ' + (r.players.length ? (r.total / r.players.length).toFixed(1) : '-') + ' · 팀 케미 평균 ' + sign(r.chem_team) }),
       el('span', { class: 'lab-muted', text: '카드의 ⇄ 교체 버튼으로 선수를 바꿀 수 있습니다' }),
       changed ? el('button', { type: 'button', text: '자동 선발로 되돌리기', onclick: reset }) : null,
       isDefaultSettings() ? null : el('button', { type: 'button', text: '가중치 초기화', onclick: resetSettings })];
@@ -231,7 +260,7 @@
     S = { preset: 'default', mult: {}, chem: 1, exp: 1.5, opponent: '' }; saveSettings();
     chemInp.value = '1'; chemVal.textContent = '1×'; expInp.value = '1.5'; expVal.textContent = '1.5×'; oppSel.value = '';
     Array.prototype.forEach.call(presetBox.children, function (b) { b.className = b.getAttribute('data-k') === 'default' ? 'on' : ''; });
-    Array.prototype.forEach.call(metricsBox.querySelectorAll('input'), function (i) { i.value = '1'; i.nextSibling.textContent = '1×'; });
+    resetWeightSliders();
     settingsChanged();
   }
   function showErr(e) { bar.appendChild(el('span', { class: 'lab-msg err', text: e.message })); }
@@ -593,7 +622,9 @@
   function settingsBanner(banner, pid, r) {
     var nm = (INIT && INIT.presets && INIT.presets[S.preset]) || S.preset;
     var parts = ['프리셋 ' + nm];
-    Object.keys(S.mult).forEach(function (k) { if (S.mult[k] !== 1) parts.push(k + ' ×' + S.mult[k]); });
+    POS_ORDER.forEach(function (pos) { (INIT && INIT.metrics && INIT.metrics[pos] || []).forEach(function (x) {
+      if (multOf(pos, x) !== 1) parts.push(POS_LABEL[pos] + ' ' + x.label + ' ' + x.weight + '→' + weightOf(pos, x));
+    }); });
     if (S.chem !== 1) parts.push('케미 ×' + S.chem);
     if (S.exp !== 1.5) parts.push('경험 보정 기준 ' + S.exp);
     if (S.opponent) parts.push('상대 맞춤 적용');

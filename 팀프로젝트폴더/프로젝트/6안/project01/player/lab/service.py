@@ -123,18 +123,26 @@ def clear_cache():
 # ---------------------------------------------------------------- 가중치와 능력 점수
 
 def build_weights(preset='default', mult=None, extra=None):
-    """지표 배율(프리셋 + 사용자가 조정한 값)을 적용한 포지션별 가중치(합계 100)."""
+    """지표 배율(프리셋 + 사용자가 조정한 값)을 적용한 포지션별 가중치(합계 100).
+
+    사용자 배율 키는 'FW:goals' 처럼 포지션별로 받는다(공격수 득점을 바꿔도 미드필더 득점은 그대로).
+    예전 형식('goals')도 읽는다 — 그 경우 그 지표가 있는 모든 포지션에 적용된다.
+    """
     pm = dict(PRESETS.get(preset, PRESETS['default'])['mult'])
+    per_pos = {}
     for k, v in (mult or {}).items():
         try:
-            pm[k] = max(0.0, min(3.0, float(v)))
+            val = max(0.0, min(20.0, float(v)))   # 화면에서 가중치 점수 0~100 입력 → 기본 5점 지표도 100까지(100/5=20배)
         except (TypeError, ValueError):
-            pass
-    for k, v in (extra or {}).items():            # 상대 맞춤 배율은 프리셋·사용자 조정 위에 곱한다
-        pm[k] = pm.get(k, 1.0) * v
+            continue
+        if ':' in str(k):
+            per_pos[str(k)] = val
+        else:
+            pm[k] = val
+    extra = extra or {}                           # 상대 맞춤 배율은 프리셋·사용자 조정 위에 곱한다
     out = {}
     for pos, base in BASE_WEIGHTS.items():
-        raw = {m: w * pm.get(m, 1.0) for m, w in base.items()}
+        raw = {m: w * per_pos.get(f'{pos}:{m}', pm.get(m, 1.0)) * extra.get(m, 1.0) for m, w in base.items()}
         total = sum(raw.values()) or 1.0
         out[pos] = {m: v / total * 100 for m, v in raw.items()}
     return out
