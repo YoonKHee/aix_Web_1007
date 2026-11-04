@@ -2,8 +2,7 @@
 {% block title %}점수 기준{% endblock %}
 {% block content %}
 <h1>점수 기준 (가중치 · 최소 출전시간)</h1>
-<div class="box warn"><b>안내:</b> 이 화면의 설정은 사용자 화면의 <b>BEST11 · 감독 연구실 · 승부예측(모의 경기)에는 적용되지 않습니다.</b> BEST11은 관리자와 선수·선수 기록만 공유하고, 점수 기준은 별도로 관리합니다.</div>
-{% if not patched %}<div class="box warn">아직 <code>python manage.py patch_services</code> 를 실행하지 않아서, 저장해도 BEST11 계산에는 반영되지 않습니다. 미리보기도 현재와 같게 나옵니다.</div>{% endif %}
+<div class="box warn"><b>안내:</b> 여기서 저장한 <b>가중치는 승부예측(모의 경기)의 선수 능력 계산에만 적용</b>됩니다. <b>BEST11 · 감독 연구실에는 적용되지 않습니다</b>(BEST11은 관리자와 선수·선수 기록만 공유). 최소 출전시간은 지금 어디에도 적용되지 않습니다. <code>python manage.py patch_services</code> 는 BEST11에 연결하는 명령이므로 실행하지 마세요.</div>
 {% if errors %}<div class="box error"><b>저장하지 않았습니다. 고쳐주세요:</b><ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
 <form method="post">{% csrf_token %}
 <h3>최소 출전시간 (분)</h3>
@@ -19,15 +18,14 @@
 {% endfor %}
 </div>
 <p><label><input type="checkbox" name="normalize"> 포지션별 합을 100으로 맞추기</label></p>
-<p>미리보기 포메이션: <select name="formation">{% for f in formations %}<option {% if f == formation %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></p>
 <button name="action" value="preview">미리보기 (저장 안 함)</button>
 <button name="action" value="save">저장</button>
 <button name="action" value="reset" onclick="return confirm('기본값으로 되돌릴까요?')" style="background:#6e7781">기본값으로</button>
 </form>
 
 {% if preview %}
-<h2>미리보기: 전체 K리그 {{ formation }} BEST11</h2>
-<p>초록 = 새로 들어오는 선수, 빨강 취소선 = 빠지는 선수. 아직 저장되지 않았습니다.</p>
+<h2>미리보기: 승부예측(모의 경기) 포지션별 능력 점수 상위 5명</h2>
+<p>초록 = 새로 들어오는 선수, 빨강 취소선 = 빠지는 선수. 아직 저장되지 않았습니다. (BEST11 화면은 바뀌지 않습니다)</p>
 <table><tr><th>포지션</th><th>선발</th><th>빠지는 선수</th></tr>
 {% for g in preview %}<tr><td>{{ g.pos }}</td>
  <td>{% for x in g.rows %}<span {% if x.new %}class="new"{% endif %}>{{ x.name }}({{ x.team }}) {{ x.score }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</td>

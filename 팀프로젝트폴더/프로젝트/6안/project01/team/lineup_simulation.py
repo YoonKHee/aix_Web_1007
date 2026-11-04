@@ -91,6 +91,22 @@ METHODS = {
 }
 
 
+def simulation_methods():
+    """모의 경기에서 쓸 (지표 함수, 가중치). 가중치는 관리자 > 점수 기준에서 저장한 값을 쓴다.
+
+    관리자 점수 기준은 모의 경기(승부예측)에만 적용되고 BEST11 화면과 감독 연구실은 영향을 받지 않는다.
+    저장한 값이 없거나 읽기에 실패하면 기본 가중치(player/services.py)를 그대로 쓴다.
+    """
+    try:
+        from manager import config
+        return {
+            role: (function, config.weights_for(role, weights))
+            for role, (function, weights) in METHODS.items()
+        }
+    except Exception:
+        return dict(METHODS)
+
+
 def slots(formation):
     if formation not in FORMATIONS:
         raise PredictionUnavailable(
@@ -113,8 +129,9 @@ class SimulationContext:
 
         self.references = {}
         candidates = get_formation_candidates()
+        self.methods = simulation_methods()
 
-        for role, (function, weights) in METHODS.items():
+        for role, (function, weights) in self.methods.items():
             group = [
                 stats
                 for stats in candidates
@@ -203,7 +220,7 @@ class SimulationContext:
             }
 
         else:
-            function, weights = METHODS[role]
+            function, weights = self.methods[role]
             values = function(stats)
 
         raw = sum(

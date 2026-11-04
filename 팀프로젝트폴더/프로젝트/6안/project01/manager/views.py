@@ -328,6 +328,21 @@ def _best11_names(cfg, formation):
                   for row in rows] for pos, rows in r['best11'].items()}
 
 
+def _sim_top(cfg, n=5):
+    """모의 경기(승부예측) 기준 포지션별 능력 점수 상위 n명. 미리보기에서 저장 전/후를 비교한다."""
+    from team.lineup_simulation import simulation_methods
+    svc = _svc()
+    with config.override(cfg):
+        methods = simulation_methods()
+    cands = svc.get_formation_candidates()
+    out = {}
+    for pos, (fn, w) in methods.items():
+        group = [s for s in cands if (s.player.position or '').strip().upper() == pos]
+        rows = svc.calculate_position_scores(group, fn, w)[:n]
+        out[pos] = [(r['stats'].player.id, r['stats'].player.name, r['stats'].player.team.team_name, r['score']) for r in rows]
+    return out
+
+
 def _diff_best11(before, after):
     out = []
     for pos in ('FW', 'MF', 'DF', 'GK'):
@@ -341,7 +356,7 @@ def _diff_best11(before, after):
 @admin_only
 def scoring(request):
     d, cur = _defaults(), _current()
-    patched = hasattr(_svc(), 'get_weights')
+    patched = True      # 점수 기준은 모의 경기(승부예측)에 바로 적용된다 (BEST11에는 적용하지 않으므로 patch_services 는 쓰지 않는다)
     formation = request.POST.get('formation') or request.GET.get('formation') or '4-3-3'
     ctx = dict(defaults=d, labels=config.METRIC_LABELS, patched=patched, formation=formation,
                formations=list(_svc().FORMATIONS.keys()), logs=ScoreConfigLog.objects.all()[:15])
@@ -365,8 +380,8 @@ def scoring(request):
             form = {'min': {**c['min'], **form['min']},
                     'weights': {p: {**c['weights'][p], **form['weights'].get(p, {})} for p in c['weights']}}
         else:
-            before_names = _best11_names({k: v for k, v in config.load_saved().items() if k in ('min', 'weights')} or {}, formation)
-            after_names = _best11_names(form, formation)
+            before_names = _sim_top({k: v for k, v in config.load_saved().items() if k in ('min', 'weights')} or {})
+            after_names = _sim_top(form)
             if action == 'save':
                 obj = ScoreConfig.objects.first() or ScoreConfig(data={})
                 before = dict(obj.data)
@@ -376,8 +391,7 @@ def scoring(request):
                 ScoreConfigLog.objects.create(created_by=request.user.get_username(),
                                               summary=f'최소시간 {form["min"]["best11"]}/{form["min"]["formation"]}분, 기본값과 다른 가중치 {changed}개',
                                               before=before, after=obj.data)
-                messages.success(request, '저장했습니다. 지금부터 BEST11 화면에 적용됩니다.' if patched else
-                                 '저장했습니다. 단, patch_services 를 아직 안 해서 BEST11 계산에는 반영되지 않습니다.')
+                messages.success(request, '저장했습니다. 지금부터 승부예측(모의 경기)의 선수 능력 계산에 적용됩니다. (BEST11에는 적용되지 않습니다)')
                 return redirect('manager:scoring')
             ctx['preview'] = _diff_best11(before_names, after_names)      # 미리보기
     ctx['form'] = form
