@@ -1,0 +1,89 @@
+<section id="player-simulation-records">
+  <hr>
+
+  <h2>{{ player.name }}의 GPS·이벤트 기록</h2>
+
+  <p>
+    실제 선수가 측정한 기록이 아닌
+    <strong>더미데이터</strong>입니다.<br>
+
+    각 행은 이 선수의 가상 경기 1회 기록입니다.
+    위 실제 시즌 기록과 별도로 관리하며,
+    ‘—’는 미집계·미확인을 뜻합니다.
+  </p>
+
+  {% if simulation_records.page.paginator.count %}
+    <p>
+      총 {{ simulation_records.page.paginator.count }}회
+      · 최근 생성 순
+    </p>
+
+    {% for group in simulation_records.groups %}
+      <h3>{{ group.title }}</h3>
+
+      <div class="site-table-scroll">
+        <table border="1">
+          <thead>
+            <tr>
+              <th>시나리오</th>
+              <th>시드</th>
+              <th>대진</th>
+
+              {% for header in group.headers %}
+                <th>{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for row in group.rows %}
+              <tr>
+                <td>{{ row.run.scenario_name }}</td>
+                <td>{{ row.run.seed }}</td>
+                <td>
+                  {{ row.home_name }}
+                  /
+                  {{ row.away_name }}
+                </td>
+
+                {% for value in row.cells %}
+                  <td>
+                    {% if value is None %}
+                      —
+                    {% else %}
+                      {{ value|floatformat:2 }}
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+
+    <nav aria-label="선수 가상 경기 기록 페이지">
+      {% if simulation_records.page.has_previous %}
+        <a href="?gps_page={{ simulation_records.page.previous_page_number }}#player-simulation-records">
+          이전
+        </a>
+      {% endif %}
+
+      {{ simulation_records.page.number }}
+      /
+      {{ simulation_records.page.paginator.num_pages }}
+
+      {% if simulation_records.page.has_next %}
+        <a href="?gps_page={{ simulation_records.page.next_page_number }}#player-simulation-records">
+          다음
+        </a>
+      {% endif %}
+    </nav>
+
+  {% else %}
+    <p>
+      이 선수에게 연결된 현재 버전의
+      더미 GPS·이벤트 기록이 없습니다.
+    </p>
+  {% endif %}
+</section>

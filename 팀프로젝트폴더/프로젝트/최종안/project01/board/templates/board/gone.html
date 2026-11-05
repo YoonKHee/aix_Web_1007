@@ -1,0 +1,9 @@
+{% extends 'board/base.html' %}
+{% block title %}삭제된 글{% endblock %}
+{% block content %}
+<div class="card post" style="text-align:center">
+  <h2>🚫 규정 위반으로 삭제된 글입니다</h2>
+  <p class="muted">게시판 규정(욕설·비하·혐오 표현 금지)에 따라 자동으로 숨김 처리되었습니다.</p>
+  <a class="btn" href="{% url 'board:list' %}">목록으로</a>
+</div>
+{% endblock %}

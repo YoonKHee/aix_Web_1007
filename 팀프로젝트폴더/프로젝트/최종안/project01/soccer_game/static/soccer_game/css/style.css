@@ -1,0 +1,839 @@
+/* ======================================================================
+   ⚽ [START SCREEN] 시작(로그) 화면 전용 스타일
+========================================================================== */
+#start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('../images/log_img.png') no-repeat center center / cover;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    filter: brightness(0.85) contrast(1.1);
+}
+
+.start-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.15) 0%, rgba(5,11,20,0.75) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title-wrapper {
+    text-align: center;
+    animation: titlePopUp 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+    opacity: 0;
+    transform: scale(0.6) translateY(50px);
+    margin-bottom: 25px;
+}
+
+@keyframes titlePopUp {
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.title-director {
+    font-size: 6.5rem;
+    font-weight: 900;
+    display: inline-block;
+    background: linear-gradient(135deg, #FFF6B7 0%, #F4D03F 40%, #FFFFFF 50%, #F4D03F 60%, #CAA023 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 25px rgba(244, 208, 63, 0.6);
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.9));
+    animation: shineGlow 3s infinite linear;
+    margin-right: 15px;
+    letter-spacing: -2px;
+}
+
+.title-doit {
+    font-size: 4.8rem;
+    font-weight: 900;
+    display: inline-block;
+    background: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 40%, #FFFFFF 50%, #B0B0B0 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.9));
+    animation: shineGlow 3.5s infinite linear reverse;
+    letter-spacing: -1px;
+}
+
+@keyframes shineGlow {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+.sub-message {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 
+        -2px -2px 0 #000, 
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000,
+         0 0 15px rgba(76, 217, 100, 0.8);
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
+    animation: fadeInSub 1.2s ease-out 0.8s forwards, textPulse 2s infinite ease-in-out;
+    opacity: 0;
+}
+
+@keyframes fadeInSub {
+    100% { opacity: 1; }
+}
+
+@keyframes textPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(255,255,255,0.4)); }
+    50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(76, 217, 100, 0.9)); }
+}
+
+.enter-badge {
+    cursor: pointer;
+    padding: 18px 55px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #11998e 100%);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    box-shadow: 
+        0 0 30px rgba(17, 153, 142, 0.6),
+        inset 0 0 15px rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: badgeFloat 1.2s ease-out 1s forwards, badgeGlow 1.8s infinite alternate;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.enter-badge:hover {
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 
+        0 0 50px rgba(76, 217, 100, 0.9),
+        inset 0 0 25px rgba(255, 255, 255, 0.8);
+    border-color: #ffffff;
+}
+
+.enter-key {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #FFE600;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 18px;
+    border-radius: 12px;
+    border: 2px solid #FFE600;
+    box-shadow: 0 4px 0 #b3a200;
+    letter-spacing: 1px;
+}
+
+.enter-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+@keyframes badgeFloat {
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes badgeGlow {
+    0% { filter: drop-shadow(0 0 10px rgba(17, 153, 142, 0.5)); }
+    100% { filter: drop-shadow(0 0 25px rgba(255, 230, 0, 0.8)); }
+}
+
+/* ======================================================================
+   🔒 [DESIGN LOCK] K리그 매니저 게임 UI 레이아웃 고정 (통합 영역)
+========================================================================== */
+
+/* 게임 전체를 감싸는 메인 래퍼 (1920x1080 기준 해상도 지정) */
+.main-game-wrapper {
+    width: 1920px;
+    height: 1080px;
+    flex-shrink: 0;
+    transform-origin: center center;
+    display: flex;
+    justify-content: center; /* 👈 space-between 에서 center로 변경! */
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.game-wrapper {
+    display: grid;
+    grid-template-columns: 330px 1110px 330px;
+    gap: 16px;
+    align-items: start;
+    max-width: 1820px;
+    width: 100%;
+}
+
+.panel {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 14px;
+    height: 1058px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.panel-header {
+    font-size: 1.3rem; 
+    border-bottom: 2px solid #333;
+    padding-bottom: 6px;
+    color: #90caf9;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.tactics-control-box {
+    background: #252525;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid #333;
+    flex-shrink: 0;
+}
+
+.t-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.05rem; 
+}
+
+.t-row select {
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 1.02rem; 
+    width: 58%;
+}
+
+.section-sub-header {
+    font-size: 1.05rem; 
+    font-weight: bold;
+    color: #ffd700;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    border-bottom: 1px dashed #444;
+    padding-bottom: 2px;
+    flex-shrink: 0;
+}
+
+.player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.player-list.sub-list {
+    flex: 1 1 auto;
+    background: #171717;
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid #282828;
+    overflow-y: auto !important;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 180px;
+}
+
+.player-card {
+    background: #2a2a2a;
+    border-radius: 5px;
+    padding: 6px 9px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-left: 4px solid #ff5252;
+    flex-shrink: 0;
+}
+
+.player-card.away { border-left-color: #448aff; }
+.player-card.substitute { opacity: 0.85; border-left-color: #ffb300; background: #222; }
+
+.player-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #444;
+}
+
+.player-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.player-main-text {
+    font-size: 0.98rem; 
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.player-sub-text {
+    font-size: 0.86rem; 
+    color: #aaa;
+    line-height: 1.1;
+}
+
+.badge-pos {
+    font-size: 0.82rem; 
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    background: #444;
+}
+.pos-fw { background: #d32f2f; }
+.pos-mf { background: #388e3c; }
+.pos-df { background: #1976d2; }
+.pos-gk { background: #f57c00; }
+
+.stadium-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.team-selector-bar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background: #1e1e1e;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.select-group {
+    display: flex;
+    gap: 8px;
+}
+
+.select-group select {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.center-menu-title {
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+}
+
+.scoreboard-board {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.team-score-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.team-emblem {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+}
+
+.team-info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team-name {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.team-score {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffd700;
+}
+
+#match-timer, .match-timer {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #ffd700;
+    letter-spacing: 3px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    display: inline-block;
+}
+
+.scoreboard-board,
+#pitchCanvas {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+#pitchCanvas {
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+/* 📌 통합된 실시간 중계 박스 설정 */
+.match-broadcast-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #121212;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin-top: 2px !important;
+    margin-bottom: 0px !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.ad-side-banner {
+    width: 200px;
+    height: 90px;
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    border: 1px solid #333;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.left-ad { border-left: 3px solid #00aad2; }
+.right-ad { border-right: 3px solid #1428a0; }
+
+.ad-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.ad-sub {
+    font-size: 1rem;
+    color: #9e9e9e;
+    margin-top: 2px;
+}
+
+.match-broadcast-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.broadcast-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #222;
+}
+
+.match-logs {
+    height: 58px !important;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #cfd8dc;
+    background: #0a0a0a;
+    padding: 2px 4px;
+    border-radius: 2px;
+    border: 1px solid #222;
+}
+
+.match-logs::-webkit-scrollbar {
+    width: 4px;
+}
+.match-logs::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 2px;
+}
+
+.ad-board {
+    width: 100% !important;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    height: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 0px;
+    margin-bottom: 1px;
+    box-sizing: border-box;
+}
+
+.ad-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #ffd700;
+    animation: flowAndBlinkCenter 10s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+@keyframes flowAndBlinkCenter {
+    0% { transform: translate(100%, -50%); opacity: 1; }
+    35% { transform: translate(-50%, -50%); opacity: 1; }
+    40% { opacity: 0.2; }
+    45% { opacity: 1; }
+    50% { opacity: 0.2; }
+    55% { opacity: 1; }
+    60% { opacity: 0.2; }
+    65% { transform: translate(-50%, -50%); opacity: 1; }
+    100% { transform: translate(-200%, -50%); opacity: 1; }
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+button {
+    flex: 1;
+    padding: 10px;
+    font-size: 0.98rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #1976d2;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover { background-color: #1565c0; }
+button.secondary { background-color: #424242; }
+button.secondary:hover { background-color: #616161; }
+button.danger { background-color: #c62828; }
+button.danger:hover { background-color: #b71c1c; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 14px;
+    width: 510px;
+    padding: 26px;
+    position: relative;
+    color: #fff;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: none; border: none;
+    color: #aaa; font-size: 1.8rem;
+    cursor: pointer;
+    width: auto; padding: 0; flex: none;
+}
+.modal-close-btn:hover { color: #fff; }
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+}
+
+.modal-thumb {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #333;
+    border: 3px solid #555;
+}
+
+.modal-header h4 { margin: 0 0 4px 0; font-size: 1.5rem; }
+.modal-header p { margin: 0; font-size: 1.15rem; color: #aaa; }
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 1.2rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    background: #1a1a1a;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #313131;
+}
+
+.graph-section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+.radar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    padding: 12px;
+}
+
+#radarCanvas { display: block; }
+
+.stats-modal-content-team {
+    background: #181818;
+    border: 1px solid #444;
+    border-radius: 12px;
+    width: 1020px !important;
+    max-width: 95vw;
+    padding: 26px;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.team-comparison-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.match-top-banner {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 14px;
+    align-items: center;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px 18px;
+}
+
+.banner-team-side {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.banner-team-side.away { justify-content: flex-end; }
+
+.banner-emblem {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.banner-team-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.banner-team-text.right { text-align: right; }
+
+.banner-team-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #90caf9;
+}
+
+.banner-mvp-label {
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
+.banner-mvp-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffd700;
+    background: #111;
+}
+
+.vs-badge-center {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.25rem;
+    color: #ff5252;
+    background: rgba(255, 82, 82, 0.15);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 82, 82, 0.4);
+}
+
+.comparison-bars-section {
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.compare-row {
+    display: grid;
+    grid-template-columns: 1fr 160px 1fr;
+    align-items: center;
+    gap: 12px;
+}
+
+.compare-label {
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.92rem;
+    color: #ffd700;
+    background: #1f1f1f;
+    padding: 7px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.bar-side {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 24px;
+}
+
+.bar-side.left { justify-content: flex-end; }
+.bar-side.right { justify-content: flex-start; }
+
+.compare-fill {
+    height: 12px;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.compare-fill.home { background: linear-gradient(90deg, #1976d2, #42a5f5); }
+.compare-fill.away { background: linear-gradient(90deg, #e53935, #ff6f60); }
+
+.val-text {
+    font-size: 0.88rem;
+    font-weight: bold;
+    width: 45px;
+}
+.val-text.left { text-align: left; }
+.val-text.right { text-align: right; }
+
+/* ======================================================================
+   📌 [최종 보정] 화면 해상도 자동 맞춤 및 완벽한 중앙 정렬
+========================================================================== */
+html, body {
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background-color: #121212 !important;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* 🎯 화면 완벽 중앙 정렬 선언 */
+    display: flex !important;
+    justify-content: center !important; /* 가로 중앙 */
+    align-items: center !important;     /* 세로 중앙 */
+    position: relative;
+}
+
+/* 🎯 메인 게임 래퍼: 스케일 변형 시 좌측 쏠림 완전 방지
+.main-game-wrapper {
+    width: 1920px !important;
+    height: 1080px !important;
+    flex-shrink: 0 !important;
+    
+    /* 중앙 기준으로 축소/확대 */
+    transform-origin: center center !important;
+    margin: 0 auto !important;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+} */

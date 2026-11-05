@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D 축구 매니저 시뮬레이터 (라인 연동 & 공간 침투 전술 적용)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0d0e12;
+            color: #f3f4f6;
+            user-select: none;
+        }
+        canvas {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+            border: 1px solid #1f2937;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-2 overflow-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-[1280px] mb-1 flex items-center justify-between px-4 py-1.5 bg-gray-900/80 backdrop-blur rounded-xl border border-gray-800">
+        <div class="flex items-center gap-3">
+            <span class="text-xl">⚽</span>
+            <h1 class="text-base font-bold bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+                2D 축구 매니저 시뮬레이터 Tactical Pro
+            </h1>
+            <span class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                v5.0 Compact Block & Space Run
+            </span>
+        </div>
+        <div id="quickStatus" class="text-xs font-medium text-emerald-400">전술판 대기 중 - 원하는 항목을 클릭하세요.</div>
+    </header>
+
+    <!-- Main Canvas Viewport -->
+    <main class="relative">
+        <canvas id="gameCanvas" width="1280" height="720" class="rounded-xl"></canvas>
+    </main>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const SCREEN_WIDTH = 1280;
+const SCREEN_HEIGHT = 720;
+
+// 색상 상수
+const COLOR_GRASS_1 = "#228B22";
+const COLOR_GRASS_2 = "#289628";
+const COLOR_LINE = "#F0F0F0";
+const COLOR_HOME = "#0077CC";
+const COLOR_AWAY = "#DC143C";
+const COLOR_BALL = "#FFFFFF";
+const COLOR_GOAL = "#F0F0F0";
+const COLOR_NET = "#B4B4B4";
+const COLOR_PANEL = "#1A1D24";
+const COLOR_BUTTON = "#2D323E";
+const COLOR_BUTTON_HOVER = "#3B82F6";
+const COLOR_BUTTON_ACTIVE = "#0284C7";
+
+const SCALE = 8.5;
+const METER_LENGTH = 105;
+const METER_WIDTH = 68;
+const PITCH_WIDTH = METER_LENGTH * SCALE;  // 892.5
+const PITCH_HEIGHT = METER_WIDTH * SCALE; // 578
+const PITCH_X = (SCREEN_WIDTH - PITCH_WIDTH) / 2;
+const PITCH_Y = 85;
+const PITCH_CENTER_X = PITCH_X + PITCH_WIDTH / 2;
+const PITCH_CENTER_Y = PITCH_Y + PITCH_HEIGHT / 2;
+
+function getPositionActionRadius(name) {
+    if (name.includes("GK")) return 110.0;
+    if (name.includes("CB") || name.includes("LB") || name.includes("RB") || name.includes("WB")) return 160.0;
+    if (name.includes("CM") || name.includes("DM") || name.includes("AM") || name.includes("LM") || name.includes("RM")) return 240.0;
+    if (name.includes("ST") || name.includes("LW") || name.includes("RW")) return 220.0;
+    return 180.0;
+}
+
+function playSound(type) {
+    const statusEl = document.getElementById('quickStatus');
+    if (type === "whistle" && statusEl) statusEl.innerText = "🔊 [Sound] 휘슬 울림!";
+    else if (type === "goal" && statusEl) statusEl.innerText = "⚽ GOAL!!!! 환호 소리!";
+    else if (type === "foul" && statusEl) statusEl.innerText = "🚨 파울 휘슬!";
+}
+
+class Particle {
+    constructor(x, y) {
+        this.x = x; this.y = y;
+        let angle = Math.random() * Math.PI * 2;
+        let speed = Math.random() * 5 + 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 50;
+        this.radius = Math.floor(Math.random() * 4) + 3;
+        const colors = ["#FFD700", "#FF4500", "#00FFFF", "#FF1493", "#32CD32", "#FFFFFF"];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.vy += 0.15; this.life -= 1; }
+    draw(context) {
+        if (this.life > 0) {
+            context.fillStyle = this.color;
+            context.beginPath(); context.arc(this.x, this.y, this.radius, 0, Math.PI * 2); context.fill();
+        }
+    }
+}
+
+class Pitch {
+    constructor() {
+        this.width = PITCH_WIDTH; this.height = PITCH_HEIGHT;
+        this.x = PITCH_X; this.y = PITCH_Y;
+        this.center_x = PITCH_CENTER_X; this.center_y = PITCH_CENTER_Y;
+        let goal_w = 7.32 * SCALE; let goal_depth = 2.5 * SCALE;
+        this.leftGoal = { x: this.x - goal_depth, y: this.center_y - goal_w / 2, width: goal_depth, height: goal_w };
+        this.rightGoal = { x: this.x + this.width, y: this.center_y - goal_w / 2, width: goal_depth, height: goal_w };
+    }
+    draw(context) {
+        context.fillStyle = "#111318";
+        context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        // 관중석 텍스처
+        context.fillStyle = "#181B22";
+        context.fillRect(20, 65, SCREEN_WIDTH - 40, PITCH_Y - 70);
+        context.fillRect(20, PITCH_Y + PITCH_HEIGHT + 10, SCREEN_WIDTH - 40, SCREEN_HEIGHT - (PITCH_Y + PITCH_HEIGHT) - 75);
+
+        // 4면 광고판
+        const boardThick = 12;
+        context.fillStyle = "#0A0B0E";
+        context.fillRect(this.x - 15, this.y - boardThick - 3, this.width + 30, boardThick);
+        context.fillRect(this.x - 15, this.y + this.height + 3, this.width + 30, boardThick);
+        context.fillRect(this.x - boardThick - 3, this.y - 15, boardThick, this.height + 30);
+        context.fillRect(this.x + this.width + 3, this.y - 15, boardThick, this.height + 30);
+
+        context.fillStyle = "#38BDF8";
+        context.font = "bold 9px 'Pretendard', sans-serif";
+        context.fillText("⚽ SOCCER MANAGER PRO LEAGUE ⚽  --- OFFICIAL SPONSOR ---  🏆 CHAMPIONS CUP", this.x + 50, this.y - 7);
+        context.fillText("🔥 COMPACT BLOCK & SPACE RUN ENGINE 🔥  --- GLOBAL PARTNERS ---  ⭐ VIRTUAL STADIUM", this.x + 50, this.y + this.height + 11);
+
+        // 잔디 구장
+        let num_stripes = 13; let stripe_width = this.width / num_stripes;
+        for (let i = 0; i < num_stripes; i++) {
+            context.fillStyle = (i % 2 === 0) ? COLOR_GRASS_1 : COLOR_GRASS_2;
+            context.fillRect(this.x + i * stripe_width, this.y, stripe_width, this.height);
+        }
+
+        context.strokeStyle = COLOR_LINE; context.lineWidth = 3; context.strokeRect(this.x, this.y, this.width, this.height);
+        context.beginPath(); context.moveTo(this.center_x, this.y); context.lineTo(this.center_x, this.y + this.height); context.stroke();
+        let center_circle_r = 9.15 * SCALE;
+        context.beginPath(); context.arc(this.center_x, this.center_y, center_circle_r, 0, Math.PI * 2); context.stroke();
+        context.beginPath(); context.arc(this.center_x, this.center_y, 4, 0, Math.PI * 2); context.fillStyle = COLOR_LINE; context.fill();
+        
+        let box_depth = 16.5 * SCALE; let box_width = 40.32 * SCALE;
+        context.strokeRect(this.x, this.center_y - box_width / 2, box_depth, box_width);
+        context.strokeRect(this.x + this.width - box_depth, this.center_y - box_width / 2, box_depth, box_width);
+        
+        this._drawGoalNet(context, this.leftGoal);
+        this._drawGoalNet(context, this.rightGoal);
+    }
+    _drawGoalNet(context, goal) {
+        context.strokeStyle = COLOR_GOAL; context.lineWidth = 3; context.strokeRect(goal.x, goal.y, goal.width, goal.height);
+        context.strokeStyle = COLOR_NET; context.lineWidth = 1; let step = 8;
+        for (let gx = goal.x + step; gx < goal.x + goal.width; gx += step) {
+            context.beginPath(); context.moveTo(gx, goal.y); context.lineTo(gx, goal.y + goal.height); context.stroke();
+        }
+        for (let gy = goal.y + step; gy < goal.y + goal.height; gy += step) {
+            context.beginPath(); context.moveTo(goal.x, gy); context.lineTo(goal.x + goal.width, gy); context.stroke();
+        }
+    }
+}
+
+class BallPhysics {
+    constructor(x, y) {
+        this.x = x; this.y = y; this.z = 0.0; this.vz = 0.0; this.vx = 0.0; this.vy = 0.0;
+        this.possessor = null; this.kickType = "GROUND";
+    }
+    applyKick(vx, vy, vz, kickType = "GROUND") {
+        this.vx = vx; this.vy = vy; this.vz = vz; this.kickType = kickType; this.possessor = null;
+    }
+    update(speedMultiplier) {
+        if (this.possessor) {
+            this.x = this.possessor.x + (this.possessor.team === 'home' ? 12 : -12);
+            this.y = this.possessor.y; this.z = 0.0; this.vx = 0.0; this.vy = 0.0; this.vz = 0.0;
+        } else {
+            this.x += this.vx * speedMultiplier; this.y += this.vy * speedMultiplier; this.z += this.vz * speedMultiplier;
+            if (this.z > 0) { this.vz -= 0.35 * speedMultiplier; }
+            else { this.z = 0.0; if (this.vz < 0) this.vz = -this.vz * 0.3; }
+            let friction = (this.kickType === "PASS") ? Math.pow(0.975, speedMultiplier) : Math.pow(0.96, speedMultiplier);
+            this.vx *= friction; this.vy *= friction;
+            if (this.x < PITCH_X || this.x > PITCH_X + PITCH_WIDTH) { this.vx *= -0.6; playSound("foul"); }
+            if (this.y < PITCH_Y || this.y > PITCH_Y + PITCH_HEIGHT) { this.vy *= -0.6; }
+        }
+    }
+    resetToCenter() {
+        this.x = PITCH_CENTER_X; this.y = PITCH_CENTER_Y; this.z = 0.0; this.vx = 0.0; this.vy = 0.0; this.vz = 0.0; this.possessor = null;
+    }
+    draw(context) {
+        let shadowScale = Math.max(3, Math.floor(12 - this.z * 0.15));
+        context.fillStyle = "rgba(0, 0, 0, 0.3)";
+        context.beginPath(); context.ellipse(this.x, this.y + 6, shadowScale, shadowScale / 2, 0, 0, Math.PI * 2); context.fill();
+        let renderY = this.y - this.z;
+        context.fillStyle = "#1E1E1E"; context.beginPath(); context.arc(this.x, renderY, 7, 0, Math.PI * 2); context.fill();
+        context.fillStyle = COLOR_BALL; context.beginPath(); context.arc(this.x, renderY, 5, 0, Math.PI * 2); context.fill();
+    }
+}
+
+class Player {
+    constructor(x, y, team, name, speed = 2.2, passing = 70, shooting = 70) {
+        this.original_base_x = x; this.original_base_y = y;
+        this.current_base_y = y;
+        this.x = x; this.y = y; this.vx = 0.0; this.vy = 0.0;
+        this.team = team; this.name = name;
+        this.stat_speed = speed; this.stat_passing = passing; this.stat_shooting = shooting;
+        this.stamina = 100.0; this.goals = 0; this.passes_completed = 0; this.interceptions = 0;
+        this.switchCooldown = 0;
+    }
+    calculateIntelligentTarget(ball, tactic, team, phase, opponents, teammates) {
+        if (ball.possessor === null && ball.z > 2.0) {
+            let timeToLand = ball.z / Math.max(0.1, Math.abs(ball.vz));
+            return {
+                x: Math.max(PITCH_X + 20, Math.min(PITCH_X + PITCH_WIDTH - 20, ball.x + ball.vx * timeToLand)),
+                y: Math.max(PITCH_Y + 20, Math.min(PITCH_Y + PITCH_HEIGHT - 20, ball.y + ball.vy * timeToLand))
+            };
+        }
+        return PositionBehaviorManager.getPositionTarget(this, ball, team, tactic, phase, opponents, teammates);
+    }
+    moveTowards(targetX, targetY, speedMultiplier, tactic) {
+        let dx = targetX - this.x; let dy = targetY - this.y; let dist = Math.hypot(dx, dy);
+        let drain = (tactic === "GEGENPRESSING") ? 0.009 : 0.005;
+        this.stamina = Math.max(0.0, this.stamina - drain * speedMultiplier);
+        let maxSpeed = this.stat_speed * speedMultiplier * (this.stamina < 30 ? 0.55 : 1.0);
+        if (dist > 1.0) {
+            this.vx += ((dx / dist) * maxSpeed - this.vx) * 0.12;
+            this.vy += ((dy / dist) * maxSpeed - this.vy) * 0.12;
+        } else { this.vx *= 0.8; this.vy *= 0.8; }
+        this.x = Math.max(PITCH_X + 12, Math.min(PITCH_X + PITCH_WIDTH - 12, this.x + this.vx));
+        this.y = Math.max(PITCH_Y + 12, Math.min(PITCH_Y + PITCH_HEIGHT - 12, this.y + this.vy));
+        
+        if (this.switchCooldown > 0) this.switchCooldown--;
+    }
+    draw(context, hasBall) {
+        context.fillStyle = "rgba(0,0,0,0.35)"; context.beginPath(); context.ellipse(this.x, this.y + 3, 9, 4.5, 0, 0, Math.PI * 2); context.fill();
+        context.fillStyle = hasBall ? "#FF8C00" : (this.team === 'home' ? COLOR_HOME : COLOR_AWAY);
+        context.strokeStyle = "#141414"; context.lineWidth = 2;
+        context.beginPath(); context.arc(this.x, this.y, hasBall ? 11 : 9, 0, Math.PI * 2); context.stroke(); context.fill();
+        context.fillStyle = "#323232"; context.fillRect(this.x - 10, this.y - 28, 20, 3);
+        context.fillStyle = this.stamina > 40 ? "#00FF00" : "#FF6400"; context.fillRect(this.x - 10, this.y - 28, 20 * (this.stamina / 100.0), 3);
+        context.fillStyle = "#FFFFFF"; context.font = "11px 'Pretendard', sans-serif"; context.fillText(this.name, this.x - 14, this.y - 18);
+    }
+}
+
+// ==========================================
+// 🧠 현대 전술 연동 & 공간 침투 AI 매니저
+// ==========================================
+
+class PositionBehaviorManager {
+    static getPositionTarget(player, ball, team, tactic, phase, opponents, teammates) {
+        let base_x = player.original_base_x;
+        let base_y = player.current_base_y;
+        let dir_sign = team.isHome ? 1 : -1;
+        let action_rad = getPositionActionRadius(player.name);
+
+        // 1. 골키퍼
+        if (player.name.includes("GK")) {
+            return { x: base_x, y: Math.max(PITCH_CENTER_Y - 45, Math.min(PITCH_CENTER_Y + 45, ball.y)) };
+        }
+
+        // 2. 포지션 스위칭 체크
+        if (phase === "FINAL_ATTACK" || phase === "CHANCE_CREATION") {
+            this.applyPositionSwitching(player, teammates);
+        }
+
+        // 3. 루즈볼 경합 (자신의 활동 반경 내에서만 반응하여 쏠림 방지)
+        if (ball.possessor === null && ball.z <= 2.0) {
+            let distToBall = Math.hypot(ball.x - player.x, ball.y - player.y);
+            if (distToBall <= action_rad) {
+                return { x: ball.x, y: ball.y };
+            }
+        }
+
+        // 4. 💡 라인 연동 전진 (Compact Block & Line Control)
+        let team_cog_x = teammates && teammates.length > 0 ? teammates.reduce((s, t) => s + t.x, 0) / teammates.length : PITCH_CENTER_X;
+        let ball_advance_offset = (ball.x - PITCH_CENTER_X) * 0.30 * dir_sign;
+        let rawTargetX = base_x + ball_advance_offset;
+        let rawTargetY = base_y;
+
+        // 포지션별 블록 연동 규칙 적용
+        if (player.name.includes("CB") || player.name.includes("LB") || player.name.includes("RB") || player.name.includes("WB")) {
+            // 🛑 수비진 마지노선 제한: 상대 진영 하프라인을 절대 넘지 않도록 락(Lock) 설정
+            let maxDefensiveLimit = team.isHome ? PITCH_CENTER_X + 30 : PITCH_CENTER_X - 30;
+            rawTargetX = Math.min(team.isHome ? maxDefensiveLimit : PITCH_X + PITCH_WIDTH - 20, 
+                         Math.max(PITCH_X + 20, dynamicLimit(base_x + ball_advance_offset * 0.6, team.isHome)));
+            
+            function dynamicLimit(val, isH) {
+                return isH ? Math.min(val, PITCH_CENTER_X - 10) : Math.max(val, PITCH_CENTER_X + 10);
+            }
+        } else if (player.name.includes("CM") || player.name.includes("DM") || player.name.includes("AM") || player.name.includes("LM") || player.name.includes("RM")) {
+            // 미드필더진: 공의 움직임에 맞춰 콤팩트하게 밀고 올라오기
+            let shift_y = (ball.y - PITCH_CENTER_Y) * 0.22;
+            rawTargetX = base_x + ball_advance_offset * 0.85;
+            rawTargetY = base_y + shift_y;
+        } else if (player.name.includes("ST") || player.name.includes("LW") || player.name.includes("RW")) {
+            // 🎯 공격수: 무소유 상태일 때 빈 공간으로 적극적 침투 및 패스 유도
+            let attackPush = phase === "FINAL_ATTACK" ? 80 : 40;
+            rawTargetX = base_x + ball_advance_offset + (dir_sign * attackPush);
+            rawTargetY = base_y + (ball.y - PITCH_CENTER_Y) * 0.18;
+        }
+
+        // 5. 💡 빈 공간 탐색(Space Detection) 및 포메이션 앵커 복원력 혼합
+        let smartTarget = this.detectEmptySpace(player, rawTargetX, rawTargetY, opponents);
+        
+        // 포메이션 자리(rawTarget)의 비중을 70%로 유지하여 유치원 축구식 쏠림을 완벽 차단하면서도 30%의 공간 침투 수행
+        return {
+            x: rawTargetX * 0.70 + smartTarget.x * 0.30,
+            y: rawTargetY * 0.70 + smartTarget.y * 0.30
+        };
+    }
+
+    // 🔄 포지션 스위칭 로직
+    static applyPositionSwitching(player, teammates) {
+        if (player.switchCooldown > 0 || !teammates) return;
+
+        teammates.forEach(partner => {
+            if (partner === player || partner.switchCooldown > 0 || partner.name.includes("GK")) return;
+            
+            let isWingCombination = (player.name.includes("LB") && partner.name.includes("LM")) || 
+                                   (player.name.includes("RB") && partner.name.includes("RM")) ||
+                                   (player.name.includes("ST1") && partner.name.includes("ST2"));
+
+            if (isWingCombination) {
+                let dist = Math.hypot(player.x - partner.x, player.y - partner.y);
+                if (dist < 45 && Math.random() < 0.05) {
+                    let tempY = player.current_base_y;
+                    player.current_base_y = partner.current_base_y;
+                    partner.current_base_y = tempY;
+
+                    player.switchCooldown = 300;
+                    partner.switchCooldown = 300;
+                    gameStatusText = `🔄 [${player.name}] ↔ [${partner.name}] 전술적 포지션 스위칭!`;
+                }
+            }
+        });
+    }
+
+    // 🎯 빈 공간 탐색 (Space Detection) 오프더볼 침투
+    static detectEmptySpace(player, targetX, targetY, opponents) {
+        if (!opponents || opponents.length === 0) return { x: targetX, y: targetY };
+
+        let bestX = targetX;
+        let bestY = targetY;
+        let maxSpaceDist = 0;
+
+        const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+        const searchRadius = 40.0;
+
+        angles.forEach(deg => {
+            let rad = (deg * Math.PI) / 180;
+            let checkX = targetX + Math.cos(rad) * searchRadius;
+            let checkY = targetY + Math.sin(rad) * searchRadius;
+
+            let minOppDist = opponents.reduce((min, opp) => {
+                let d = Math.hypot(opp.x - checkX, opp.y - checkY);
+                return d < min ? d : min;
+            }, 9999);
+
+            if (minOppDist > maxSpaceDist) {
+                maxSpaceDist = minOppDist;
+                bestX = checkX;
+                bestY = checkY;
+            }
+        });
+
+        return {
+            x: targetX * 0.5 + bestX * 0.5,
+            y: targetY * 0.5 + bestY * 0.5
+        };
+    }
+}
+
+class DecisionEngine {
+    static selectPassReceiver(passer, teammates, opponents) {
+        if (!teammates || teammates.length === 0) return null;
+        let action_rad = getPositionActionRadius(passer.name);
+        let valid = teammates.filter(p => Math.hypot(p.x - passer.x, p.y - passer.y) <= action_rad);
+        let pool = valid.length > 0 ? valid : teammates;
+        return pool.reduce((prev, curr) => Math.hypot(curr.x - passer.x, curr.y - passer.y) < Math.hypot(prev.x - passer.x, prev.y - passer.y) ? curr : prev);
+    }
+    static evaluateShot(passer, distToGoal) {
+        return distToGoal < 480 && Math.random() < (0.45 + passer.stat_shooting / 240.0);
+    }
+}
+
+class Team {
+    constructor(isHome = true, formation = "4-4-2", tactic = "TIKI_TAKA") {
+        this.isHome = isHome; this.formation = formation; this.tactic = tactic;
+        let px = isHome ? PITCH_X + 40 : PITCH_X + PITCH_WIDTH - 40;
+        let dirSign = isHome ? 1 : -1;
+        let teamStr = isHome ? 'home' : 'away';
+        let prefix = isHome ? 'H' : 'A';
+        this.starters = this._createStarters(px, dirSign, teamStr, prefix, formation);
+        this.bench = [
+            new Player(px, PITCH_CENTER_Y, teamStr, `${prefix}-SUB1`, 2.3, 75, 70),
+            new Player(px, PITCH_CENTER_Y, teamStr, `${prefix}-SUB2`, 2.2, 72, 72),
+            new Player(px, PITCH_CENTER_Y, teamStr, `${prefix}-SUB3`, 2.4, 70, 75),
+        ];
+        this.subsLeft = 3;
+    }
+    _createStarters(px, dirSign, teamStr, prefix, formation) {
+        let gk = new Player(px + dirSign * 15, PITCH_CENTER_Y, teamStr, `${prefix}-GK`, 1.8, 60, 30);
+        return [
+            gk,
+            new Player(px + dirSign * 90, PITCH_CENTER_Y - 160, teamStr, `${prefix}-LB`, 2.3, 72, 45),
+            new Player(px + dirSign * 70, PITCH_CENTER_Y - 55, teamStr, `${prefix}-CB1`, 2.0, 68, 40),
+            new Player(px + dirSign * 70, PITCH_CENTER_Y + 55, teamStr, `${prefix}-CB2`, 2.0, 68, 40),
+            new Player(px + dirSign * 90, PITCH_CENTER_Y + 160, teamStr, `${prefix}-RB`, 2.3, 72, 45),
+            new Player(px + dirSign * 200, PITCH_CENTER_Y - 180, teamStr, `${prefix}-LM`, 2.4, 78, 65),
+            new Player(px + dirSign * 170, PITCH_CENTER_Y - 60, teamStr, `${prefix}-CM1`, 2.1, 85, 60),
+            new Player(px + dirSign * 170, PITCH_CENTER_Y + 60, teamStr, `${prefix}-CM2`, 2.1, 85, 60),
+            new Player(px + dirSign * 200, PITCH_CENTER_Y + 180, teamStr, `${prefix}-RM`, 2.4, 78, 65),
+            new Player(px + dirSign * 330, PITCH_CENTER_Y - 40, teamStr, `${prefix}-ST1`, 2.3, 70, 88),
+            new Player(px + dirSign * 330, PITCH_CENTER_Y + 40, teamStr, `${prefix}-ST2`, 2.3, 70, 88),
+        ];
+    }
+}
+
+// ==========================================
+// 🖱️ UI 인터페이스 및 하단 제어 바
+// ==========================================
+
+let pitch = new Pitch();
+let ball = new BallPhysics(PITCH_CENTER_X, PITCH_CENTER_Y);
+let homeTeam = new Team(true, "4-4-2", "TIKI_TAKA");
+let awayTeam = new Team(false, "4-4-2", "TIKI_TAKA");
+let allPlayers = [...homeTeam.starters, ...awayTeam.starters];
+let particles = [];
+
+let gameState = "MENU";
+let gameStatusText = "전술판 대기 중 - 원하는 항목을 클릭하세요.";
+let matchTime = 0.0; let homeScore = 0; let awayScore = 0;
+let isPaused = false;
+const speedLevels = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.5, 10.0];
+let speedIdx = 1;
+let matchDuration = 120.0;
+
+const homeFormButtons = [
+    { rect: { x: 60, y: 495, w: 95, h: 30 }, name: "4-4-2" },
+    { rect: { x: 160, y: 495, w: 95, h: 30 }, name: "4-3-3" },
+    { rect: { x: 260, y: 495, w: 95, h: 30 }, name: "3-5-2" },
+    { rect: { x: 360, y: 495, w: 95, h: 30 }, name: "4-2-3-1" },
+];
+
+const homeTacticButtons = [
+    { rect: { x: 60, y: 560, w: 95, h: 30 }, code: "TIKI_TAKA", label: "티키타카" },
+    { rect: { x: 160, y: 560, w: 95, h: 30 }, code: "GEGENPRESSING", label: "게겐프레싱" },
+    { rect: { x: 260, y: 560, w: 95, h: 30 }, code: "COUNTER", label: "역습" },
+    { rect: { x: 360, y: 560, w: 95, h: 30 }, code: "WING_PLAY", label: "측면돌파" },
+];
+
+const awayFormButtons = [
+    { rect: { x: 725, y: 495, w: 95, h: 30 }, name: "4-4-2" },
+    { rect: { x: 825, y: 495, w: 95, h: 30 }, name: "4-3-3" },
+    { rect: { x: 925, y: 495, w: 95, h: 30 }, name: "3-5-2" },
+    { rect: { x: 1025, y: 495, w: 95, h: 30 }, name: "4-2-3-1" },
+];
+
+const awayTacticButtons = [
+    { rect: { x: 725, y: 560, w: 95, h: 30 }, code: "TIKI_TAKA", label: "티키타카" },
+    { rect: { x: 825, y: 560, w: 95, h: 30 }, code: "GEGENPRESSING", label: "게겐프레싱" },
+    { rect: { x: 925, y: 560, w: 95, h: 30 }, code: "COUNTER", label: "역습" },
+    { rect: { x: 1025, y: 560, w: 95, h: 30 }, code: "WING_PLAY", label: "측면돌파" },
+];
+
+const btnStartMatch = { x: 440, y: 640, w: 180, h: 45, label: "▶ 경기 시작" };
+const btnOpenLocker = { x: 660, y: 640, w: 180, h: 45, label: "🚪 라커룸 체크보드" };
+
+// 하단 컨트롤 바
+const bottomBarY = SCREEN_HEIGHT - 45;
+const btnMatchPause = { x: 340, y: bottomBarY, w: 85, h: 35 };
+const btnSpeedDown = { x: 435, y: bottomBarY, w: 35, h: 35, label: "➖" };
+const btnSpeedUp = { x: 480, y: bottomBarY, w: 35, h: 35, label: "➕" };
+const btnMatchLocker = { x: 535, y: bottomBarY, w: 95, h: 35, label: "🚪 라커룸" };
+const btnMatchSub = { x: 640, y: bottomBarY, w: 95, h: 35, label: "🔄 선수교체" };
+const btnMatchEnd = { x: 745, y: bottomBarY, w: 105, h: 35, label: "🛑 경기종료" };
+
+const btnCloseLocker = { x: 530, y: 660, w: 220, h: 40, label: "◀ 경기 화면으로 돌아가기" };
+const btnRestart = { x: 530, y: 460, w: 220, h: 45, label: "🔄 전술판으로 이동" };
+
+let mousePos = { x: 0, y: 0 };
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mousePos.x = e.clientX - rect.left;
+    mousePos.y = e.clientY - rect.top;
+});
+
+canvas.addEventListener('click', () => {
+    if (gameState === "MENU") {
+        homeFormButtons.forEach(btn => {
+            if (isInside(mousePos, btn.rect)) {
+                homeTeam = new Team(true, btn.name, homeTeam.tactic);
+                allPlayers = [...homeTeam.starters, ...awayTeam.starters];
+                gameStatusText = `홈 팀 포메이션 변경: [${btn.name}]`;
+            }
+        });
+        homeTacticButtons.forEach(btn => {
+            if (isInside(mousePos, btn.rect)) {
+                homeTeam.tactic = btn.code;
+                gameStatusText = `홈 팀 전술 변경: [${btn.label}]`;
+            }
+        });
+        awayFormButtons.forEach(btn => {
+            if (isInside(mousePos, btn.rect)) {
+                awayTeam = new Team(false, btn.name, awayTeam.tactic);
+                allPlayers = [...homeTeam.starters, ...awayTeam.starters];
+                gameStatusText = `원정 팀 포메이션 변경: [${btn.name}]`;
+            }
+        });
+        awayTacticButtons.forEach(btn => {
+            if (isInside(mousePos, btn.rect)) {
+                awayTeam.tactic = btn.code;
+                gameStatusText = `원정 팀 전술 변경: [${btn.label}]`;
+            }
+        });
+        if (isInside(mousePos, btnStartMatch)) {
+            gameState = "MATCH";
+            playSound("whistle");
+            ball.x = PITCH_CENTER_X; ball.y = PITCH_CENTER_Y;
+            ball.possessor = homeTeam.starters[homeTeam.starters.length - 1];
+            gameStatusText = "⚽ 킥오프! 라인 연동 및 공간 침투 엔진 가동.";
+        }
+        if (isInside(mousePos, btnOpenLocker)) {
+            gameState = "LOCKER_ROOM";
+        }
+    } else if (gameState === "MATCH") {
+        if (isInside(mousePos, btnMatchPause)) isPaused = !isPaused;
+        else if (isInside(mousePos, btnSpeedDown) && speedIdx > 0) speedIdx--;
+        else if (isInside(mousePos, btnSpeedUp) && speedIdx < speedLevels.length - 1) speedIdx++;
+        else if (isInside(mousePos, btnMatchLocker)) gameState = "LOCKER_ROOM";
+        else if (isInside(mousePos, btnMatchSub)) executePlayerSub();
+        else if (isInside(mousePos, btnMatchEnd)) {
+            gameState = "SUMMARY";
+            playSound("whistle");
+            gameStatusText = "🏁 감독 권한으로 경기가 종료되었습니다.";
+        }
+    } else if (gameState === "LOCKER_ROOM") {
+        if (isInside(mousePos, btnCloseLocker)) gameState = (matchTime > 0) ? "MATCH" : "MENU";
+    } else if (gameState === "SUMMARY") {
+        if (isInside(mousePos, btnRestart)) {
+            pitch = new Pitch();
+            ball = new BallPhysics(PITCH_CENTER_X, PITCH_CENTER_Y);
+            homeTeam = new Team(true, "4-4-2", "TIKI_TAKA");
+            awayTeam = new Team(false, "4-4-2", "TIKI_TAKA");
+            allPlayers = [...homeTeam.starters, ...awayTeam.starters];
+            particles = []; matchTime = 0.0; homeScore = 0; awayScore = 0;
+            isPaused = false; gameState = "MENU";
+            gameStatusText = "전술판 대기 중 - 원하는 설정을 선택하세요.";
+        }
+    }
+});
+
+function isInside(pos, rect) {
+    let w = rect.w || rect.width; let h = rect.h || rect.height;
+    return pos.x >= rect.x && pos.x <= rect.x + w && pos.y >= rect.y && pos.y <= rect.y + h;
+}
+
+function executePlayerSub() {
+    if (homeTeam.subsLeft > 0 && homeTeam.bench.length > 0) {
+        let fieldPlayers = homeTeam.starters.filter(p => !p.name.includes("GK"));
+        if (fieldPlayers.length > 0) {
+            let tiredPlayer = fieldPlayers.reduce((prev, curr) => curr.stamina < prev.stamina ? curr : prev);
+            let subPlayer = homeTeam.bench.shift();
+            subPlayer.x = tiredPlayer.x; subPlayer.y = tiredPlayer.y;
+            subPlayer.original_base_x = tiredPlayer.original_base_x;
+            subPlayer.original_base_y = tiredPlayer.original_base_y;
+            subPlayer.current_base_y = tiredPlayer.current_base_y;
+            let idx = homeTeam.starters.indexOf(tiredPlayer);
+            homeTeam.starters[idx] = subPlayer;
+            allPlayers = [...homeTeam.starters, ...awayTeam.starters];
+            homeTeam.subsLeft--;
+            gameStatusText = `🔄 감독 선수 교체: [${tiredPlayer.name}] OUT -> [${subPlayer.name}] IN`;
+        }
+    } else {
+        gameStatusText = "❌ 교체 불가 (잔여 횟수 소진)";
+    }
+}
+
+// ==========================================
+// 🔁 메인 루프
+// ==========================================
+
+function gameLoop() {
+    let currentSpeed = speedLevels[speedIdx];
+
+    if (gameState === "MATCH" && !isPaused) {
+        matchTime += (1.0 / 60.0) * currentSpeed;
+
+        if (matchTime >= matchDuration) {
+            gameState = "SUMMARY";
+            playSound("whistle");
+        }
+
+        // 1. 득점 판정
+        if (ball.x >= pitch.rightGoal.x && ball.y >= pitch.rightGoal.y && ball.y <= pitch.rightGoal.y + pitch.rightGoal.height) {
+            homeScore++; if (ball.possessor) ball.possessor.goals++;
+            playSound("goal");
+            for (let i = 0; i < 60; i++) particles.push(new Particle(ball.x, ball.y));
+            gameStatusText = `⚽ GOAL! 홈 팀 득점! (${homeScore} : ${awayScore})`;
+            ball.resetToCenter(); ball.possessor = homeTeam.starters[homeTeam.starters.length - 1];
+        } else if (ball.x <= pitch.leftGoal.x + pitch.leftGoal.width && ball.y >= pitch.leftGoal.y && ball.y <= pitch.leftGoal.y + pitch.leftGoal.height) {
+            awayScore++; if (ball.possessor) ball.possessor.goals++;
+            playSound("goal");
+            for (let i = 0; i < 60; i++) particles.push(new Particle(ball.x, ball.y));
+            gameStatusText = `⚽ GOAL! 원정 팀 득점! (${homeScore} : ${awayScore})`;
+            ball.resetToCenter(); ball.possessor = awayTeam.starters[awayTeam.starters.length - 1];
+        }
+
+        // 2. 볼 소유자 처리
+        if (ball.possessor) {
+            let passer = ball.possessor;
+            let targetGoalX = (passer.team === 'home') ? PITCH_X + PITCH_WIDTH : PITCH_X;
+            passer.x += (passer.team === 'home' ? 1.8 : -1.8) * currentSpeed;
+
+            if (Math.floor(matchTime * 60) % Math.floor(Math.max(10, 60 / currentSpeed)) === 0) {
+                if (DecisionEngine.evaluateShot(passer, Math.abs(passer.x - targetGoalX))) {
+                    let dx = targetGoalX - passer.x; let dy = PITCH_CENTER_Y - passer.y;
+                    let dist = Math.hypot(dx, dy);
+                    if (dist > 0) ball.applyKick((dx / dist) * 8.5, (dy / dist) * 8.5, 3.0, "SHOT");
+                    gameStatusText = `🔥 [${passer.name}] 강력한 슈팅 발사!`;
+                } else {
+                    let teammates = (passer.team === 'home' ? homeTeam : awayTeam).starters.filter(p => p !== passer);
+                    let opponents = (passer.team === 'home') ? awayTeam.starters : homeTeam.starters;
+                    let receiver = DecisionEngine.selectPassReceiver(passer, teammates, opponents);
+                    if (receiver) {
+                        let dx = receiver.x - passer.x; let dy = receiver.y - passer.y; let dist = Math.hypot(dx, dy);
+                        if (dist > 0) ball.applyKick((dx / dist) * 5.5, (dy / dist) * 5.5, 2.0, "PASS");
+                        passer.passes_completed++;
+                        gameStatusText = `[${passer.name}] -> [${receiver.name}] 지능형 패스 연결!`;
+                    }
+                }
+            }
+        }
+
+        // 3. 콤팩트 블록 & 공간 침투 AI 실행
+        allPlayers.forEach(p => {
+            if (ball.possessor === p) return;
+            let currentTeam = (p.team === 'home') ? homeTeam : awayTeam;
+            let opponents = (p.team === 'home') ? awayTeam.starters : homeTeam.starters;
+            let phase = (Math.abs(ball.x - (p.team === 'home' ? PITCH_X + PITCH_WIDTH : PITCH_X)) > 600) ? "BUILD_UP" : "FINAL_ATTACK";
+
+            let target = p.calculateIntelligentTarget(ball, currentTeam.tactic, currentTeam, phase, opponents, currentTeam.starters);
+            p.moveTowards(target.x, target.y, currentSpeed, currentTeam.tactic);
+        });
+
+        ball.update(currentSpeed);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].life <= 0) particles.splice(i, 1);
+    }
+
+    // ==========================================
+    // 🎨 UI 렌더링
+    // ==========================================
+
+    if (gameState === "MENU") {
+        ctx.fillStyle = "#121318"; ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 24px 'Pretendard', sans-serif";
+        ctx.fillText("⚽ 축구 매니저 시뮬레이터 (라인 연동 & 공간 침투 전술)", SCREEN_WIDTH / 2 - 260, 45);
+
+        ctx.fillStyle = COLOR_PANEL; ctx.fillRect(40, 70, 580, 550); ctx.fillRect(660, 70, 580, 550);
+
+        ctx.fillStyle = COLOR_HOME; ctx.font = "bold 16px 'Pretendard', sans-serif";
+        ctx.fillText(`🏠 홈 팀 선발 명단 (${homeTeam.formation})`, 60, 95);
+        ctx.fillStyle = "#E0E0E0"; ctx.font = "13px 'Pretendard', sans-serif";
+        homeTeam.starters.forEach((p, idx) => ctx.fillText(`[${p.name}] 속도:${p.stat_speed} 패스:${p.stat_passing} 슛:${p.stat_shooting}`, 60, 125 + idx * 25));
+
+        ctx.fillStyle = COLOR_AWAY; ctx.font = "bold 16px 'Pretendard', sans-serif";
+        ctx.fillText(`✈️ 원정 팀 선발 명단 (${awayTeam.formation})`, 680, 95);
+        ctx.fillStyle = "#E0E0E0"; ctx.font = "13px 'Pretendard', sans-serif";
+        awayTeam.starters.forEach((p, idx) => ctx.fillText(`[${p.name}] 속도:${p.stat_speed} 패스:${p.stat_passing} 슛:${p.stat_shooting}`, 680, 125 + idx * 25));
+
+        ctx.fillStyle = "#FFFFFF"; ctx.fillText("포메이션 선택:", 60, 475);
+        homeFormButtons.forEach(btn => drawBtn(btn.rect, btn.name, homeTeam.formation === btn.name));
+        ctx.fillText("전술 성향 선택:", 60, 545);
+        homeTacticButtons.forEach(btn => drawBtn(btn.rect, btn.label, homeTeam.tactic === btn.code));
+
+        ctx.fillText("포메이션 선택:", 680, 475);
+        awayFormButtons.forEach(btn => drawBtn(btn.rect, btn.name, awayTeam.formation === btn.name));
+        ctx.fillText("전술 성향 선택:", 680, 545);
+        awayTacticButtons.forEach(btn => drawBtn(btn.rect, btn.label, awayTeam.tactic === btn.code));
+
+        drawActionBtn(btnStartMatch, "#059669");
+        drawActionBtn(btnOpenLocker, "#2563EB");
+
+    } else if (gameState === "LOCKER_ROOM") {
+        ctx.fillStyle = "#121318"; ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        ctx.fillStyle = "#FFD700"; ctx.font = "bold 22px 'Pretendard', sans-serif";
+        ctx.fillText("🚪 라커룸 및 선수 실시간 통계 체크보드", SCREEN_WIDTH / 2 - 210, 40);
+
+        ctx.fillStyle = COLOR_PANEL; ctx.fillRect(40, 70, 580, 580); ctx.fillRect(660, 70, 580, 580);
+
+        ctx.fillStyle = COLOR_HOME; ctx.font = "bold 16px 'Pretendard', sans-serif"; ctx.fillText("🏠 홈 팀 실시간 스탯", 60, 95);
+        ctx.fillStyle = "#9CA3AF"; ctx.font = "12px 'Pretendard', sans-serif";
+        ctx.fillText("이름        상태   체력     패스  슛  골  성공패스  인터셉트", 60, 120);
+
+        ctx.fillStyle = "#F3F4F6";
+        homeTeam.starters.forEach((p, idx) => {
+            let line = `${p.name.padEnd(8)}  주전   ${p.stamina.toFixed(1)}%    ${p.stat_passing}   ${p.stat_shooting}   ${p.goals}골   ${p.passes_completed}회     ${p.interceptions}회`;
+            ctx.fillText(line, 60, 145 + idx * 24);
+        });
+
+        ctx.fillStyle = COLOR_AWAY; ctx.font = "bold 16px 'Pretendard', sans-serif"; ctx.fillText("✈️ 원정 팀 실시간 스탯", 680, 95);
+        ctx.fillStyle = "#9CA3AF"; ctx.font = "12px 'Pretendard', sans-serif";
+        ctx.fillText("이름        상태   체력     패스  슛  골  성공패스  인터셉트", 680, 120);
+
+        ctx.fillStyle = "#F3F4F6";
+        awayTeam.starters.forEach((p, idx) => {
+            let line = `${p.name.padEnd(8)}  주전   ${p.stamina.toFixed(1)}%    ${p.stat_passing}   ${p.stat_shooting}   ${p.goals}골   ${p.passes_completed}회     ${p.interceptions}회`;
+            ctx.fillText(line, 680, 145 + idx * 24);
+        });
+
+        drawActionBtn(btnCloseLocker, "#4B5563");
+
+    } else if (gameState === "SUMMARY") {
+        ctx.fillStyle = "#0D0E12"; ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        ctx.fillStyle = "#FFD700"; ctx.font = "bold 26px 'Pretendard', sans-serif";
+        ctx.fillText("🏁 경기 종료 (FULL TIME)", SCREEN_WIDTH / 2 - 140, 100);
+
+        ctx.fillStyle = COLOR_PANEL; ctx.fillRect(340, 160, 600, 380);
+        ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 36px 'Pretendard', sans-serif";
+        ctx.fillText(`HOME  ${homeScore}  :  ${awayScore}  AWAY`, SCREEN_WIDTH / 2 - 160, 240);
+
+        drawActionBtn(btnRestart, "#2563EB");
+
+    } else {
+        // MATCH View
+        pitch.draw(ctx);
+        let renderList = [...allPlayers, ball];
+        renderList.sort((a, b) => a.y - b.y);
+        renderList.forEach(obj => {
+            if (obj instanceof BallPhysics) obj.draw(ctx);
+            else obj.draw(ctx, ball.possessor === obj);
+        });
+        particles.forEach(p => p.draw(ctx));
+
+        // 1. 최상단 전광판 영역
+        ctx.fillStyle = "rgba(10, 11, 15, 0.95)"; ctx.fillRect(0, 0, SCREEN_WIDTH, 55);
+        ctx.strokeStyle = "#38BDF8"; ctx.lineWidth = 1; ctx.strokeRect(0, 0, SCREEN_WIDTH, 55);
+
+        ctx.fillStyle = "#FACC15"; ctx.font = "bold 20px 'Pretendard', sans-serif";
+        ctx.fillText(`🏠 HOME  ${homeScore} : ${awayScore}  AWAY ✈️`, SCREEN_WIDTH / 2 - 100, 24);
+        ctx.font = "11px 'Pretendard', sans-serif"; ctx.fillStyle = "#9CA3AF";
+        ctx.fillText(`경기 시간: ${Math.floor(matchTime)}/${Math.floor(matchDuration)}초 | 배속: ${currentSpeed.toFixed(1)}x`, SCREEN_WIDTH / 2 - 105, 43);
+
+        // 2. 하단 제어 바 영역
+        ctx.fillStyle = "rgba(15, 15, 20, 0.95)"; ctx.fillRect(0, SCREEN_HEIGHT - 55, SCREEN_WIDTH, 55);
+        ctx.strokeStyle = "#374151"; ctx.lineWidth = 1; ctx.strokeRect(0, SCREEN_HEIGHT - 55, SCREEN_WIDTH, 55);
+
+        drawActionBtn({ x: btnMatchPause.x, y: btnMatchPause.y, w: btnMatchPause.w, h: btnMatchPause.h, label: isPaused ? "▶️ 재개" : "⏸️ 정지" }, isPaused ? "#059669" : "#DC2626");
+        drawActionBtn(btnSpeedDown, "#374151");
+        drawActionBtn(btnSpeedUp, "#374151");
+        drawActionBtn(btnMatchLocker, "#2563EB");
+        drawActionBtn(btnMatchSub, "#D97706");
+        drawActionBtn(btnMatchEnd, "#7F1D1D");
+
+        ctx.fillStyle = "#FACC15"; ctx.font = "12px 'Pretendard', sans-serif";
+        ctx.fillText(`상황: ${gameStatusText}`, 30, SCREEN_HEIGHT - 22);
+
+        // 3. 좌·우측 하단 실시간 선수 플레이 요약 패널
+        ctx.fillStyle = "rgba(15, 15, 20, 0.9)"; ctx.fillRect(15, SCREEN_HEIGHT - 235, 260, 165);
+        ctx.strokeStyle = COLOR_HOME; ctx.strokeRect(15, SCREEN_HEIGHT - 235, 260, 165);
+        ctx.fillStyle = COLOR_HOME; ctx.font = "bold 12px 'Pretendard', sans-serif"; ctx.fillText("🏠 홈 팀 주요 선수 실시간 플레이", 25, SCREEN_HEIGHT - 212);
+        ctx.fillStyle = "#D1D5DB"; ctx.font = "11px 'Pretendard', sans-serif";
+        homeTeam.starters.slice(0, 5).forEach((p, idx) => {
+            let info = `${p.name}: 체력 ${p.stamina.toFixed(0)}% | 득점 ${p.goals} | 패스 ${p.passes_completed}`;
+            ctx.fillText(info, 25, SCREEN_HEIGHT - 190 + (idx * 22));
+        });
+
+        ctx.fillStyle = "rgba(15, 15, 20, 0.9)"; ctx.fillRect(SCREEN_WIDTH - 275, SCREEN_HEIGHT - 235, 260, 165);
+        ctx.strokeStyle = COLOR_AWAY; ctx.strokeRect(SCREEN_WIDTH - 275, SCREEN_HEIGHT - 235, 260, 165);
+        ctx.fillStyle = COLOR_AWAY; ctx.font = "bold 12px 'Pretendard', sans-serif"; ctx.fillText("✈️ 어웨이 팀 주요 선수 실시간 플레이", SCREEN_WIDTH - 265, SCREEN_HEIGHT - 212);
+        ctx.fillStyle = "#D1D5DB"; ctx.font = "11px 'Pretendard', sans-serif";
+        awayTeam.starters.slice(0, 5).forEach((p, idx) => {
+            let info = `${p.name}: 체력 ${p.stamina.toFixed(0)}% | 득점 ${p.goals} | 패스 ${p.passes_completed}`;
+            ctx.fillText(info, SCREEN_WIDTH - 265, SCREEN_HEIGHT - 190 + (idx * 22));
+        });
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+function drawBtn(rect, label, isSelected) {
+    let isHover = isInside(mousePos, rect);
+    ctx.fillStyle = isSelected ? COLOR_BUTTON_ACTIVE : (isHover ? COLOR_BUTTON_HOVER : COLOR_BUTTON);
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    ctx.fillStyle = "#FFFFFF"; ctx.font = "12px 'Pretendard', sans-serif";
+    ctx.fillText(label, rect.x + 12, rect.y + 19);
+}
+
+function drawActionBtn(btn, bgColor) {
+    let isHover = isInside(mousePos, btn);
+    ctx.fillStyle = isHover ? "#60A5FA" : bgColor;
+    ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+    ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 11px 'Pretendard', sans-serif";
+    let textW = ctx.measureText(btn.label).width;
+    ctx.fillText(btn.label, btn.x + (btn.w - textW) / 2, btn.y + (btn.h / 2) + 4);
+}
+
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

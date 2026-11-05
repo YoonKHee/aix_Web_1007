@@ -1,0 +1,480 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D 가상 애니메이션 축구 게임 - 감독!! 내가한다.</title>
+    <link rel="stylesheet" href="{% static 'soccer_game/css/style.css' %}?v=20261105">
+</head>
+<body>
+
+<!-- 🌟 1. 첫 화면에 뜨는 웅장한 로그/시작 화면 -->
+<div id="start-screen">
+    <div class="start-overlay">
+        <div class="title-wrapper">
+            <span class="title-director">감독!!</span>
+            <span class="title-doit">내가한다.</span>
+        </div>
+        <div class="sub-message">
+            당신만이 할 수 있는 멋진 게임을 즐기세요.
+        </div>
+        <div class="enter-badge" id="enterBtn" onclick="enterGame()">
+            <span class="enter-key">ENTER ↵</span>
+            <span class="enter-text">경기장 입장하기</span>
+        </div>
+    </div>
+</div>
+
+<!-- ⚽ 2. 기존 메인 축구 게임 UI 컨테이너 (1920x1080 기준 디자인) -->
+<div class="main-game-wrapper" id="gameWrapper"> 
+    <div class="game-wrapper">
+        <div class="panel">
+            <h3 class="panel-header">🏠 홈 락커룸</h3>
+            
+            <div class="tactics-control-box">
+                <div class="t-row">
+                    <label>포메이션</label>
+                    <select id="home-formation-select">
+                        <option value="4-3-3">4-3-3 (공격형)</option>
+                        <option value="4-4-2">4-4-2 (표준형)</option>
+                        <option value="3-5-2">3-5-2 (중원강화)</option>
+                        <option value="4-2-3-1">4-2-3-1 (안정형)</option>
+                    </select>
+                </div>
+                <div class="t-row">
+                    <label>팀 전술</label>
+                    <select id="home-tactic-select">
+                        <optgroup label="팀 전술">
+                            <option value="공격형">전방 압박 / 게겐프레싱</option>
+                            <option value="밸런스" selected>밸런스 / 밸런스드</option>
+                            <option value="수비형">선수비 후역습</option>
+                            <option value="점유율">티키타카 / 점유율 축구</option>
+                        </optgroup>
+                        <optgroup label="압박 방식">
+                            <option value="하이프레스">하이프레스</option>
+                            <option value="미드블록">미드블록</option>
+                            <option value="로우블록">로우블록</option>
+                        </optgroup>
+                        <optgroup label="빌드업 방식">
+                            <option value="짧은 패스">짧은 패스</option>
+                            <option value="롱 패스">롱 패스</option>
+                            <option value="측면 공략">측면 공략</option>
+                            <option value="역습">역습</option>
+                        </optgroup>
+                        <optgroup label="수비 방식">
+                            <option value="지역방어">지역방어</option>
+                            <option value="맨마킹">맨마킹</option>
+                            <option value="혼합방어">혼합방어</option>
+                        </optgroup>
+                        <optgroup label="공수 균형">
+                            <option value="풀백 오버래핑">풀백 오버래핑</option>
+                            <option value="수비형 미드필더 배치">수비형 미드필더 배치</option>
+                            <option value="밸런스" selected>기본 밸런스</option>
+                        </optgroup>
+                        <optgroup label="선수 역할 변경">
+                            <option value="윙어 중앙 이동">윙어 중앙 이동</option>
+                            <option value="센터백 전진">센터백 전진</option>
+                            <option value="가짜 9번">가짜 9번 (False 9)</option>
+                        </optgroup>
+                        <optgroup label="세트피스 전략">
+                            <option value="코너킥 집중">코너킥 집중 공략</option>
+                            <option value="프리킥 패턴">프리킥 맞춤 패턴</option>
+                        </optgroup>
+                        <optgroup label="템포와 시간관리">
+                            <option value="속도 조절">경기 템포 조절</option>
+                            <option value="리드 시간 끌기">리드 시 시간 끌기</option>
+                        </optgroup>
+                        <optgroup label="마킹 대상 지정">
+                            <option value="상대 핵심선수 봉쇄">상대 핵심선수 전담 봉쇄</option>
+                        </optgroup>
+                        <optgroup label="골키퍼 전략">
+                            <option value="골키퍼 공격 가담">골키퍼 공격 가담</option>
+                            <option value="빌드업 참여">빌드업 적극 참여</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-sub-header">🟢 선발 라인업 (11명)</div>
+            <div class="player-list" id="home-player-list"></div>
+            
+            <div class="section-sub-header">🟡 교체 후보 선수</div>
+            <div class="player-list sub-list" id="home-sub-list"></div>
+        </div>
+
+        <!-- 2. 중앙 경기장 및 전광판 영역 -->
+        <div class="stadium-container">
+            <div class="team-selector-bar">
+                <div class="select-group">
+                    <select id="home-league-select">
+                        <option value="1부리그">1부리그</option>
+                        <option value="2부리그">2부리그</option>
+                    </select>
+                    <select id="home-team-select"></select>
+                </div>
+
+                <div class="center-menu-title">
+                    <span>🏆 감독! 내가한다 🏆</span>
+                </div>
+
+                <div class="select-group">
+                    <select id="away-league-select">
+                        <option value="1부리그">1부리그</option>
+                        <option value="2부리그" selected>2부리그</option>
+                    </select>
+                    <select id="away-team-select"></select>
+                </div>
+            </div>
+
+            <div class="scoreboard-board">
+                <div class="team-score-area">
+                    <img id="home-logo" src="" alt="홈마크" class="team-emblem">
+                    <div class="team-info-box">
+                        <span id="home-team-name" class="team-name">홈팀</span> 
+                        <span class="team-score">[ <span id="home-score">0</span> ]</span>
+                    </div>
+                </div>
+
+                <div class="match-timer" id="match-timer">00:00</div>
+
+                <div class="team-score-area right">
+                    <div class="team-info-box right">
+                        <span class="team-score">[ <span id="away-score">0</span> ]</span>
+                        <span id="away-team-name" class="team-name">어웨이팀</span>
+                    </div>
+                    <img id="away-logo" src="" alt="어웨이마크" class="team-emblem">
+                </div>
+            </div>
+
+            <canvas id="pitchCanvas" width="1050" height="650"></canvas>
+
+            <div class="match-broadcast-box">
+                <div class="ad-side-banner left-ad">
+                    <span class="ad-brand">HYUNDAI</span>
+                    <span class="ad-sub">현대자동차</span>
+                </div>
+
+                <div class="match-broadcast-center">
+                    <div class="broadcast-title">⚡ 실시간 경기 중계 보기 </div>
+                    <div class="match-logs" id="match-logs">
+                        <div>[00:00] 양 팀 선수들이 그라운드에 입장했습니다. 경기를 시작하세요!</div>
+                    </div>
+                </div>
+
+                <div class="ad-side-banner right-ad">
+                    <span class="ad-brand">SAMSUNG</span>
+                    <span class="ad-sub">삼성전자</span>
+                </div>
+            </div>
+
+            <div class="ad-board">
+                <div class="ad-text">🔥 2026 K리그 공식 파트너와 함께하는 가상 축구 매니저 게임 🔥 | 승리를 향한 최적의 전술을 구성하세요!</div>
+            </div>
+
+            <div class="controls">
+                <button id="btn-start">경기 시작</button>
+                <button id="btn-end" class="secondary">경기 종료</button>
+                <button id="btn-new" class="secondary">새로운 게임</button>
+                <button id="btn-quit" class="danger">게임 종료</button>
+            </div>
+        </div>
+        
+        <!-- 구단 성적 대칭형 비교 리포트 모달 -->
+        <div id="stats-modal" class="modal-overlay" style="display: none;">
+            <div class="stats-modal-content-team">
+                <button id="stats-modal-close" class="modal-close-btn">&times;</button>
+                <div class="modal-header">
+                    <h2>🏆 가상 경기 결과와 구단 기록 참고</h2>
+<p style="font-size:12px;color:#b8c4d6">득점과 경기 시간은 이번 게임 결과입니다. 그 외 비교 수치는 원본 구단 기록 참고값이며 이번 경기의 실측 통계가 아닙니다.</p>
+                    <div style="font-size: 1.2rem; color: #ff5252; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;경기 시간: <span id="report-match-time">00:00</span> | 연장 시간: <span id="report-extra-time">00:00</span>
+                    </div>
+                </div>
+                
+                <div class="team-comparison-container">
+                    <div class="match-top-banner">
+                        <div class="banner-team-side home">
+                            <img id="modal-home-emblem" src="" alt="홈 구단마크" class="banner-emblem">
+                            <div class="banner-team-text">
+                                <span id="modal-home-name" class="banner-team-name">홈팀</span>
+                                <span class="banner-mvp-label">MVP: <b id="home-mvp-name">-</b></span>
+                            </div>
+                            <img id="home-mvp-thumb" src="" alt="홈 MVP" class="banner-mvp-thumb">
+                        </div>
+
+                        <div class="vs-badge-center">VS</div>
+
+                        <div class="banner-team-side away">
+                            <img id="away-mvp-thumb" src="" alt="어웨이 MVP" class="banner-mvp-thumb">
+                            <div class="banner-team-text right">
+                                <span id="modal-away-name" class="banner-team-name">어웨이팀</span>
+                                <span class="banner-mvp-label">MVP: <b id="away-mvp-name">-</b></span>
+                            </div>
+                            <img id="modal-away-emblem" src="" alt="어웨이 구단마크" class="banner-emblem">
+                        </div>
+                    </div>
+
+                    <div class="comparison-bars-section">
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-goal" class="compare-fill home" style="width: 0%;"></div><span id="home-val-goal" class="val-text left">0</span></div>
+                            <div class="compare-label">⚽ 득점</div>
+                            <div class="bar-side right"><span id="away-val-goal" class="val-text right">0</span><div id="away-bar-goal" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-shots" class="compare-fill home" style="width: 0%;"></div><span id="home-val-shots" class="val-text left">0</span></div>
+                            <div class="compare-label">🎯 슈팅 시도</div>
+                            <div class="bar-side right"><span id="away-val-shots" class="val-text right">0</span><div id="away-bar-shots" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-sog" class="compare-fill home" style="width: 0%;"></div><span id="home-val-sog" class="val-text left">0</span></div>
+                            <div class="compare-label">⚡ 유효 슈팅</div>
+                            <div class="bar-side right"><span id="away-val-sog" class="val-text right">0</span><div id="away-bar-sog" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-pass" class="compare-fill home" style="width: 0%;"></div><span id="home-val-pass" class="val-text left">0%</span></div>
+                            <div class="compare-label">🔄 패스 성공률</div>
+                            <div class="bar-side right"><span id="away-val-pass" class="val-text right">0%</span><div id="away-bar-pass" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-keypass" class="compare-fill home" style="width: 0%;"></div><span id="home-val-keypass" class="val-text left">0</span></div>
+                            <div class="compare-label">🔑 키패스</div>
+                            <div class="bar-side right"><span id="away-val-keypass" class="val-text right">0</span><div id="away-bar-keypass" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-cross" class="compare-fill home" style="width: 0%;"></div><span id="home-val-cross" class="val-text left">0%</span></div>
+                            <div class="compare-label">📐 크로스 성공률</div>
+                            <div class="bar-side right"><span id="away-val-cross" class="val-text right">0%</span><div id="away-bar-cross" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-tackle" class="compare-fill home" style="width: 0%;"></div><span id="home-val-tackle" class="val-text left">0</span></div>
+                            <div class="compare-label">🛡️ 태클 성공</div>
+                            <div class="bar-side right"><span id="away-val-tackle" class="val-text right">0</span><div id="away-bar-tackle" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="compare-row">
+                            <div class="bar-side left"><div id="home-bar-intercept" class="compare-fill home" style="width: 0%;"></div><span id="home-val-intercept" class="val-text left">0</span></div>
+                            <div class="compare-label">🛑 인터셉트</div>
+                            <div class="bar-side right"><span id="away-val-intercept" class="val-text right">0</span><div id="away-bar-intercept" class="compare-fill away" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 우측 어웨이팀 락커룸 -->
+        <div class="panel">
+            <h3 class="panel-header">✈️ 어웨이 락커룸</h3>
+            <div class="tactics-control-box">
+                <div class="t-row">
+                    <label>포메이션</label>
+                    <select id="away-formation-select">
+                        <option value="4-3-3">4-3-3 (공격형)</option>
+                        <option value="4-4-2" selected>4-4-2 (표준형)</option>
+                        <option value="3-5-2">3-5-2 (중원강화)</option>
+                        <option value="4-2-3-1">4-2-3-1 (안정형)</option>
+                    </select>
+                </div>
+                <div class="t-row">
+                    <label>팀 전술</label>
+                    <select id="away-tactic-select">  
+                        <optgroup label="팀 전술">
+                            <option value="공격형">전방 압박 / 게겐프레싱</option>
+                            <option value="밸런스" selected>밸런스 / 밸런스드</option>
+                            <option value="수비형">선수비 후역습</option>
+                            <option value="점유율">티키타카 / 점유율 축구</option>
+                        </optgroup>
+                        <optgroup label="압박 방식">
+                            <option value="하이프레스">하이프레스</option>
+                            <option value="미드블록">미드블록</option>
+                            <option value="로우블록">로우블록</option>
+                        </optgroup>
+                        <optgroup label="빌드업 방식">
+                            <option value="짧은 패스">짧은 패스</option>
+                            <option value="롱 패스">롱 패스</option>
+                            <option value="측면 공략">측면 공략</option>
+                            <option value="역습">역습</option>
+                        </optgroup>
+                        <optgroup label="수비 방식">
+                            <option value="지역방어">지역방어</option>
+                            <option value="맨마킹">맨마킹</option>
+                            <option value="혼합방어">혼합방어</option>
+                        </optgroup>
+                        <optgroup label="공수 균형">
+                            <option value="풀백 오버래핑">풀백 오버래핑</option>
+                            <option value="수비형 미드필더 배치">수비형 미드필더 배치</option>
+                            <option value="밸런스" selected>기본 밸런스</option>
+                        </optgroup>
+                        <optgroup label="선수 역할 변경">
+                            <option value="윙어 중앙 이동">윙어 중앙 이동</option>
+                            <option value="센터백 전진">센터백 전진</option>
+                            <option value="가짜 9번">가짜 9번 (False 9)</option>
+                        </optgroup>
+                        <optgroup label="세트피스 전략">
+                            <option value="코너킥 집중">코너킥 집중 공략</option>
+                            <option value="프리킥 패턴">프리킥 맞춤 패턴</option>
+                        </optgroup>
+                        <optgroup label="템포와 시간관리">
+                            <option value="속도 조절">경기 템포 조절</option>
+                            <option value="리드 시간 끌기">리드 시 시간 끌기</option>
+                        </optgroup>
+                        <optgroup label="마킹 대상 지정">
+                            <option value="상대 핵심선수 봉쇄">상대 핵심선수 전담 봉쇄</option>
+                        </optgroup>
+                        <optgroup label="골키퍼 전략">
+                            <option value="골키퍼 공격 가담">골키퍼 공격 가담</option>
+                            <option value="빌드업 참여">빌드업 적극 참여</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-sub-header">🟢 선발 라인업 (11명)</div>
+            <div class="player-list" id="away-player-list"></div>
+            
+            <div class="section-sub-header">🟡 교체 후보 선수</div>
+            <div class="player-list sub-list" id="away-sub-list"></div>
+        </div>
+    </div>
+
+    <!-- 선수 상세 정보 및 육각 그래프 팝업 모달 -->
+    <div id="player-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="modal-close" class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <img id="modal-player-thumb" alt="선수 사진" class="modal-thumb">
+                <div>
+                    <h4 id="modal-player-name">선수 이름</h4>
+                    <p id="modal-player-sub">No.0 | 포지션</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="stat-row"><span>소속 클럽</span> <span id="modal-club">-</span></div>
+                <div class="stat-row"><span>키 / 체중</span> <span id="modal-hw">-</span></div>
+                <div class="stat-row"><span>생년월일</span> <span id="modal-birth">-</span></div>
+                
+                <div class="graph-section-title">📊 포지션별 능력치 육각 분석</div>
+                <div class="radar-container">
+                    <canvas id="radarCanvas" width="260" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="bg-img-path" value="{% static 'soccer_game/images/pitch_bg.png' %}">
+<input type="hidden" id="static-url-base" value="{% static 'soccer_game/images/' %}">
+<input type="hidden" id="data-url-base" value="{% static 'soccer_game/data/' %}">
+
+<input type="hidden" id="player-placeholder-url" value="{% static 'soccer_game/images/player-placeholder.svg' %}">
+<!-- 게임 엔진 스크립트 연결 -->
+<script src="{% static 'soccer_game/js/ScreenManager.js' %}"></script>
+<script src="{% static 'soccer_game/js/PitchGeometry.js' %}"></script>
+<script src="{% static 'soccer_game/js/Ball.js' %}"></script>
+<script src="{% static 'soccer_game/js/RuleEngine.js' %}"></script>
+<script src="{% static 'soccer_game/js/TacticalEngine.js' %}"></script>
+<script src="{% static 'soccer_game/js/PlayerController.js' %}"></script>
+<script src="{% static 'soccer_game/js/game.js' %}"></script>
+
+<script>
+    // 🔊 오디오 및 전체 화면 / 해상도 반응형 스케일링 제어 스크립트
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playWhistleSound() {
+        initAudio();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(2800, now);
+        osc.frequency.exponentialRampToValueAtTime(3200, now + 0.1);
+        osc.frequency.exponentialRampToValueAtTime(2900, now + 0.3);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+    }
+
+    // 📐 해상도 맞춤 실시간 스케일링 (1920x1080 기준 비율 유지 및 중앙 정렬)
+    function updateGameScale() {
+        const wrapper = document.getElementById('gameWrapper');
+        if (!wrapper) return;
+
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        const scaleX = windowWidth / baseWidth;
+        const scaleY = windowHeight / baseHeight;
+        const scale = Math.min(scaleX, scaleY); // 비율을 유지하며 화면에 꽉 차도록 축소/확대
+
+        wrapper.style.transform = `scale(${scale})`;
+    }
+
+    // 창 크기 변경 시 자동 재조정
+    window.addEventListener('resize', updateGameScale);
+
+    // 🚀 게임 입장 함수 (자동 풀스크린 + 시작 화면 페이드아웃 + 스케일 적용)
+    function enterGame() {
+        playWhistleSound();
+
+        // 1. 브라우저 전체 화면(Full Screen) 자동 전환 요청
+        const docElem = document.documentElement;
+        if (docElem.requestFullscreen) {
+            docElem.requestFullscreen().catch(err => {
+                console.log("전체 화면 모드 전환이 거부되었거나 지원되지 않습니다:", err);
+            });
+        } else if (docElem.webkitRequestFullscreen) {
+            docElem.webkitRequestFullscreen();
+        } else if (docElem.msRequestFullscreen) {
+            docElem.msRequestFullscreen();
+        }
+
+        const startScreen = document.getElementById('start-screen');
+        
+        // 2. 줌인 및 페이드아웃 효과 적용
+        startScreen.style.transform = 'scale(1.3)';
+        startScreen.style.opacity = '0';
+
+        setTimeout(() => {
+            startScreen.style.display = 'none';
+            
+            // 3. 게임 컨테이너 해상도 스케일 초기 계산 및 적용
+            updateGameScale();
+
+            console.log("⚽ 감독 모드 시뮬레이터가 풀스크린 및 해상도 맞춤 모드로 시작되었습니다!");
+        }, 800);
+    }
+
+    // ⌨️ 키보드 ENTER 키 입력 시 자동 입장
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen && startScreen.style.display !== 'none') {
+                enterGame();
+            }
+        }
+    });
+
+    window.addEventListener('click', () => {
+        initAudio();
+    }, { once: true });
+</script>
+</body>
+</html>

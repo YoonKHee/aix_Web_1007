@@ -1,0 +1,69 @@
+<p>
+  아래 컬럼은 <strong>선수별 더미 GPS·이벤트 요약</strong>입니다.<br>
+  실제 선수의 측정 기록이 아닙니다.
+  선수 이름을 누르면 경기별 상세 기록을 볼 수 있습니다.
+</p>
+
+<div class="site-table-scroll">
+  <table border="1">
+    <thead>
+      <tr>
+        <th>번호</th>
+        <th>구단</th>
+        <th>선수명</th>
+        <th>등번호</th>
+        <th>포지션</th>
+        <th>더미 횟수<br>GPS / 이벤트</th>
+        <th>분당 거리(m)</th>
+        <th>분당 고속 거리(m)</th>
+        <th>최고 속도(km/h)</th>
+        <th>공격 지역(%)</th>
+        <th>패스 성공률(%)</th>
+        <th>가상 경기당 가로채기</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for p in list %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.team.team_name }}</td>
+
+          <td>
+            <a href="/player/pview/{{ p.id }}/">
+              {{ p.name }}
+            </a>
+          </td>
+
+          <td>{{ p.number }}</td>
+          <td>{{ p.position }}</td>
+
+          <td>
+            {% if p.simulation_summary.has_data %}
+              {{ p.simulation_summary.gps_count }}
+              /
+              {{ p.simulation_summary.event_count }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+
+          {% for value in p.simulation_summary.cells %}
+            <td>
+              {% if value is None %}
+                —
+              {% else %}
+                {{ value|floatformat:2 }}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+
+      {% empty %}
+        <tr>
+          <td colspan="12">검색된 선수가 없습니다.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
