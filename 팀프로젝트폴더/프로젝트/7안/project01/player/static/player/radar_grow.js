@@ -19,15 +19,28 @@
     var chart = Chart.getChart('playerRadarChart');
     if (!chart || chart === lastChart) return;       // 같은 그래프를 두 번 퍼뜨리지 않는다
     lastChart = chart;
-    chart.options.animation = { duration: DURATION, easing: 'easeOutQuart' };
-    // 팝업이 화면에 나타나 크기가 정해질 때까지 두 프레임 기다린 뒤, 가운데 상태로 되돌리고 다시 그린다
+    // 숨겨진 팝업에서 만든 그래프는 시작 좌표가 계산되지 않아(NaN) reset() 으로는 퍼지지 않는다.
+    // 그래서 팝업이 보인 뒤 크기를 다시 잡고, 점수를 잠깐 0(가운데)으로 그렸다가 실제 점수로 바꿔 퍼지게 한다.
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
-        try { chart.resize(); chart.reset(); chart.update(); } catch (e) { /* 그래프가 없어졌으면 무시 */ }
+        try {
+          chart.stop();                                           // 숨겨진 상태에서 시작된(NaN) 애니메이션 멈춤
+          chart.resize();
+          var sets = chart.data.datasets;
+          var real = sets.map(function (d) { return d.data.slice(); });
+          sets.forEach(function (d) { d.data = d.data.map(function () { return 0; }); });
+          chart.update('none');                                   // 가운데에 모두 모인 상태
+          sets.forEach(function (d, i) { d.data = real[i]; });
+          chart.options.animation = { duration: DURATION, easing: 'easeOutQuart' };
+          chart.update();                                         // 가운데 → 각 점수까지 퍼짐
+        } catch (e) { /* 그래프가 없어졌으면 무시 */ }
       });
     });
   }
 
   new MutationObserver(function () { if (visible()) grow(); })
     .observe(modal, { attributes: true, attributeFilter: ['style', 'class'] });
+  var canvas = document.getElementById('playerRadarChart');
+  if (canvas) new MutationObserver(function () { if (visible()) grow(); })
+    .observe(canvas, { attributes: true, attributeFilter: ['width', 'height'] });
 })();

@@ -183,3 +183,33 @@
 
 .b11-bar .b11-sim-link{display:inline-block;padding:6px 12px;border-radius:8px;background:#78e7ff;color:#073344;font-weight:700;text-decoration:none}
 .b11-bar .b11-sim-link:hover{filter:brightness(.95)}
+
+/* ---------- BEST11 상세설정 (자동 설정 / 내 설정) ---------- */
+.b11-tools{padding:16px 18px}
+.b11-settings-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.b11-settings-title{margin:0;font-size:17px;font-weight:800;color:#0f172a}
+.b11-tools .b11-mode{display:inline-flex;border:1px solid #c7ccd4;border-radius:999px;padding:3px;background:#f1f5f9}
+.b11-tools .b11-mode button{border:0;border-radius:999px;background:transparent;padding:6px 16px;font-weight:700;color:#475569}
+.b11-tools .b11-mode button.on{background:#0f5132;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.b11-mode-note{flex-basis:100%;margin:0;font-size:13px;color:#475569}
+.b11-mine{margin-top:12px;padding:12px 14px;border-radius:10px;background:#f8faf9;border:1px solid #e2e8f0;display:grid;gap:12px}
+.b11-mine[hidden]{display:none}
+.b11-step h4{margin:0 0 6px;font-size:14px;font-weight:800;color:#0f172a}
+.b11-step > summary{font-size:14px;font-weight:800;color:#0f172a;cursor:pointer}
+.b11-step-note{margin:0 0 6px;font-size:12px;color:#64748b}
+.b11-step-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 16px}
+.b11-step-grid .b11-slider{display:flex;align-items:center;gap:8px;font-size:13px}
+.b11-step-grid .b11-slider span{min-width:120px}
+.b11-step-grid .b11-slider input{flex:1;min-width:80px}
+.b11-presets{display:flex;flex-wrap:wrap;gap:6px}
+.b11-pickbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff8db;border:2px solid #f2b705}
+.b11-tools .b11-pick{padding:10px 22px;font-size:16px;font-weight:800;border:0;border-radius:10px;background:#16a34a;color:#fff;box-shadow:0 2px 6px rgba(22,163,74,.35)}
+.b11-tools .b11-pick:hover{background:#15803d}
+.b11-tools .b11-pick.pending{animation:b11pulse 1.4s ease-in-out infinite}
+@keyframes b11pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.55)}50%{box-shadow:0 0 0 8px rgba(22,163,74,0)}}
+@media (prefers-reduced-motion:reduce){.b11-tools .b11-pick.pending{animation:none;outline:3px solid #f2b705}}
+.b11-pick-hint{font-size:13px;font-weight:600;color:#7a5b00}
+.b11-subtools{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.b11-subtools button{font-size:13px}
+.b11-tools-foot{margin:8px 0 0;font-size:12px;color:#64748b}
+@media (max-width:640px){.b11-subtools{margin-left:0}.b11-tools .b11-pick{width:100%}}
