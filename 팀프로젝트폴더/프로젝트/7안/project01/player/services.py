@@ -1199,58 +1199,41 @@ def get_player_radar(player_id):
 
 
     # =====================================================
-    # 2. 포지션별 육각형 설정
+    # 2. 통합 점수 범주 (BEST11 점수·관리자 범주와 같은 기준)
+    #
+    # 그래프 꼭짓점 = 포지션별 범주 4~6개 (FW·DF·GK 5개, MF 6개)
+    # 범주 점수 = 범주 안 컬럼들의 0~100 점수 평균
+    # BEST11 점수 = 범주 점수 × 범주 비율 의 합 → 그래프와 점수가 같은 기준
     # =====================================================
 
-    config = get_position_radar_config(
-        position
-    )
-
-
-    if config is None:
+    if position not in SC.POSITIONS:
 
         return None
 
 
-    metric_function = (
-        config['function']
-    )
+    groups = SC.GROUPS[position]
 
-
-    labels = (
-        config['labels']
-    )
-
-
-    # =====================================================
-    # 3. BEST11 후보
-    # =====================================================
-
-    candidates = (
-        get_best11_candidates()
-    )
+    labels = [
+        group_label
+        for _key, group_label, _weight, _keys in groups
+    ]
 
 
     # =====================================================
-    # 4. 같은 포지션 선수만 추출
+    # 3. 비교 대상: BEST11 점수와 같은 450분 이상 같은 포지션 선수
     # =====================================================
 
-    same_position_stats = []
+    same_position_stats = [
 
+        candidate
 
-    for candidate in candidates:
+        for candidate in get_formation_candidates()
 
-        candidate_position = (
+        if (
             candidate.player.position
             or ''
-        ).strip().upper()
-
-
-        if candidate_position == position:
-
-            same_position_stats.append(
-                candidate
-            )
+        ).strip().upper() == position
+    ]
 
 
     if not same_position_stats:
@@ -1258,99 +1241,96 @@ def get_player_radar(player_id):
         return None
 
 
-    # =====================================================
-    # 5. 현재 선수의 육각형 원본 기록
-    # =====================================================
+    keys = SC.metric_keys(position)
 
-    player_metrics = (
-        metric_function(
-            stats
-        )
-    )
-
-
-    metric_names = list(
-        player_metrics.keys()
+    normalizer = SC.Normalizer(
+        [
+            SC.metric_values(candidate, position)
+            for candidate in same_position_stats
+        ],
+        keys,
     )
 
 
     # =====================================================
-    # 6. 백분위 점수 계산
+    # 4. 이 선수의 범주 점수 (0~100)
     # =====================================================
+
+    player_values = SC.metric_values(
+        stats,
+        position
+    )
 
     radar_scores = []
 
+    radar_virtual = []
 
-    for metric_name in metric_names:
+    for _key, _label, _weight, group_keys in groups:
 
-
-        comparison_values = []
-
-
-        for candidate in same_position_stats:
-
-
-            candidate_metrics = (
-                metric_function(
-                    candidate
-                )
-            )
-
-
-            comparison_values.append(
-                candidate_metrics[
-                    metric_name
-                ]
-            )
-
-
-        score = percentile_score(
-
-            player_metrics[
-                metric_name
-            ],
-
-            comparison_values
-        )
-
+        unit_scores = [
+            normalizer.unit(
+                key,
+                player_values.get(key)
+            ) * 100
+            for key in group_keys
+        ]
 
         radar_scores.append(
-            score
+            round(
+                sum(unit_scores) / len(unit_scores),
+                1
+            )
         )
+
+        # 가상 데이터 컬럼이 들어 있는 범주 표시
+        radar_virtual.append(
+            any(
+                SC.METRIC_DEFS[key][5]
+                for key in group_keys
+            )
+        )
+
+
+    # 현재 범주 비율 (관리자 > 점수 기준, 합계 100으로 환산)
+    current_weights = SC.group_weights(position)
+
+    weight_total = sum(current_weights.values()) or 1
+
+    radar_weights = [
+        round(
+            current_weights.get(key, 0) / weight_total * 100,
+            1
+        )
+        for key, _label, _weight, _keys in groups
+    ]
 
 
     # =====================================================
-    # 7. BEST11 점수 / 순위
+    # 5. BEST11 점수 / 순위 (600분 이상 공식 순위)
     # =====================================================
 
     best11_result = (
         get_best11()
     )
 
-
     ranking = (
-
         best11_result[
             'rankings'
         ]
-
         .get(
             position,
             []
         )
     )
 
-
     best11_score = None
 
     position_rank = None
-
 
     for index, row in enumerate(
         ranking,
         start=1
     ):
-
 
         if row['player'].id == player.id:
 
@@ -1365,32 +1345,10 @@ def get_player_radar(player_id):
             break
 
 
-    # =====================================================
-    # 8. 기존 views.py와 호환되는 radar
-    #
-    # 다음 단계에서 views.py를 변경하기 전까지
-    # 기존 JSON이 깨지지 않게 유지
-    # =====================================================
-
+    # 기존 views.py 호환용: 범주 키 → 점수
     radar = {
-
-        'attack':
-            radar_scores[0],
-
-        'shooting':
-            radar_scores[1],
-
-        'passing':
-            radar_scores[2],
-
-        'dribbling':
-            radar_scores[3],
-
-        'defense':
-            radar_scores[4],
-
-        'duel':
-            radar_scores[5],
+        key: score
+        for (key, _label, _weight, _keys), score in zip(groups, radar_scores)
     }
 
 
@@ -1422,7 +1380,7 @@ def get_player_radar(player_id):
 
         'position_candidate_count':
             len(
-                same_position_stats
+                ranking
             ),
 
 
@@ -1435,6 +1393,12 @@ def get_player_radar(player_id):
 
         'radar_scores':
             radar_scores,
+
+        'radar_weights':
+            radar_weights,
+
+        'radar_virtual':
+            radar_virtual,
 
 
         # -------------------------------------------------
