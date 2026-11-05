@@ -1,6 +1,7 @@
 {% load static %}
 {# 감독 연구실: BEST11 화면 안에서 쓰는 도구(가중치·케미·교체·VS 비교)와 아래쪽 분석 패널 (best11.html 맨 아래에서 include 로 불러온다) #}
 <link rel="stylesheet" href="{% static 'player/lab.css' %}">
+<link rel="stylesheet" href="{% static 'player/best11_mobile.css' %}">{# 휴대폰 폭(760px 이하)에서만 적용, 맨 마지막에 불러와 덮어씀 #}
 <section id="lab" class="lab" data-urls='{"quality":"{% url "player:lab_quality" %}"}'>
   {% csrf_token %}
   <details class="lab-wrap">

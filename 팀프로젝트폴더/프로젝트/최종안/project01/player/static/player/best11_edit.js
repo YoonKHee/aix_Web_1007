@@ -80,10 +80,19 @@
   function filled() { return ids.filter(function (x) { return x != null; }); }
   var last = null;                     // 마지막 평가 결과
   var INIT = null;                     // 서버 초기 정보 (구단·프리셋·지표)
-  var ST = readJSON(SKEY, {});
-  var S = { preset: ST.preset || 'default', mult: ST.mult || {}, chem: typeof ST.chem === 'number' ? ST.chem : 1, exp: typeof ST.exp === 'number' ? ST.exp : 1.5, opponent: ST.opponent || '' };
-  function saveSettings() { writeJSON(SKEY, S); }
-  function isDefaultSettings() { return S.preset === 'default' && !Object.keys(S.mult).length && S.chem === 1 && S.exp === 1.5 && !S.opponent; }
+  /* 상세설정: '자동 설정' = 관리자가 정한 기본 가중치, '내 설정' = 내가 조절한 가중치(브라우저에 저장).
+     자동 설정으로 바꿔도 내 설정 값은 지워지지 않고, 다시 '내 설정'을 누르면 그대로 돌아온다. */
+  var MKEY = 'kleague-b11-mode-v1';
+  function defaultSettings() { return { preset: 'default', mult: {}, chem: 1, exp: 1.5, opponent: '' }; }
+  function readMine() {
+    var ST = readJSON(SKEY, {});
+    return { preset: ST.preset || 'default', mult: ST.mult || {}, chem: typeof ST.chem === 'number' ? ST.chem : 1, exp: typeof ST.exp === 'number' ? ST.exp : 1.5, opponent: ST.opponent || '' };
+  }
+  function sameAsDefault(o) { return o.preset === 'default' && !Object.keys(o.mult).length && o.chem === 1 && o.exp === 1.5 && !o.opponent; }
+  var mode = (function () { var m = readJSON(MKEY, null); return m === 'auto' || m === 'mine' ? m : (sameAsDefault(readMine()) ? 'auto' : 'mine'); })();
+  var S = mode === 'mine' ? readMine() : defaultSettings();
+  function saveSettings() { if (mode === 'mine') writeJSON(SKEY, S); }   // 자동 설정일 때는 내 설정을 덮어쓰지 않는다
+  function isDefaultSettings() { return sameAsDefault(S); }
   function params() { var f = filled(); return { team: team(), formation: formation(), lineup: f, partial: f.length < 11, preset: S.preset, mult: S.mult, chem_scale: S.chem, exp_scale: S.exp, opponent: S.opponent || null }; }
   function isCustom() { return ids.some(function (x, i) { return x !== autoIds[i]; }); }
   var autoIds = originalIds.slice();   // '자동 선발' 기준 라인업 (설정이 기본이면 화면이 원래 보여 준 선수, 아니면 서버가 가중치로 다시 뽑은 선수)
@@ -130,22 +139,76 @@
   var oppNote = el('span', { class: 'lab-muted' });
   var oppRptBtn = el('button', { type: 'button', text: '상대 맞춤 보고서', hidden: '', onclick: function () { openOppReport(); } });
   var metricsBox = el('div', { class: 'lab-metrics' });
+  var modeAuto = el('button', { type: 'button', role: 'tab', text: '자동 설정', onclick: function () { setMode('auto'); } });
+  var modeMine = el('button', { type: 'button', role: 'tab', text: '내 설정', onclick: function () { setMode('mine'); } });
+  var modeNote = el('p', { class: 'b11-mode-note' });
+  var minePanel = el('div', { class: 'b11-mine' });
+  var pickBtn = el('button', { type: 'button', class: 'b11-pick', title: '지금 가중치로 선수 11명을 다시 뽑습니다', onclick: function () { pick(false); } }, ['✅ 이 가중치로 선발']);
+  var pickHint = el('span', { class: 'b11-pick-hint' });
   function buildTools() {
     clear(tools);
-    tools.appendChild(el('div', { class: 'b11-tools-row' }, [
-      el('b', { text: '가중치' }), presetBox,
-      el('label', { class: 'b11-slider' }, ['케미 중시 ', chemInp, ' ', chemVal]),
-      el('label', { class: 'b11-slider', title: '출전시간이 적은 선수의 점수를 깎는 정도 (0 = 보정 없음)' }, ['경험(출전시간) 중시 ', expInp, ' ', expVal]),
-      el('label', {}, ['상대 맞춤 ', oppSel]), oppNote]));
-    tools.appendChild(el('div', { class: 'b11-tools-row' }, [
-      el('button', { type: 'button', text: '이 가중치로 선발', title: '지금 가중치로 선수를 다시 뽑습니다', onclick: function () { pick(false); } }),
-      el('button', { type: 'button', text: '케미 반영 최적화', title: '케미까지 반영해 선수를 다듬습니다', onclick: function () { pick(true); } }),
-      el('button', { type: 'button', text: '교체·대체 보고서', title: '빠지면 점수가 얼마나 떨어지는지', onclick: openIrrReport }),
-      oppRptBtn,
-      el('button', { type: 'button', text: '포메이션 추천', title: '이 구단·가중치에서 점수가 가장 높은 포메이션', onclick: openFormations }),
-      el('span', { class: 'lab-muted', text: '카드 숫자 = 능력 점수, 옆의 색 숫자 = 케미 가산점' })]));
-    var det = el('details', { class: 'lab-detail' }, [el('summary', { text: '범주별 가중치 자세히 (포지션별 범주 4~6개, 합계 100 기준 · 승부예측과 같은 점수)' }), metricsBox]);
-    tools.appendChild(det);
+    tools.appendChild(el('div', { class: 'b11-settings-head' }, [
+      el('h3', { class: 'b11-settings-title', text: '⚙ 상세설정' }),
+      el('div', { class: 'b11-mode', role: 'tablist', 'aria-label': '가중치 설정 방식' }, [modeAuto, modeMine]),
+      modeNote]));
+    // 내 설정: ① 스타일 → ② 세부 조절 → ③ 범주별 가중치
+    clear(minePanel);
+    minePanel.appendChild(el('div', { class: 'b11-step' }, [
+      el('h4', { text: '① 스타일 고르기' }),
+      el('p', { class: 'b11-step-note', text: '고르면 아래 범주별 가중치가 그 스타일 값으로 바뀝니다.' }),
+      presetBox]));
+    minePanel.appendChild(el('div', { class: 'b11-step' }, [
+      el('h4', { text: '② 세부 조절' }),
+      el('div', { class: 'b11-step-grid' }, [
+        el('label', { class: 'b11-slider' }, [el('span', { text: '케미 중시' }), chemInp, chemVal]),
+        el('label', { class: 'b11-slider', title: '출전시간이 적은 선수의 점수를 깎는 정도 (0 = 보정 없음)' }, [el('span', { text: '경험(출전시간) 중시' }), expInp, expVal]),
+        el('label', { class: 'b11-slider' }, [el('span', { text: '상대 맞춤' }), oppSel])]),
+      oppNote]));
+    minePanel.appendChild(el('details', { class: 'b11-step lab-detail' }, [
+      el('summary', { text: '③ 범주별 가중치 직접 조절 (포지션별 범주 4~6개 · 합계 100 기준 · 승부예측과 같은 점수)' }), metricsBox]));
+    tools.appendChild(minePanel);
+    // 선발 버튼: 가장 눈에 띄게
+    tools.appendChild(el('div', { class: 'b11-pickbar' }, [
+      pickBtn, pickHint,
+      el('div', { class: 'b11-subtools' }, [
+        el('button', { type: 'button', text: '케미 반영 최적화', title: '케미까지 반영해 선수를 다듬습니다', onclick: function () { pick(true); } }),
+        el('button', { type: 'button', text: '교체·대체 보고서', title: '빠지면 점수가 얼마나 떨어지는지', onclick: openIrrReport }),
+        oppRptBtn,
+        el('button', { type: 'button', text: '포메이션 추천', title: '이 구단·가중치에서 점수가 가장 높은 포메이션', onclick: openFormations })])]));
+    tools.appendChild(el('p', { class: 'b11-tools-foot', text: '카드의 큰 숫자 = 능력 점수, 옆의 색 숫자 = 케미 가산점' }));
+    paintMode();
+  }
+  var pending = false;                 // 설정을 바꿨지만 아직 '이 가중치로 선발'을 누르지 않은 상태
+  function paintMode() {
+    modeAuto.className = mode === 'auto' ? 'on' : ''; modeAuto.setAttribute('aria-selected', String(mode === 'auto'));
+    modeMine.className = mode === 'mine' ? 'on' : ''; modeMine.setAttribute('aria-selected', String(mode === 'mine'));
+    minePanel.hidden = mode !== 'mine';
+    modeNote.textContent = mode === 'auto'
+      ? '관리자가 정한 기본 가중치로 선수를 뽑습니다. 직접 조절하려면 [내 설정]을 누르세요.'
+      : '내가 정한 가중치로 선수를 뽑습니다. 설정은 이 브라우저에 저장되고, [자동 설정]을 눌러도 지워지지 않습니다.';
+    pickBtn.className = 'b11-pick' + (pending ? ' pending' : '');
+    pickHint.textContent = pending ? '설정이 바뀌었습니다. 눌러야 선발에 반영됩니다.' : '설정을 바꾼 뒤 이 버튼을 눌러야 선수가 다시 뽑힙니다.';
+  }
+  function syncControls() {            // S 값을 화면의 버튼·슬라이더에 다시 그린다
+    chemInp.value = String(S.chem); chemVal.textContent = fmtMult(S.chem);
+    expInp.value = String(S.exp); expVal.textContent = fmtMult(S.exp);
+    oppSel.value = S.opponent || '';
+    Array.prototype.forEach.call(presetBox.children, function (b) { b.className = b.getAttribute('data-k') === S.preset ? 'on' : ''; });
+    if (INIT) POS_ORDER.forEach(function (pos) {
+      (INIT.metrics[pos] || []).forEach(function (x) {
+        var i = metricsBox.querySelector('input[data-pos="' + pos + '"][data-key="' + x.key + '"]');
+        if (i) { i.value = String(weightOf(pos, x)); i.nextSibling.textContent = i.value; }
+      });
+    });
+    Array.prototype.forEach.call(metricsBox.querySelectorAll('fieldset'), function (f) { if (f.updateSum) f.updateSum(); });
+  }
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m; writeJSON(MKEY, mode);
+    S = mode === 'mine' ? readMine() : defaultSettings();
+    syncControls();
+    settingsChanged();
+    paintMode();
   }
   function fmtMult(v) { return v.toFixed(2).replace(/0$/, '') + '×'; }
   // 지표별 가중치는 점수(0~100)로 보여주고, 서버에는 기본 가중치 대비 배율(mult)로 보낸다.
@@ -186,7 +249,7 @@
       INIT.metrics[pos].forEach(function (x) {
         var cur = weightOf(pos, x);
         var out = el('b', { text: String(cur) });
-        var inp = el('input', { type: 'range', min: '0', max: '100', step: '1', value: String(cur), 'data-key': x.key, 'data-base': String(x.weight) });
+        var inp = el('input', { type: 'range', min: '0', max: '100', step: '1', value: String(cur), 'data-key': x.key, 'data-pos': pos, 'data-base': String(x.weight) });
         inputs.push(inp);
         inp.addEventListener('input', function () { out.textContent = inp.value; updateSum(); });
         inp.addEventListener('change', function () { setWeight(pos, x, Number(inp.value)); saveSettings(); settingsChanged(); });
@@ -219,13 +282,16 @@
   }
   function settingsChanged() {
     // 내가 직접 바꾼 라인업이 있으면 선수는 그대로 두고 점수만 다시 계산, 아니면 가중치로 다시 선발
-    run(function () { return (filled().length === 11 && !isCustom()) ? autoPick(false) : evaluate(); });
+    var auto = filled().length === 11 && !isCustom();
+    pending = !auto && filled().length > 0;          // 자동으로 다시 뽑지 않은 경우에는 선발 버튼을 강조
+    paintMode();
+    run(function () { return auto ? autoPick(false) : evaluate(); });
   }
   function autoPick(optimize) {
     var b = params(); b.optimize = !!optimize; delete b.lineup;
     return post(URLS.lineup, b).then(function (r) { autoIds = r.lineup.slice(); ids = r.lineup.slice(); save(); return evaluate(); });
   }
-  function pick(optimize) { run(function () { return autoPick(optimize); }); }
+  function pick(optimize) { pending = false; paintMode(); run(function () { return autoPick(optimize); }); }
   function evaluate() {
     if (!filled().length) { renderEmpty(); return Promise.resolve(); }
     return post(URLS.evaluate, params()).then(render);

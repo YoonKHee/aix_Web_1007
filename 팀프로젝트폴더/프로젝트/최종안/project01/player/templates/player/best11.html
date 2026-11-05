@@ -4043,7 +4043,8 @@
 
 
             <div class="radar-description">
-                같은 포지션 선수 기준 · 백분위 점수
+                통합 점수 범주별 점수(0~100) · 같은 포지션 450분 이상 선수와 비교<br>
+                BEST11 점수 = 범주 점수 × 범주 비율(%)의 합
             </div>
 
 
@@ -4501,8 +4502,17 @@
                         // → views.py JSON
                         // → 여기에서 그대로 사용
                         // =================================================
+                        // 꼭짓점 = 통합 점수 범주 (이름 + 범주 비율, 가상 데이터 포함 표시)
                         labels:
-                            data.radar_labels,
+                            data.radar_labels.map(
+                                (name, i) => [
+                                    name,
+                                    (data.radar_weights || [])[i] != null
+                                        ? `${data.radar_weights[i]}%`
+                                          + ((data.radar_virtual || [])[i] ? ' · 가상 포함' : '')
+                                        : ''
+                                ]
+                            ),
 
 
                         datasets: [

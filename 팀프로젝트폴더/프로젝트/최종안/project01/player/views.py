@@ -513,52 +513,20 @@ def player_info(request, id):
 
 
         # =================================================
-        # 기존 호환용 radar
+        # 범주 비율(%) · 가상 데이터 포함 여부
         # =================================================
-        'radar': {
+        'radar_weights':
+            result['radar_weights'],
 
-            'attack':
-                result[
-                    'radar'
-                ][
-                    'attack'
-                ],
+        'radar_virtual':
+            result['radar_virtual'],
 
-            'shooting':
-                result[
-                    'radar'
-                ][
-                    'shooting'
-                ],
 
-            'passing':
-                result[
-                    'radar'
-                ][
-                    'passing'
-                ],
-
-            'dribbling':
-                result[
-                    'radar'
-                ][
-                    'dribbling'
-                ],
-
-            'defense':
-                result[
-                    'radar'
-                ][
-                    'defense'
-                ],
-
-            'duel':
-                result[
-                    'radar'
-                ][
-                    'duel'
-                ],
-        },
+        # =================================================
+        # 기존 호환용 radar (범주 키 → 점수)
+        # =================================================
+        'radar':
+            result['radar'],
 
 
         # =================================================
