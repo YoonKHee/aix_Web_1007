@@ -1,0 +1,205 @@
+/* =========================================================
+   BEST11 화면 휴대폰 맞춤 (폭 760px 이하에서만 적용)
+
+   - best11.html 안의 큰 화면용 규칙(고정 폭·!important)이 많아서,
+     이 파일을 맨 마지막에 불러와 휴대폰 폭에서만 덮어쓴다.
+   - 큰 화면(PC) 모양은 바꾸지 않는다.
+   - 경기장은 세로로 세운다: 위에서부터 FW → MF → DF → GK
+========================================================= */
+@media (max-width: 760px) {
+
+  html body { overflow-x: hidden; }
+
+  /* ---------- 전체 틀: 왼쪽 패널과 경기장을 위아래로 ---------- */
+  html body .best11-workspace {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 12px !important;
+    grid-template-columns: none !important;
+  }
+  html body .best11-sidebar {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 14px !important;
+    padding: 16px !important;
+  }
+  html body .best11-main {
+    width: auto !important;
+    min-width: 0 !important;
+  }
+  html body .sidebar-filter {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr auto !important;
+    gap: 8px !important;
+    align-items: end !important;
+  }
+  html body .sidebar-filter select { width: 100% !important; min-width: 0 !important; }
+  html body .summary-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
+
+  /* ---------- 경기장: 세로 배치 ---------- */
+  html body .best11-workspace .football-field,
+  html body .best11-workspace .football-field.formation-4-2-3-1 {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: grid !important;
+    position: relative !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 44px 6px 14px !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto auto !important;
+    grid-template-areas: "fw" "mf" "df" "gk" !important;
+    row-gap: 10px !important;
+    column-gap: 0 !important;
+  }
+  html body .best11-workspace .football-field .formation-line {
+    position: static !important;
+    left: auto !important; right: auto !important; top: auto !important; bottom: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  html body .best11-workspace .football-field .position-title {
+    position: static !important;
+    left: auto !important; top: auto !important;
+    transform: none !important;
+    margin: 0 0 4px !important;
+  }
+  html body .best11-workspace .football-field .player-card {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    transform: none !important;
+  }
+  html body .best11-workspace .football-field .field-result-title { top: 10px !important; white-space: nowrap !important; }
+  html body .best11-workspace .football-field .formation-line .position-row.position-row,
+  html body .best11-workspace .football-field.formation-4-2-3-1 .mf-split-area > .position-row.position-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  /* 4-2-3-1: 공격형 MF 3명 줄 위, 수비형 MF 2명 줄 아래 */
+  html body .best11-workspace .formation-4-2-3-1 .mf-split-area {
+    display: grid !important;
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas: "am" "dm" !important;
+    gap: 6px !important;
+    height: auto !important;
+  }
+  /* 경기장 선(중앙선·원)은 세로 배치와 맞지 않아 숨김 */
+  html body .best11-workspace .football-field .center-line,
+  html body .best11-workspace .football-field .center-circle { display: none !important; }
+
+  /* 선수 카드: 한 줄에 최대 4~5명 */
+  html body .best11-workspace .football-field .formation-line .player-card.player-card {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    padding: 4px 2px !important;
+    font-size: 11px !important;
+  }
+  html body .best11-workspace .football-field .formation-line .player-photo.player-photo {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 auto 2px !important;
+  }
+  html body .best11-workspace .player-name { font-size: 12px !important; line-height: 1.2 !important; }
+  html body .best11-workspace .team-name { font-size: 9px !important; line-height: 1.2 !important; }
+  html body .best11-workspace .team-name .team-mini-logo { display: none !important; }
+  html body .best11-workspace .player-score { font-size: 10px !important; }
+  html body .best11-workspace .player-card .b11-swap { font-size: 10px !important; padding: 1px 4px !important; }
+
+  /* ---------- 상세설정 · 라인업 막대 ---------- */
+  html body .b11-tools,
+  html body .b11-bar {
+    width: auto !important;
+    max-width: none !important;
+    margin: 10px 0 !important;
+    padding: 12px !important;
+  }
+  html body .b11-settings-head { gap: 8px !important; }
+  html body .b11-step-grid { grid-template-columns: 1fr !important; }
+  html body .b11-step-grid .b11-slider span { min-width: 96px !important; }
+  html body .b11-tools .lab-metrics { grid-template-columns: 1fr !important; }
+  html body .b11-tools .lab-metrics input { width: 90px !important; }
+  html body .b11-pickbar { padding: 10px !important; }
+  html body .b11-tools .b11-pick { width: 100% !important; }
+  html body .b11-subtools { margin-left: 0 !important; }
+  html body .b11-bar { gap: 8px !important; }
+
+  /* ---------- TOP10 순위: 구단·출전시간 칸을 빼고 한 화면에 ---------- */
+  html body .ranking-v2 { width: auto !important; margin-left: 12px !important; margin-right: 12px !important; padding: 18px 12px !important; }
+  html body .ranking-list { overflow-x: visible !important; }
+  html body .ranking-list-head,
+  html body .ranking-list-row {
+    min-width: 0 !important;
+    width: 100% !important;
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+    box-sizing: border-box !important;
+    gap: 8px !important;
+  }
+  html body .ranking-list-head > span:nth-child(3),
+  html body .ranking-list-head > span:nth-child(4),
+  html body .ranking-list-row > span:nth-child(3),
+  html body .ranking-list-row > span:nth-child(4) { display: none !important; }
+
+  /* ---------- 선수 팝업 ---------- */
+  html body #playerModal .modal-content,
+  html body #playerModal > div {
+    width: calc(100vw - 20px) !important;
+    max-width: none !important;
+    max-height: calc(100vh - 20px) !important;
+    overflow-y: auto !important;
+  }
+  html body .lab-modal-box { width: calc(100vw - 20px) !important; max-width: none !important; }
+  /* 카드 점수: 카드 폭 안에서 줄바꿈, 케미 이유 문장은 팝업에서 보이므로 카드에서는 숨김 */
+  html body .best11-workspace .football-field .formation-line .player-card .player-score {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+    padding: 2px 3px !important;
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    position: static !important;
+    transform: none !important;
+  }
+  html body .best11-workspace .football-field .player-card .b11-cr { display: none !important; }
+  html body .best11-workspace .football-field .formation-line .position-title { display: none !important; }
+  html body .best11-workspace .football-field .player-card .b11-swap {
+    font-size: 9px !important; padding: 1px 4px !important; top: -4px !important; right: -4px !important;
+  }
+  html body .best11-workspace .football-field .player-card .b11-remove {
+    width: 20px !important; height: 20px !important; font-size: 10px !important; top: -4px !important; left: -4px !important;
+  }
+
+  /* 선수 팝업 이름 아래 케미·버튼 줄: 한 줄에 안 들어가면 줄바꿈 */
+  html body #modalPlayerName { display: block !important; }
+  html body .b11-mwrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 6px 0 !important;
+  }
+  html body .b11-mwrap[hidden] { display: none !important; }
+  html body .b11-mwrap .b11-cr-pop { flex-basis: 100% !important; text-align: center !important; margin: 0 !important; }
+  html body .b11-mwrap .b11-vs { white-space: nowrap !important; font-size: 12px !important; padding: 4px 10px !important; }
+}
