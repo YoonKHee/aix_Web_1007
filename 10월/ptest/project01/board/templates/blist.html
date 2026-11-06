@@ -1,0 +1,95 @@
+{% extends "base2.html" %}
+{% load static %}
+<!---------------------------------------------------->
+{% block script-block %}
+{% endblock script-block %}
+<!---------------------------------------------------->
+{% block head-block %}
+    <link rel="stylesheet" href="/static/css/blist.css/">
+{% endblock head-block %}
+<!---------------------------------------------------->
+{% block title-block %}
+    <h1>게시판</h1>
+    <p>포레스트의 새로운 소식을 만나보세요.</p>
+{% endblock title-block %}
+<!---------------------------------------------------->
+{% block container-block %} 
+    <!-- CONTENT -->
+    <main>
+    <div class="container">
+    <div class="breadcrumb">
+                HOME
+                <span>&gt;</span>
+                FOREST
+                <span>&gt;</span>
+                NEWS
+            </div>
+    <div class="title">
+    <h2>게시판</h2>
+    <p>
+                    포레스트의 다양한 소식과 새로운 이야기를 확인해보세요.
+                </p>
+    </div>
+    <!-- SEARCH -->
+    <div class="search">
+    <select>
+    <option>제목</option>
+    <option>내용</option>
+    <option>전체</option>
+    </select>
+    <input placeholder="검색어를 입력하세요." type="text"/>
+    <button>검색</button>
+    </div>
+    <!-- NEWS LIST -->
+    <div class="board-wrap">
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>조회수</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if list %}
+                    {% for board in list %}
+                        <tr>
+                            <td class="number">{{board.bno}}</td>
+                            <td class="subject"><a href="/board/bview/{{board.bno}}/">{{board.btitle}}</a></td>
+                            <td>{{board.member.nickname}}</td>
+                            <td>{{board.bdate|date:'Y-m-d H:i'}}</td>
+                            <td>{{board.bhit}}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                        <tr>
+                            <td colspan='5' class="number">게시글이 없습니다.</td>
+                        </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <!-- WRITE BUTTON -->
+    <div class="write-area">
+    <a class="write-btn" href="/board/bwrite/">
+                    글쓰기
+                </a>
+    </div>
+    <!-- PAGINATION -->
+    <div class="pagination">
+    <a href="#">«</a>
+    <a href="#">‹</a>
+    <a class="active" href="#">1</a>
+    <a href="#">2</a>
+    <a href="#">3</a>
+    <a href="#">4</a>
+    <a href="#">5</a>
+    <a href="#">›</a>
+    <a href="#">»</a>
+    </div>
+    </div>
+    </main>
+{% endblock container-block %} 
+<!---------------------------------------------------->

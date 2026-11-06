@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="/static/css/blist.css/">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>게시판</title>
+
+</head>
+<body>
+<!-- HEADER -->
+<header>
+<div class="top">
+<div class="logo"><a href="/" onclick='cursorpoint()'>
+                FOREST RESOM</a>
+            </div>
+<ul class="menu">
+<li><a href="#">소개</a></li>
+<li><a href="#">뉴스</a></li>
+<li><a href="#">학생관리</a></li>
+<li><a href="#">학과정보</a></li>
+<li><a href="/board/blist/">게시판</a></li>
+</ul>
+</div>
+{% block head-block %}
+
+{% endblock head-block %}
+</header>
+<!-- VISUAL -->
+<section class="visual">
+<div>
+{% block title-block %}
+
+{% endblock title-block %}
+</div>
+</section>
+<!-- CONTENT -->
+<main>
+
+{% block script-block %}
+
+{% endblock script-block %}
+
+
+{% block container-block %}
+    
+    
+    
+{% endblock container-block %}
+
+
+</main>
+<!-- FOOTER -->
+<footer>
+<div class="footer-inner">
+<div class="footer-menu">
+<a href="#">회사소개</a>
+<a href="#">오시는 길</a>
+<a href="#">개인정보처리방침</a>
+<a href="#">이용약관</a>
+<a href="#">이메일무단수집거부</a>
+</div>
+<div class="footer-info">
+
+            포레스트 리조트\
+            충청북도 제천시 백운면 금봉로 365\
+            대표번호 : 043-649-6000
+
+        </div>
+</div>
+</footer>
+</body>
+</html>

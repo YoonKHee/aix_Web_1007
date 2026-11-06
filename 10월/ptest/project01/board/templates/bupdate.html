@@ -1,0 +1,198 @@
+{% extends "base2.html" %}
+{% load static %}
+<!---------------------------------------------------->
+{% block script-block %}
+{% endblock script-block %}
+<!---------------------------------------------------->
+{% block head-block %}
+    <link rel='stylesheet' href='/static/css/bwrite.css'>
+{% endblock head-block %}
+<!---------------------------------------------------->
+{% block title-block %}
+    <h1>게시판</h1>
+    <p>포레스트의 새로운 소식을 만나보세요.</p>
+{% endblock title-block %}
+<!---------------------------------------------------->
+{% block container-block %}
+    <main>
+
+        <div class="container">
+
+
+            <!-- BREADCRUMB -->
+
+            <div class="breadcrumb">
+
+                HOME
+
+                <span>></span>
+
+                FOREST
+
+                <span>></span>
+
+                NEWS
+
+                <span>></span>
+
+                WRITE
+
+            </div>
+
+
+            <!-- PAGE TITLE -->
+
+            <div class="page-title">
+
+                <h2>
+                    글수정
+                </h2>
+
+            </div>
+
+
+            <!-- =========================
+                WRITE FORM
+            ========================= -->
+
+            <form
+                class="write-form"
+                action="/board/bupdate/{{board.bno}}/"
+                method="post"
+                enctype="multipart/form-data"
+            >
+            <input type='hidden' name='old_bfile' value='{{board.bfile}}' >
+            {% csrf_token %}
+                <!-- TITLE -->
+
+                <div class="form-row">
+
+                    <div class="form-label">
+
+                        제목
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-input">
+
+                        <input
+                            type="text"
+                            name="btitle"
+                            placeholder="제목을 입력하세요."
+                            value='{{board.btitle}}'
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- AUTHOR -->
+
+                <div class="form-row">
+
+                    <div class="form-label">
+
+                        작성자
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-input">
+
+                        <input
+                            type="text"
+                            name="id"
+                            class="author-input"
+                            placeholder="작성자"
+                            value='{{board.member.id}}'
+                            disabled
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- CONTENT -->
+
+                <div class="form-row content-row">
+
+                    <div class="form-label">
+
+                        내용
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-input content-input">
+
+                        <textarea name="bcontent"
+                            placeholder="내용을 입력하세요." required
+                        >{{board.bcontent}}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FILE -->
+                <div class="form-row">
+                    <div class="form-label">첨부파일</div>
+                    <div class="form-input file-input">
+                        <input type="file" name="bfile">
+                    </div>
+                </div>
+                <!-- FILE -->
+                <div class="form-row">
+                    <div class="form-label">기존파일</div>
+                    <div class="form-input file-input">
+                        {% if board.bfile %}{{board.bfile}}
+                        {% else %}파일 첨부가 없습니다.
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <!-- =========================
+                    BUTTON
+                ========================= -->
+
+                <div class="button-area">
+
+                    <a href="/" class="btn">홈으로</a>
+                    <a
+                        href="/board/blist/"
+                        class="btn btn-cancel"
+                    >
+                        취소
+                    </a>
+
+
+                    <button type="submit" class="btn btn-dark">
+                        등록
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </main>
+{% endblock container-block %} 
+
